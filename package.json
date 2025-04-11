@@ -1,0 +1,31 @@
+{
+  "name": "unkey-marketing",
+  "private": true,
+  "license": "AGPL-3.0",
+  "author": "Unkeyed, Inc.",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "fmt": "pnpm biome format . --write && pnpm biome check . --write",
+    "landing:dev": "turbo run dev --filter=./apps/www",
+    "landing:build": "turbo run build --filter=./apps/www",
+    "playground:dev": "turbo run dev --filter=./apps/play",
+    "playground:build": "turbo run build --filter=./apps/play",
+    "generator:dev": "turbo run dev --filter=./apps/generator",
+    "generator:build": "turbo run build --filter=./apps/generator",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "check-types": "turbo run check-types"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "@biomejs/biome": "^1.9.4",
+    "turbo": "^2.5.0",
+    "typescript": "5.8.2"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {}
+}

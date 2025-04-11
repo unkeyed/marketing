@@ -1,12 +1,13 @@
 "use client";
 import { useForm } from "@tanstack/react-form";
 import { useStore } from "@tanstack/react-store";
-import { Button, FormInput, FormTextarea } from "@unkey/ui";
+import { Button, FormInput, FormTextarea } from "../components/form";
 import { useState } from "react";
 import create, { type ServerResponse } from "../server/action";
 import { formOpts } from "../validator";
 
-const EMAIL_REGEX = /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i;
+const EMAIL_REGEX =
+  /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i;
 
 export const ContactForm = () => {
   const [loading, setLoading] = useState(false);
@@ -15,20 +16,26 @@ export const ContactForm = () => {
     submitted: false,
   } as const;
 
-  const [serverState, setServerState] = useState<ServerResponse>(initialServerState);
+  const [serverState, setServerState] =
+    useState<ServerResponse>(initialServerState);
 
   const form = useForm({
     ...formOpts,
   });
 
-  const formErrors = useStore(form.store, (formState) => formState.errors ?? []);
+  const formErrors = useStore(
+    form.store,
+    (formState) => formState.errors ?? [],
+  );
 
   return (
     <div className="p-8 md:p-8 rounded-lg relative bg-black border-0 overflow-hidden before:absolute before:inset-0 before:p-[1px] before:rounded-lg before:bg-linear-to-r before:from-orange-500 before:via-purple-500 before:to-blue-500 before:-z-10 shadow-[0_0_50px_rgba(249,115,22,0.25)]">
       <div className="h-full">
         <div className="">
           <h2 className="text-2xl font-semibold">Apply now</h2>
-          <p className="py-4">Complete the fields below and we'll be in touch.</p>
+          <p className="py-4">
+            Complete the fields below and we'll be in touch.
+          </p>
         </div>
 
         <form
@@ -219,7 +226,12 @@ export const ContactForm = () => {
           {/* Submit button */}
           <div className="space-y-2 justify-end align-bottom">
             <form.Subscribe
-              selector={(state) => [state.canSubmit, loading, state.isPristine, state.isSubmitting]}
+              selector={(state) => [
+                state.canSubmit,
+                loading,
+                state.isPristine,
+                state.isSubmitting,
+              ]}
               children={([canSubmit, loading, isPristine, isSubmitting]) => (
                 <Button
                   size="lg"
@@ -239,21 +251,22 @@ export const ContactForm = () => {
             </div>
           ) : null}
 
-          {serverState?.status === "error" && serverState.errors?.length > 0 && (
-            <div className="text-red-500 p-4 rounded-md bg-red-500/10 mb-4">
-              {serverState?.status === "error" &&
-                serverState.errors?.map((error) => (
-                  <p key={`server-error-${error}`} className="mb-1">
+          {serverState?.status === "error" &&
+            serverState.errors?.length > 0 && (
+              <div className="text-red-500 p-4 rounded-md bg-red-500/10 mb-4">
+                {serverState?.status === "error" &&
+                  serverState.errors?.map((error) => (
+                    <p key={`server-error-${error}`} className="mb-1">
+                      {error}
+                    </p>
+                  ))}
+                {formErrors.map((error) => (
+                  <p key={`form-error-${error}`} className="mb-1">
                     {error}
                   </p>
                 ))}
-              {formErrors.map((error) => (
-                <p key={`form-error-${error}`} className="mb-1">
-                  {error}
-                </p>
-              ))}
-            </div>
-          )}
+              </div>
+            )}
         </form>
       </div>
     </div>

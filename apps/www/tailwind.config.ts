@@ -1,4 +1,3 @@
-import defaultTheme from "@unkey/ui/tailwind.config";
 import type { Config } from "tailwindcss";
 
 const config = {
@@ -12,8 +11,11 @@ const config = {
     "../../internal/icons/src/**/*.tsx",
   ],
   prefix: "",
-  theme: merge(defaultTheme.theme!, {
+  theme: {
     extend: {
+      colors: {
+        ...generateRadixColors(),
+      },
       container: {
         padding: {
           DEFAULT: "24px",
@@ -148,11 +150,14 @@ const config = {
         },
       },
     },
-  }),
+  },
   plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 } satisfies Config;
 
-export function merge<T extends object, U extends object>(obj1: T, obj2: U): T & U {
+export function merge<T extends object, U extends object>(
+  obj1: T,
+  obj2: U,
+): T & U {
   for (const key in obj2) {
     if (Object.prototype.hasOwnProperty.call(obj2, key)) {
       const obj2Key = obj2[key];
@@ -161,7 +166,10 @@ export function merge<T extends object, U extends object>(obj1: T, obj2: U): T &
         if (!(key in obj1)) {
           (obj1 as any)[key] = {};
         }
-        (obj1 as any)[key] = merge((obj1 as any)[key] as object, obj2Key as object);
+        (obj1 as any)[key] = merge(
+          (obj1 as any)[key] as object,
+          obj2Key as object,
+        );
       } else {
         (obj1 as any)[key] = obj2Key;
       }
@@ -172,6 +180,55 @@ export function merge<T extends object, U extends object>(obj1: T, obj2: U): T &
 
 function isObject(item: any): boolean {
   return typeof item === "object" && item !== null && !Array.isArray(item);
+}
+
+//@ts-expect-error
+const getColor = (colorVar, { opacityVariable, opacityValue }) => {
+  // For alpha colors, we need to extract the alpha from the variable itself
+  // to avoid the syntax error in the generated CSS
+  const alphaColors = ["grayA", "errorA", "successA", "warningA"];
+  if (alphaColors.some((color) => colorVar.includes(color))) {
+    return `hsla(var(--${colorVar.replace("--", "")}))`;
+  }
+
+  if (opacityValue !== undefined) {
+    return `hsla(var(${colorVar}), ${opacityValue})`;
+  }
+  if (opacityVariable !== undefined) {
+    return `hsla(var(${colorVar}), var(${opacityVariable}, 1))`;
+  }
+  return `hsl(var(${colorVar}))`;
+};
+
+function generateRadixColors() {
+  const colorNames = [
+    "gray",
+    "grayA",
+    "info",
+    "success",
+    "successA", // Added tealA
+    "orange",
+    "warning",
+    "warningA", // Added amberA
+    "error",
+    "errorA", // Added tomatoA
+    "feature",
+    "accent", // Also labeled as "brand" in Figma colors
+    "base",
+  ];
+
+  const colors = {};
+  //@ts-ignore
+  colorNames.forEach((name) => {
+    //@ts-ignore
+    colors[name] = {};
+    for (let i = 1; i <= 12; i++) {
+      //@ts-ignore
+      colors[name][i] = (params) => getColor(`--${name}-${i}`, params);
+    }
+  });
+
+  return colors;
 }
 
 export default config;

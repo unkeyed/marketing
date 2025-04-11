@@ -30,8 +30,6 @@
     "@tanstack/react-form": "^1.1.0",
     "@tanstack/react-store": "^0.7.0",
     "@team-plain/typescript-sdk": "^2.19.0",
-    "@unkey/db": "workspace:^",
-    "@unkey/ui": "workspace:^",
     "@vercel/og": "^0.6.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
