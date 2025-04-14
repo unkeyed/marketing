@@ -1,0 +1,26 @@
+name: Deploy to Trigger.dev
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/generator/**"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "apps/generator/**"
+
+jobs:
+  deploy:
+    # Only run deployment on push to main (not on PR)
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Trigger.dev
+        uses: your-username/trigger-deploy-action@v1
+        with:
+          access-token: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
+          working-directory: "apps/generator"
