@@ -1,4 +1,4 @@
-import { CircleInfo, TriangleWarning2 } from "../icons";
+import { CircleInfo, TriangleWarning2 } from "@/components/icons";
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { type DocumentedInputProps, Input, type InputProps } from "./input";
