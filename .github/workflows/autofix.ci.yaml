@@ -16,7 +16,7 @@ jobs:
           node-version: 22
 
       - name: Install
-        uses: ./.github/actions/install
+        uses: ./.github/workflow/actions/install
         with:
           ts: true
           go: true
