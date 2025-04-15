@@ -16,7 +16,10 @@ jobs:
           node-version: 22
 
       - name: Install
-        uses: ./.github/workflow/actions/install
+        uses: ./.github/actions/install
+        with:
+          ts: true
+          go: false
 
       - run: pnpm biome format . --write && pnpm biome check . --write
 
