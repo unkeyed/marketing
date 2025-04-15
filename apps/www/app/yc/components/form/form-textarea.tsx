@@ -1,11 +1,7 @@
 import { CircleInfo, TriangleWarning2 } from "@/components/icons";
-import React from "react";
 import { cn } from "@/lib/utils";
-import {
-  type DocumentedTextareaProps,
-  Textarea,
-  type TextareaProps,
-} from "./textarea";
+import React from "react";
+import { type DocumentedTextareaProps, Textarea, type TextareaProps } from "./textarea";
 
 // Hack to populate fumadocs' AutoTypeTable
 export type DocumentedFormTextareaProps = DocumentedTextareaProps & {
@@ -18,10 +14,7 @@ export type DocumentedFormTextareaProps = DocumentedTextareaProps & {
 
 export type FormTextareaProps = TextareaProps & DocumentedFormTextareaProps;
 
-export const FormTextarea = React.forwardRef<
-  HTMLTextAreaElement,
-  FormTextareaProps
->(
+export const FormTextarea = React.forwardRef<HTMLTextAreaElement, FormTextareaProps>(
   (
     {
       label,
@@ -45,9 +38,7 @@ export const FormTextarea = React.forwardRef<
     const errorId = `${textareaId}-error`;
 
     return (
-      <fieldset
-        className={cn("flex flex-col gap-1.5 border-0 m-0 p-0", className)}
-      >
+      <fieldset className={cn("flex flex-col gap-1.5 border-0 m-0 p-0", className)}>
         {label && (
           <label
             id={`${textareaId}-label`}
@@ -66,9 +57,7 @@ export const FormTextarea = React.forwardRef<
           leftIcon={leftIcon}
           rightIcon={rightIcon}
           wrapperClassName={wrapperClassName}
-          aria-describedby={
-            error ? errorId : description ? descriptionId : undefined
-          }
+          aria-describedby={error ? errorId : description ? descriptionId : undefined}
           aria-invalid={!!error}
           aria-required={required}
           {...props}
@@ -76,15 +65,8 @@ export const FormTextarea = React.forwardRef<
         {(description || error) && (
           <div className="text-[13px] leading-5">
             {error ? (
-              <div
-                id={errorId}
-                role="alert"
-                className="text-error-11 flex gap-2 items-center"
-              >
-                <TriangleWarning2
-                  className="flex-shrink-0"
-                  aria-hidden="true"
-                />
+              <div id={errorId} role="alert" className="text-error-11 flex gap-2 items-center">
+                <TriangleWarning2 className="flex-shrink-0" aria-hidden="true" />
                 <span className="flex-1">{error}</span>
               </div>
             ) : description ? (

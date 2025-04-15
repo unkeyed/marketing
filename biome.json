@@ -36,26 +36,14 @@
         "noForEach": "off"
       }
     },
-    "ignore": [
-      "node_modules",
-      ".next",
-      "dist",
-      ".content-collections",
-      ".trigger"
-    ]
+    "ignore": ["node_modules", ".next", "dist", ".content-collections", ".trigger"]
   },
   "formatter": {
     "indentStyle": "space",
     "indentWidth": 2,
     "enabled": true,
     "lineWidth": 100,
-    "ignore": [
-      "node_modules",
-      ".next",
-      "dist",
-      ".content-collections",
-      ".trigger"
-    ]
+    "ignore": ["node_modules", ".next", "dist", ".content-collections", ".trigger"]
   },
   "organizeImports": {
     "enabled": true,

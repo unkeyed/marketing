@@ -1,6 +1,6 @@
+import { cn } from "@/lib/utils";
 import { type VariantProps, cva } from "class-variance-authority";
 import * as React from "react";
-import { cn } from "@/lib/utils";
 
 const textareaVariants = cva(
   "flex min-h-9 w-full rounded-lg text-[13px] leading-5 transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-50 placeholder:text-gray-7 text-gray-12",
@@ -56,14 +56,9 @@ export type TextareaProps = DocumentedTextareaProps &
   React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  (
-    { className, variant, leftIcon, rightIcon, wrapperClassName, ...props },
-    ref,
-  ) => {
+  ({ className, variant, leftIcon, rightIcon, wrapperClassName, ...props }, ref) => {
     return (
-      <div
-        className={cn(textareaWrapperVariants({ variant }), wrapperClassName)}
-      >
+      <div className={cn(textareaWrapperVariants({ variant }), wrapperClassName)}>
         {leftIcon && (
           <div className="absolute left-3 top-3 flex items-start pointer-events-none">
             {leftIcon}
@@ -79,11 +74,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           ref={ref}
           {...props}
         />
-        {rightIcon && (
-          <div className="absolute right-3 top-3 flex items-start">
-            {rightIcon}
-          </div>
-        )}
+        {rightIcon && <div className="absolute right-3 top-3 flex items-start">{rightIcon}</div>}
       </div>
     );
   },

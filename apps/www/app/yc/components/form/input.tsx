@@ -1,6 +1,6 @@
+import { cn } from "@/lib/utils";
 import { type VariantProps, cva } from "class-variance-authority";
 import * as React from "react";
-import { cn } from "@/lib/utils";
 
 const inputVariants = cva(
   "flex min-h-9 w-full rounded-lg text-[13px] leading-5 transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-50 placeholder:text-gray-7 text-gray-12",
@@ -52,28 +52,14 @@ export type DocumentedInputProps = VariantProps<typeof inputVariants> & {
   wrapperClassName?: string;
 };
 
-export type InputProps = DocumentedInputProps &
-  React.InputHTMLAttributes<HTMLInputElement>;
+export type InputProps = DocumentedInputProps & React.InputHTMLAttributes<HTMLInputElement>;
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  (
-    {
-      className,
-      variant,
-      type,
-      leftIcon,
-      rightIcon,
-      wrapperClassName,
-      ...props
-    },
-    ref,
-  ) => {
+  ({ className, variant, type, leftIcon, rightIcon, wrapperClassName, ...props }, ref) => {
     return (
       <div className={cn(inputWrapperVariants({ variant }), wrapperClassName)}>
         {leftIcon && (
-          <div className="absolute left-3 flex items-center pointer-events-none">
-            {leftIcon}
-          </div>
+          <div className="absolute left-3 flex items-center pointer-events-none">{leftIcon}</div>
         )}
         <input
           type={type}
@@ -86,9 +72,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           {...props}
         />
-        {rightIcon && (
-          <div className="absolute right-3 flex items-center">{rightIcon}</div>
-        )}
+        {rightIcon && <div className="absolute right-3 flex items-center">{rightIcon}</div>}
       </div>
     );
   },

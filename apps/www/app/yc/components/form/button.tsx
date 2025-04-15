@@ -1,8 +1,8 @@
 "use client";
+import { cn } from "@/lib/utils";
 import { Slot } from "@radix-ui/react-slot";
 import { type VariantProps, cva } from "class-variance-authority";
 import * as React from "react";
-import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
   "inline-flex group relative duration-150 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 disabled:cursor-not-allowed",
@@ -192,8 +192,7 @@ const keyboardIconVariants = cva(
     variants: {
       variant: {
         default: "bg-gray-4 border-gray-7 text-gray-12",
-        primary:
-          "bg-gray-12/10 border-gray-8 text-white dark:text-black group-hover:bg-gray-12/20",
+        primary: "bg-gray-12/10 border-gray-8 text-white dark:text-black group-hover:bg-gray-12/20",
         outline:
           "bg-gray-3 border-gray-6 text-gray-11 group-hover:bg-gray-4 group-hover:border-gray-7",
         ghost:
@@ -208,16 +207,11 @@ const keyboardIconVariants = cva(
   },
 );
 
-type ButtonVariant = NonNullable<
-  VariantProps<typeof buttonVariants>["variant"]
->;
+type ButtonVariant = NonNullable<VariantProps<typeof buttonVariants>["variant"]>;
 
 type ButtonColor = NonNullable<VariantProps<typeof buttonVariants>["color"]>;
 
-const VARIANT_MAP: Record<
-  string,
-  { variant: ButtonVariant; color?: ButtonColor }
-> = {
+const VARIANT_MAP: Record<string, { variant: ButtonVariant; color?: ButtonColor }> = {
   default: { variant: "primary" },
   destructive: { variant: "primary", color: "danger" },
 };
@@ -259,8 +253,7 @@ const AnimatedLoadingSpinner = () => {
       <g>
         {segments.map((id, index) => {
           // Calculate opacity based on position relative to current index
-          const distance =
-            (segments.length + index - segmentIndex) % segments.length;
+          const distance = (segments.length + index - segmentIndex) % segments.length;
           const opacity = distance <= 4 ? 1 - distance * 0.2 : 0.1;
 
           return (
@@ -334,9 +327,7 @@ const Button: React.FC<ButtonProps> = ({
 
   // Width reference for consistent sizing during loading state
   const buttonRef = React.useRef<HTMLButtonElement>(null);
-  const [buttonWidth, setButtonWidth] = React.useState<number | undefined>(
-    undefined,
-  );
+  const [buttonWidth, setButtonWidth] = React.useState<number | undefined>(undefined);
 
   // Capture initial width when entering loading state
   React.useEffect(() => {
@@ -408,11 +399,7 @@ const Button: React.FC<ButtonProps> = ({
             className={cn(
               keyboardIconVariants({
                 variant:
-                  variant === "primary"
-                    ? "primary"
-                    : variant === "outline"
-                      ? "default"
-                      : "ghost",
+                  variant === "primary" ? "primary" : variant === "outline" ? "default" : "ghost",
               }),
             )}
           >
