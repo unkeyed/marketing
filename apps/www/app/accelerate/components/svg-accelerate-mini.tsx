@@ -1,4 +1,7 @@
-export default function SVGAccelerateMini(props: { className?: string; no: number }) {
+export default function SVGAccelerateMini(props: {
+  className?: string;
+  no: number;
+}) {
   if (props.no === 1) {
     return (
       <svg
@@ -14,9 +17,9 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
           cy="55"
           r="24"
           stroke="#FF1D4F"
-          stroke-opacity="0.15"
-          stroke-width="16"
-          stroke-dasharray="2 3"
+          strokeOpacity="0.15"
+          strokeWidth="16"
+          strokeDasharray="2 3"
           {...props}
         />
         <g opacity="0.5" filter="url(#filter0_f_5190_171)">
@@ -45,14 +48,14 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             cy="55"
             r="24"
             stroke="url(#paint1_angular_5190_171)"
-            stroke-width="16"
-            stroke-dasharray="2 3"
+            strokeWidth="16"
+            strokeDasharray="2 3"
           />
         </g>
         <path
           d="M47.7188 24.0903L64.2832 85.9096"
           stroke="url(#paint2_linear_5190_171)"
-          stroke-width="2"
+          strokeWidth="2"
         />
         <defs>
           <filter
@@ -62,11 +65,19 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             width="80"
             height="78.9097"
             filterUnits="userSpaceOnUse"
-            color-interpolation-filters="sRGB"
+            colorInterpolationFilters="sRGB"
           >
-            <feFlood flood-opacity="0" result="BackgroundImageFix" />
-            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-            <feGaussianBlur stdDeviation="12" result="effect1_foregroundBlur_5190_171" />
+            <feFlood floodOpacity="0" result="BackgroundImageFix" />
+            <feBlend
+              mode="normal"
+              in="SourceGraphic"
+              in2="BackgroundImageFix"
+              result="shape"
+            />
+            <feGaussianBlur
+              stdDeviation="12"
+              result="effect1_foregroundBlur_5190_171"
+            />
           </filter>
           <radialGradient
             id="paint0_angular_5190_171"
@@ -76,8 +87,8 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             gradientUnits="userSpaceOnUse"
             gradientTransform="translate(56 55) rotate(45) scale(31.8198)"
           >
-            <stop offset="0.0001" stop-color="#FF1D4F" />
-            <stop offset="0.9997" stop-color="#7002FC" />
+            <stop offset="0.0001" stopColor="#FF1D4F" />
+            <stop offset="0.9997" stopColor="#7002FC" />
           </radialGradient>
           <radialGradient
             id="paint1_angular_5190_171"
@@ -87,14 +98,14 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             gradientUnits="userSpaceOnUse"
             gradientTransform="translate(56 55) rotate(43.5461) scale(30.8026)"
           >
-            <stop stop-color="#7002FC" />
-            <stop offset="0.0001" stop-color="#FF1D4F" stop-opacity="0" />
-            <stop offset="0.0002" stop-color="#FF1D4F" stop-opacity="0.1" />
-            <stop offset="0.352076" stop-color="#FF1D4F" stop-opacity="0.1" />
-            <stop offset="0.378012" stop-color="#FF1D4F" stop-opacity="0.1" />
-            <stop offset="0.381003" stop-color="#FF1D4F" />
-            <stop offset="0.9997" stop-color="#7002FC" />
-            <stop offset="0.9998" stop-color="#7002FC" stop-opacity="0" />
+            <stop stopColor="#7002FC" />
+            <stop offset="0.0001" stopColor="#FF1D4F" stopOpacity="0" />
+            <stop offset="0.0002" stopColor="#FF1D4F" stopOpacity="0.1" />
+            <stop offset="0.352076" stopColor="#FF1D4F" stopOpacity="0.1" />
+            <stop offset="0.378012" stopColor="#FF1D4F" stopOpacity="0.1" />
+            <stop offset="0.381003" stopColor="#FF1D4F" />
+            <stop offset="0.9997" stopColor="#7002FC" />
+            <stop offset="0.9998" stopColor="#7002FC" stopOpacity="0" />
           </radialGradient>
           <linearGradient
             id="paint2_linear_5190_171"
@@ -104,9 +115,9 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             y2="85.7802"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stop-color="white" />
-            <stop offset="0.5" stop-color="white" stop-opacity="0" />
-            <stop offset="0.5" stop-color="white" stop-opacity="0" />
+            <stop stopColor="white" />
+            <stop offset="0.5" stopColor="white" stopOpacity="0" />
+            <stop offset="0.5" stopColor="white" stopOpacity="0" />
           </linearGradient>
         </defs>
       </svg>
@@ -127,9 +138,9 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
           cy="56"
           r="24"
           stroke="#FF1D4F"
-          stroke-opacity="0.15"
-          stroke-width="16"
-          stroke-dasharray="2 3"
+          strokeOpacity="0.15"
+          strokeWidth="16"
+          strokeDasharray="2 3"
         />
         <g opacity="0.5" filter="url(#filter0_f_5190_448)">
           <path
@@ -157,14 +168,14 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             cy="56"
             r="24"
             stroke="url(#paint1_angular_5190_448)"
-            stroke-width="16"
-            stroke-dasharray="2 3"
+            strokeWidth="16"
+            strokeDasharray="2 3"
           />
         </g>
         <path
           d="M78.6289 33.3726L33.3741 78.6274"
           stroke="url(#paint2_linear_5190_448)"
-          stroke-width="2"
+          strokeWidth="2"
         />
         <defs>
           <filter
@@ -174,11 +185,19 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             width="102.627"
             height="80"
             filterUnits="userSpaceOnUse"
-            color-interpolation-filters="sRGB"
+            colorInterpolationFilters="sRGB"
           >
-            <feFlood flood-opacity="0" result="BackgroundImageFix" />
-            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-            <feGaussianBlur stdDeviation="12" result="effect1_foregroundBlur_5190_448" />
+            <feFlood floodOpacity="0" result="BackgroundImageFix" />
+            <feBlend
+              mode="normal"
+              in="SourceGraphic"
+              in2="BackgroundImageFix"
+              result="shape"
+            />
+            <feGaussianBlur
+              stdDeviation="12"
+              result="effect1_foregroundBlur_5190_448"
+            />
           </filter>
           <radialGradient
             id="paint0_angular_5190_448"
@@ -188,8 +207,8 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             gradientUnits="userSpaceOnUse"
             gradientTransform="translate(56 56) rotate(45) scale(31.8198)"
           >
-            <stop offset="0.0001" stop-color="#FF1D4F" />
-            <stop offset="0.9997" stop-color="#7002FC" />
+            <stop offset="0.0001" stopColor="#FF1D4F" />
+            <stop offset="0.9997" stopColor="#7002FC" />
           </radialGradient>
           <radialGradient
             id="paint1_angular_5190_448"
@@ -199,14 +218,14 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             gradientUnits="userSpaceOnUse"
             gradientTransform="translate(56 56) rotate(43.5461) scale(30.8026)"
           >
-            <stop stop-color="#7002FC" />
-            <stop offset="0.0001" stop-color="#FF1D4F" stop-opacity="0" />
-            <stop offset="0.0002" stop-color="#FF1D4F" stop-opacity="0.1" />
-            <stop offset="0.352076" stop-color="#FF1D4F" stop-opacity="0.1" />
-            <stop offset="0.378012" stop-color="#FF1D4F" stop-opacity="0.1" />
-            <stop offset="0.381003" stop-color="#FF1D4F" />
-            <stop offset="0.9997" stop-color="#7002FC" />
-            <stop offset="0.9998" stop-color="#7002FC" stop-opacity="0" />
+            <stop stopColor="#7002FC" />
+            <stop offset="0.0001" stopColor="#FF1D4F" stopOpacity="0" />
+            <stop offset="0.0002" stopColor="#FF1D4F" stopOpacity="0.1" />
+            <stop offset="0.352076" stopColor="#FF1D4F" stopOpacity="0.1" />
+            <stop offset="0.378012" stopColor="#FF1D4F" stopOpacity="0.1" />
+            <stop offset="0.381003" stopColor="#FF1D4F" />
+            <stop offset="0.9997" stopColor="#7002FC" />
+            <stop offset="0.9998" stopColor="#7002FC" stopOpacity="0" />
           </radialGradient>
           <linearGradient
             id="paint2_linear_5190_448"
@@ -216,9 +235,9 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             y2="78.9809"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stop-color="white" />
-            <stop offset="0.5" stop-color="white" stop-opacity="0" />
-            <stop offset="0.5" stop-color="white" stop-opacity="0" />
+            <stop stopColor="white" />
+            <stop offset="0.5" stopColor="white" stopOpacity="0" />
+            <stop offset="0.5" stopColor="white" stopOpacity="0" />
           </linearGradient>
         </defs>
       </svg>
@@ -239,9 +258,9 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
           cy="56"
           r="24"
           stroke="#FF1D4F"
-          stroke-opacity="0.15"
-          stroke-width="16"
-          stroke-dasharray="2 3"
+          strokeOpacity="0.15"
+          strokeWidth="16"
+          strokeDasharray="2 3"
         />
         <g opacity="0.5" filter="url(#filter0_f_5190_448)">
           <path
@@ -269,14 +288,14 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             cy="56"
             r="24"
             stroke="url(#paint1_angular_5190_448)"
-            stroke-width="16"
-            stroke-dasharray="2 3"
+            strokeWidth="16"
+            strokeDasharray="2 3"
           />
         </g>
         <path
           d="M78.6289 33.3726L33.3741 78.6274"
           stroke="url(#paint2_linear_5190_448)"
-          stroke-width="2"
+          strokeWidth="2"
         />
         <defs>
           <filter
@@ -286,11 +305,19 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             width="102.627"
             height="80"
             filterUnits="userSpaceOnUse"
-            color-interpolation-filters="sRGB"
+            colorInterpolationFilters="sRGB"
           >
-            <feFlood flood-opacity="0" result="BackgroundImageFix" />
-            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-            <feGaussianBlur stdDeviation="12" result="effect1_foregroundBlur_5190_448" />
+            <feFlood floodOpacity="0" result="BackgroundImageFix" />
+            <feBlend
+              mode="normal"
+              in="SourceGraphic"
+              in2="BackgroundImageFix"
+              result="shape"
+            />
+            <feGaussianBlur
+              stdDeviation="12"
+              result="effect1_foregroundBlur_5190_448"
+            />
           </filter>
           <radialGradient
             id="paint0_angular_5190_448"
@@ -300,8 +327,8 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             gradientUnits="userSpaceOnUse"
             gradientTransform="translate(56 56) rotate(45) scale(31.8198)"
           >
-            <stop offset="0.0001" stop-color="#FF1D4F" />
-            <stop offset="0.9997" stop-color="#7002FC" />
+            <stop offset="0.0001" stopColor="#FF1D4F" />
+            <stop offset="0.9997" stopColor="#7002FC" />
           </radialGradient>
           <radialGradient
             id="paint1_angular_5190_448"
@@ -311,14 +338,14 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             gradientUnits="userSpaceOnUse"
             gradientTransform="translate(56 56) rotate(43.5461) scale(30.8026)"
           >
-            <stop stop-color="#7002FC" />
-            <stop offset="0.0001" stop-color="#FF1D4F" stop-opacity="0" />
-            <stop offset="0.0002" stop-color="#FF1D4F" stop-opacity="0.1" />
-            <stop offset="0.352076" stop-color="#FF1D4F" stop-opacity="0.1" />
-            <stop offset="0.378012" stop-color="#FF1D4F" stop-opacity="0.1" />
-            <stop offset="0.381003" stop-color="#FF1D4F" />
-            <stop offset="0.9997" stop-color="#7002FC" />
-            <stop offset="0.9998" stop-color="#7002FC" stop-opacity="0" />
+            <stop stopColor="#7002FC" />
+            <stop offset="0.0001" stopColor="#FF1D4F" stopOpacity="0" />
+            <stop offset="0.0002" stopColor="#FF1D4F" stopOpacity="0.1" />
+            <stop offset="0.352076" stopColor="#FF1D4F" stopOpacity="0.1" />
+            <stop offset="0.378012" stopColor="#FF1D4F" stopOpacity="0.1" />
+            <stop offset="0.381003" stopColor="#FF1D4F" />
+            <stop offset="0.9997" stopColor="#7002FC" />
+            <stop offset="0.9998" stopColor="#7002FC" stopOpacity="0" />
           </radialGradient>
           <linearGradient
             id="paint2_linear_5190_448"
@@ -328,9 +355,9 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             y2="78.9809"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stop-color="white" />
-            <stop offset="0.5" stop-color="white" stop-opacity="0" />
-            <stop offset="0.5" stop-color="white" stop-opacity="0" />
+            <stop stopColor="white" />
+            <stop offset="0.5" stopColor="white" stopOpacity="0" />
+            <stop offset="0.5" stopColor="white" stopOpacity="0" />
           </linearGradient>
         </defs>
       </svg>
@@ -351,9 +378,9 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
           cy="56"
           r="24"
           stroke="#FF1D4F"
-          stroke-opacity="0.15"
-          stroke-width="16"
-          stroke-dasharray="2 3"
+          strokeOpacity="0.15"
+          strokeWidth="16"
+          strokeDasharray="2 3"
         />
         <g opacity="0.5" filter="url(#filter0_f_5190_521)">
           <path
@@ -381,14 +408,14 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             cy="56"
             r="24"
             stroke="url(#paint1_angular_5190_521)"
-            stroke-width="16"
-            stroke-dasharray="2 3"
+            strokeWidth="16"
+            strokeDasharray="2 3"
           />
         </g>
         <path
           d="M86.9102 47.7178L25.0909 64.2822"
           stroke="url(#paint2_linear_5190_521)"
-          stroke-width="2"
+          strokeWidth="2"
         />
         <defs>
           <filter
@@ -398,11 +425,19 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             width="110.91"
             height="80"
             filterUnits="userSpaceOnUse"
-            color-interpolation-filters="sRGB"
+            colorInterpolationFilters="sRGB"
           >
-            <feFlood flood-opacity="0" result="BackgroundImageFix" />
-            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-            <feGaussianBlur stdDeviation="12" result="effect1_foregroundBlur_5190_521" />
+            <feFlood floodOpacity="0" result="BackgroundImageFix" />
+            <feBlend
+              mode="normal"
+              in="SourceGraphic"
+              in2="BackgroundImageFix"
+              result="shape"
+            />
+            <feGaussianBlur
+              stdDeviation="12"
+              result="effect1_foregroundBlur_5190_521"
+            />
           </filter>
           <radialGradient
             id="paint0_angular_5190_521"
@@ -412,8 +447,8 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             gradientUnits="userSpaceOnUse"
             gradientTransform="translate(56 56) rotate(45) scale(31.8198)"
           >
-            <stop offset="0.0001" stop-color="#FF1D4F" />
-            <stop offset="0.9997" stop-color="#7002FC" />
+            <stop offset="0.0001" stopColor="#FF1D4F" />
+            <stop offset="0.9997" stopColor="#7002FC" />
           </radialGradient>
           <radialGradient
             id="paint1_angular_5190_521"
@@ -423,14 +458,14 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             gradientUnits="userSpaceOnUse"
             gradientTransform="translate(56 56) rotate(43.5461) scale(30.8026)"
           >
-            <stop stop-color="#7002FC" />
-            <stop offset="0.0001" stop-color="#FF1D4F" stop-opacity="0" />
-            <stop offset="0.0002" stop-color="#FF1D4F" stop-opacity="0.1" />
-            <stop offset="0.352076" stop-color="#FF1D4F" stop-opacity="0.1" />
-            <stop offset="0.378012" stop-color="#FF1D4F" stop-opacity="0.1" />
-            <stop offset="0.381003" stop-color="#FF1D4F" />
-            <stop offset="0.9997" stop-color="#7002FC" />
-            <stop offset="0.9998" stop-color="#7002FC" stop-opacity="0" />
+            <stop stopColor="#7002FC" />
+            <stop offset="0.0001" stopColor="#FF1D4F" stopOpacity="0" />
+            <stop offset="0.0002" stopColor="#FF1D4F" stopOpacity="0.1" />
+            <stop offset="0.352076" stopColor="#FF1D4F" stopOpacity="0.1" />
+            <stop offset="0.378012" stopColor="#FF1D4F" stopOpacity="0.1" />
+            <stop offset="0.381003" stopColor="#FF1D4F" />
+            <stop offset="0.9997" stopColor="#7002FC" />
+            <stop offset="0.9998" stopColor="#7002FC" stopOpacity="0" />
           </radialGradient>
           <linearGradient
             id="paint2_linear_5190_521"
@@ -440,9 +475,9 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             y2="64.7652"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stop-color="white" />
-            <stop offset="0.5" stop-color="white" stop-opacity="0" />
-            <stop offset="0.5" stop-color="white" stop-opacity="0" />
+            <stop stopColor="white" />
+            <stop offset="0.5" stopColor="white" stopOpacity="0" />
+            <stop offset="0.5" stopColor="white" stopOpacity="0" />
           </linearGradient>
         </defs>
       </svg>
@@ -463,9 +498,9 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
           cy="56"
           r="24"
           stroke="#FF1D4F"
-          stroke-opacity="0.15"
-          stroke-width="16"
-          stroke-dasharray="2 3"
+          strokeOpacity="0.15"
+          strokeWidth="16"
+          strokeDasharray="2 3"
         />
         <g opacity="0.5" filter="url(#filter0_f_5190_660)">
           <path
@@ -493,8 +528,8 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             cy="56"
             r="24"
             stroke="url(#paint1_angular_5190_660)"
-            stroke-width="16"
-            stroke-dasharray="2 3"
+            strokeWidth="16"
+            strokeDasharray="2 3"
           />
         </g>
         <mask
@@ -517,14 +552,14 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             cy="56"
             r="24"
             stroke="url(#paint2_angular_5190_660)"
-            stroke-width="16"
-            stroke-dasharray="2 3"
+            strokeWidth="16"
+            strokeDasharray="2 3"
           />
         </g>
         <path
           d="M86.9102 64.2822L25.0909 47.7178"
           stroke="url(#paint3_linear_5190_660)"
-          stroke-width="2"
+          strokeWidth="2"
         />
         <defs>
           <filter
@@ -534,11 +569,19 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             width="112"
             height="88.2822"
             filterUnits="userSpaceOnUse"
-            color-interpolation-filters="sRGB"
+            colorInterpolationFilters="sRGB"
           >
-            <feFlood flood-opacity="0" result="BackgroundImageFix" />
-            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-            <feGaussianBlur stdDeviation="12" result="effect1_foregroundBlur_5190_660" />
+            <feFlood floodOpacity="0" result="BackgroundImageFix" />
+            <feBlend
+              mode="normal"
+              in="SourceGraphic"
+              in2="BackgroundImageFix"
+              result="shape"
+            />
+            <feGaussianBlur
+              stdDeviation="12"
+              result="effect1_foregroundBlur_5190_660"
+            />
           </filter>
           <radialGradient
             id="paint0_angular_5190_660"
@@ -548,8 +591,8 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             gradientUnits="userSpaceOnUse"
             gradientTransform="translate(56 56) rotate(45) scale(31.8198)"
           >
-            <stop offset="0.0001" stop-color="#FF1D4F" />
-            <stop offset="0.9997" stop-color="#7002FC" />
+            <stop offset="0.0001" stopColor="#FF1D4F" />
+            <stop offset="0.9997" stopColor="#7002FC" />
           </radialGradient>
           <radialGradient
             id="paint1_angular_5190_660"
@@ -559,14 +602,14 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             gradientUnits="userSpaceOnUse"
             gradientTransform="translate(56 56) rotate(43.5461) scale(30.8026)"
           >
-            <stop stop-color="#7002FC" />
-            <stop offset="0.0001" stop-color="#FF1D4F" stop-opacity="0" />
-            <stop offset="0.0002" stop-color="#FF1D4F" stop-opacity="0.1" />
-            <stop offset="0.352076" stop-color="#FF1D4F" stop-opacity="0.1" />
-            <stop offset="0.378012" stop-color="#FF1D4F" stop-opacity="0.1" />
-            <stop offset="0.381003" stop-color="#FF1D4F" />
-            <stop offset="0.9997" stop-color="#7002FC" />
-            <stop offset="0.9998" stop-color="#7002FC" stop-opacity="0" />
+            <stop stopColor="#7002FC" />
+            <stop offset="0.0001" stopColor="#FF1D4F" stopOpacity="0" />
+            <stop offset="0.0002" stopColor="#FF1D4F" stopOpacity="0.1" />
+            <stop offset="0.352076" stopColor="#FF1D4F" stopOpacity="0.1" />
+            <stop offset="0.378012" stopColor="#FF1D4F" stopOpacity="0.1" />
+            <stop offset="0.381003" stopColor="#FF1D4F" />
+            <stop offset="0.9997" stopColor="#7002FC" />
+            <stop offset="0.9998" stopColor="#7002FC" stopOpacity="0" />
           </radialGradient>
           <radialGradient
             id="paint2_angular_5190_660"
@@ -576,14 +619,14 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             gradientUnits="userSpaceOnUse"
             gradientTransform="translate(56 56) rotate(43.5461) scale(30.8026)"
           >
-            <stop stop-color="#7002FC" />
-            <stop offset="0.0001" stop-color="#FF1D4F" stop-opacity="0" />
-            <stop offset="0.0002" stop-color="#FF1D4F" stop-opacity="0.1" />
-            <stop offset="0.352076" stop-color="#FF1D4F" stop-opacity="0.1" />
-            <stop offset="0.378012" stop-color="#FF1D4F" stop-opacity="0.1" />
-            <stop offset="0.381003" stop-color="#FF1D4F" />
-            <stop offset="0.9997" stop-color="#7002FC" />
-            <stop offset="0.9998" stop-color="#7002FC" stop-opacity="0" />
+            <stop stopColor="#7002FC" />
+            <stop offset="0.0001" stopColor="#FF1D4F" stopOpacity="0" />
+            <stop offset="0.0002" stopColor="#FF1D4F" stopOpacity="0.1" />
+            <stop offset="0.352076" stopColor="#FF1D4F" stopOpacity="0.1" />
+            <stop offset="0.378012" stopColor="#FF1D4F" stopOpacity="0.1" />
+            <stop offset="0.381003" stopColor="#FF1D4F" />
+            <stop offset="0.9997" stopColor="#7002FC" />
+            <stop offset="0.9998" stopColor="#7002FC" stopOpacity="0" />
           </radialGradient>
           <linearGradient
             id="paint3_linear_5190_660"
@@ -593,9 +636,9 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             y2="48.2008"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stop-color="white" />
-            <stop offset="0.5" stop-color="white" stop-opacity="0" />
-            <stop offset="0.5" stop-color="white" stop-opacity="0" />
+            <stop stopColor="white" />
+            <stop offset="0.5" stopColor="white" stopOpacity="0" />
+            <stop offset="0.5" stopColor="white" stopOpacity="0" />
           </linearGradient>
         </defs>
       </svg>
@@ -616,9 +659,9 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
           cy="56"
           r="24"
           stroke="#FF1D4F"
-          stroke-opacity="0.15"
-          stroke-width="16"
-          stroke-dasharray="2 3"
+          strokeOpacity="0.15"
+          strokeWidth="16"
+          strokeDasharray="2 3"
         />
         <g opacity="0.5" filter="url(#filter0_f_5190_741)">
           <path
@@ -646,14 +689,14 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             cy="56"
             r="24"
             stroke="url(#paint1_angular_5190_741)"
-            stroke-width="16"
-            stroke-dasharray="2 3"
+            strokeWidth="16"
+            strokeDasharray="2 3"
           />
         </g>
         <path
           d="M78.627 78.6274L33.3721 33.3726"
           stroke="url(#paint2_linear_5190_741)"
-          stroke-width="2"
+          strokeWidth="2"
         />
         <defs>
           <filter
@@ -663,11 +706,19 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             width="112"
             height="102.627"
             filterUnits="userSpaceOnUse"
-            color-interpolation-filters="sRGB"
+            colorInterpolationFilters="sRGB"
           >
-            <feFlood flood-opacity="0" result="BackgroundImageFix" />
-            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-            <feGaussianBlur stdDeviation="12" result="effect1_foregroundBlur_5190_741" />
+            <feFlood floodOpacity="0" result="BackgroundImageFix" />
+            <feBlend
+              mode="normal"
+              in="SourceGraphic"
+              in2="BackgroundImageFix"
+              result="shape"
+            />
+            <feGaussianBlur
+              stdDeviation="12"
+              result="effect1_foregroundBlur_5190_741"
+            />
           </filter>
           <radialGradient
             id="paint0_angular_5190_741"
@@ -677,8 +728,8 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             gradientUnits="userSpaceOnUse"
             gradientTransform="translate(56 56) rotate(45) scale(31.8198)"
           >
-            <stop offset="0.0001" stop-color="#FF1D4F" />
-            <stop offset="0.9997" stop-color="#7002FC" />
+            <stop offset="0.0001" stopColor="#FF1D4F" />
+            <stop offset="0.9997" stopColor="#7002FC" />
           </radialGradient>
           <radialGradient
             id="paint1_angular_5190_741"
@@ -688,14 +739,14 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             gradientUnits="userSpaceOnUse"
             gradientTransform="translate(56 56) rotate(43.5461) scale(30.8026)"
           >
-            <stop stop-color="#7002FC" />
-            <stop offset="0.0001" stop-color="#FF1D4F" stop-opacity="0" />
-            <stop offset="0.0002" stop-color="#FF1D4F" stop-opacity="0.1" />
-            <stop offset="0.352076" stop-color="#FF1D4F" stop-opacity="0.1" />
-            <stop offset="0.378012" stop-color="#FF1D4F" stop-opacity="0.1" />
-            <stop offset="0.381003" stop-color="#FF1D4F" />
-            <stop offset="0.9997" stop-color="#7002FC" />
-            <stop offset="0.9998" stop-color="#7002FC" stop-opacity="0" />
+            <stop stopColor="#7002FC" />
+            <stop offset="0.0001" stopColor="#FF1D4F" stopOpacity="0" />
+            <stop offset="0.0002" stopColor="#FF1D4F" stopOpacity="0.1" />
+            <stop offset="0.352076" stopColor="#FF1D4F" stopOpacity="0.1" />
+            <stop offset="0.378012" stopColor="#FF1D4F" stopOpacity="0.1" />
+            <stop offset="0.381003" stopColor="#FF1D4F" />
+            <stop offset="0.9997" stopColor="#7002FC" />
+            <stop offset="0.9998" stopColor="#7002FC" stopOpacity="0" />
           </radialGradient>
           <linearGradient
             id="paint2_linear_5190_741"
@@ -705,9 +756,9 @@ export default function SVGAccelerateMini(props: { className?: string; no: numbe
             y2="33.7262"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stop-color="white" />
-            <stop offset="0.5" stop-color="white" stop-opacity="0" />
-            <stop offset="0.5" stop-color="white" stop-opacity="0" />
+            <stop stopColor="white" />
+            <stop offset="0.5" stopColor="white" stopOpacity="0" />
+            <stop offset="0.5" stopColor="white" stopOpacity="0" />
           </linearGradient>
         </defs>
       </svg>

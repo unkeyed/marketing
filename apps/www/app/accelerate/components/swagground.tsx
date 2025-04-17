@@ -1,17 +1,26 @@
 export function AccelerateSwaggroundIcon() {
   return (
-    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width="36"
+      height="36"
+      viewBox="0 0 36 36"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M18 12.5C20.4853 12.5 22.5 10.4853 22.5 8C22.5 5.51472 20.4853 3.5 18 3.5C15.5147 3.5 13.5 5.51472 13.5 8C13.5 10.4853 15.5147 12.5 18 12.5Z"
         stroke="white"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M18.5 12.5C18.5 12.2239 18.2761 12 18 12C17.7239 12 17.5 12.2239 17.5 12.5H18.5ZM17.5 12.5V19H18.5V12.5H17.5Z"
         fill="white"
       />
-      <path d="M12.75 15.25L7.5 18V20L18 25L28.5 20V18L23.25 15.25" stroke="white" />
+      <path
+        d="M12.75 15.25L7.5 18V20L18 25L28.5 20V18L23.25 15.25"
+        stroke="white"
+      />
       <path d="M7.5 20V25.5L18 30.5L28.5 25.5V20" stroke="white" />
     </svg>
   );
@@ -42,8 +51,17 @@ export function AccelerateSwaggroundIllustration() {
           strokeWidth="0.75"
           d="M550.037 300.5L479 266.893l70.154-33.393"
         />
-        <path stroke="#1F1F1F" strokeWidth="0.75" d="M-245 135.5l488 232.03 84 39.94L815 639.5" />
-        <path stroke="#fff" strokeOpacity="0.12" strokeWidth="0.75" d="M-312 245.5l1194 568" />
+        <path
+          stroke="#1F1F1F"
+          strokeWidth="0.75"
+          d="M-245 135.5l488 232.03 84 39.94L815 639.5"
+        />
+        <path
+          stroke="#fff"
+          strokeOpacity="0.12"
+          strokeWidth="0.75"
+          d="M-312 245.5l1194 568"
+        />
         <path
           stroke="#1F1F1F"
           strokeWidth="0.75"
@@ -61,7 +79,12 @@ export function AccelerateSwaggroundIllustration() {
           d="M-295 705l622-297.438M1035 69L410.926 367.43"
         />
         <path stroke="#1F1F1F" strokeWidth="0.75" d="M-398 472l1536-734" />
-        <path stroke="#fff" strokeOpacity="0.12" strokeWidth="0.75" d="M-354 310l1448-692" />
+        <path
+          stroke="#fff"
+          strokeOpacity="0.12"
+          strokeWidth="0.75"
+          d="M-354 310l1448-692"
+        />
         <path
           stroke="#1F1F1F"
           strokeDasharray="2.5 2.5"
@@ -84,9 +107,20 @@ export function AccelerateSwaggroundIllustration() {
           strokeWidth="0.75"
           d="M327 363.5l-84-40v44l84 40 84-40v-44l-84 40z"
         />
-        <path stroke="#363636" strokeWidth="0.75" d="M243 323.5v44l84 40 84-40v-44" />
-        <path stroke="#363636" strokeWidth="0.75" d="M369 287.5l42 20v16l-84 40-84-40v-16l42-20" />
-        <path fill="#363636" d="M327.375 263.5a.375.375 0 00-.75 0h.75zm-.75 0v52h.75v-52h-.75z" />
+        <path
+          stroke="#363636"
+          strokeWidth="0.75"
+          d="M243 323.5v44l84 40 84-40v-44"
+        />
+        <path
+          stroke="#363636"
+          strokeWidth="0.75"
+          d="M369 287.5l42 20v16l-84 40-84-40v-16l42-20"
+        />
+        <path
+          fill="#363636"
+          d="M327.375 263.5a.375.375 0 00-.75 0h.75zm-.75 0v52h.75v-52h-.75z"
+        />
         <path
           fill="#121212"
           stroke="#363636"

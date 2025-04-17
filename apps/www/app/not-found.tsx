@@ -146,7 +146,7 @@ function PerlinNoise() {
           height="100%"
           filterUnits="objectBoundingBox"
           primitiveUnits="userSpaceOnUse"
-          color-interpolation-filters="linearRGB"
+          colorInterpolationFilters="linearRGB"
         >
           <feTurbulence
             type="fractalNoise"
