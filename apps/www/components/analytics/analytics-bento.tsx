@@ -1,12 +1,6 @@
 "use client";
 import type { LangIconProps } from "@/components/svg/lang-icons";
-import {
-  CurlIcon,
-  GoIcon,
-  PythonIcon,
-  RustIcon,
-  TSIcon,
-} from "@/components/svg/lang-icons";
+import { CurlIcon, GoIcon, PythonIcon, RustIcon, TSIcon } from "@/components/svg/lang-icons";
 import { CopyCodeSnippetButton } from "@/components/ui/copy-code-button";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -69,11 +63,7 @@ export function AnalyticsBento() {
   return (
     <div className="relative flex justify-center w-full">
       <div className="absolute z-50 top-14">
-        <button
-          type="button"
-          aria-label="Show API code"
-          onClick={() => toggleShowApi(!showApi)}
-        >
+        <button type="button" aria-label="Show API code" onClick={() => toggleShowApi(!showApi)}>
           <PrimaryButton shiny label="Show API code" IconLeft={Wand2} />
         </button>
       </div>
@@ -90,9 +80,7 @@ export function AnalyticsBento() {
         <div className="absolute inset-0 w-full h-full duration-500 pointer-events-none bg-gradient-to-t from-black from-10% via-black/50 to-transparent group-hover:opacity-0 group-hover:backdrop-blur-0" />
         <BentoText
           className={
-            showApi
-              ? "group-hover:opacity-0 group-hover:pointer-events-none duration-500"
-              : ""
+            showApi ? "group-hover:opacity-0 group-hover:pointer-events-none duration-500" : ""
           }
         />
       </div>
@@ -355,12 +343,7 @@ function AnalyticsWebAppView() {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        <path
-          d="M10 3.9585V4.37516"
-          stroke="white"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
+        <path d="M10 3.9585V4.37516" stroke="white" strokeLinecap="round" strokeLinejoin="round" />
         <path
           d="M13.0208 4.76758L12.8125 5.12842"
           stroke="white"
@@ -373,18 +356,8 @@ function AnalyticsWebAppView() {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        <path
-          d="M16.0417 10H15.625"
-          stroke="white"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M4.37467 10H3.95801"
-          stroke="white"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
+        <path d="M16.0417 10H15.625" stroke="white" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M4.37467 10H3.95801" stroke="white" strokeLinecap="round" strokeLinejoin="round" />
         <path
           d="M5.12842 7.18734L4.76758 6.979"
           stroke="white"
@@ -413,24 +386,9 @@ function AnalyticsWebAppView() {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        <path
-          d="M14 14.375H18"
-          stroke="white"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M5.75 6.625H14.25"
-          stroke="white"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M10 6.41683V4.9585"
-          stroke="white"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
+        <path d="M14 14.375H18" stroke="white" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M5.75 6.625H14.25" stroke="white" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M10 6.41683V4.9585" stroke="white" strokeLinecap="round" strokeLinejoin="round" />
         <path
           d="M12.25 6.625C12.25 6.625 12.25 8.70833 10.25 10.375C8.25 12.0417 5.75 12.0417 5.75 12.0417"
           stroke="white"
@@ -515,24 +473,9 @@ function AnalyticsWebAppView() {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        <path
-          d="M6.25 7.2915H13.75"
-          stroke="white"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M6.25 12.7085H13.75"
-          stroke="white"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M6.25 15.2085H13.75"
-          stroke="white"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
+        <path d="M6.25 7.2915H13.75" stroke="white" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M6.25 12.7085H13.75" stroke="white" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M6.25 15.2085H13.75" stroke="white" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
   };
@@ -665,32 +608,11 @@ function AnalyticsWebAppView() {
           </div>
           <p className="mt-8">Your APIs</p>
           <div className="mt-4">
-            <Tab
-              backgroundColor="#6E56CF"
-              light
-              text="QuantumWeather"
-              icon={icons.sun}
-            />
-            <Tab
-              backgroundColor="#4CBBA5"
-              text="StellarTranslate"
-              icon={icons.translate}
-            />
-            <Tab
-              backgroundColor="#978365"
-              text="NebulaAnalytics"
-              icon={icons.analytics}
-            />
-            <Tab
-              backgroundColor="#00A2C7"
-              text="CryptoSentiment"
-              icon={icons.crypto}
-            />
-            <Tab
-              backgroundColor="#8DB654"
-              text="BioSyncHealth"
-              icon={icons.bio}
-            />
+            <Tab backgroundColor="#6E56CF" light text="QuantumWeather" icon={icons.sun} />
+            <Tab backgroundColor="#4CBBA5" text="StellarTranslate" icon={icons.translate} />
+            <Tab backgroundColor="#978365" text="NebulaAnalytics" icon={icons.analytics} />
+            <Tab backgroundColor="#00A2C7" text="CryptoSentiment" icon={icons.crypto} />
+            <Tab backgroundColor="#8DB654" text="BioSyncHealth" icon={icons.bio} />
           </div>
         </div>
         <div className="text-white pt-4 pl-8 flex w-full px-[40px] flex-col">
@@ -843,9 +765,7 @@ function AnalyticsWebAppView() {
           <div className="border-[0.75px] border-white/15 p-6 gap-x-6 mt-[32px] rounded-2xl flex flex-col">
             <div className="flex items-center justify-between w-full text-xs text-white/30">
               <div className="min-w-[400px]">
-                <h3 className="text-base font-medium text-white">
-                  Usage 30 days
-                </h3>
+                <h3 className="text-base font-medium text-white">Usage 30 days</h3>
                 <p>See when this key was verified</p>
               </div>
               <div className="flex items-center">
@@ -911,13 +831,11 @@ export function BentoText({ className }: { className?: string }) {
             fillOpacity="0.4"
           />
         </svg>
-        <h3 className="ml-4 text-lg font-medium text-white">
-          Realtime Analytics
-        </h3>
+        <h3 className="ml-4 text-lg font-medium text-white">Realtime Analytics</h3>
       </div>
       <p className="mt-4 leading-6 text-white/60">
-        Access real-time insights into your API usage through our dashboard, or
-        build your own on top of our API.
+        Access real-time insights into your API usage through our dashboard, or build your own on
+        top of our API.
       </p>
     </div>
   );
@@ -1033,14 +951,7 @@ export function LightSvg({ className }: { className?: string }) {
           }}
           filter="url(#m)"
         >
-          <ellipse
-            cx={353}
-            cy={253.199}
-            rx={240}
-            ry={140.1}
-            fill="url(#n)"
-            fillOpacity={0.5}
-          />
+          <ellipse cx={353} cy={253.199} rx={240} ry={140.1} fill="url(#n)" fillOpacity={0.5} />
         </g>
         <g
           style={{
@@ -1184,10 +1095,7 @@ export function LightSvg({ className }: { className?: string }) {
         >
           <feFlood floodOpacity={0} result="BackgroundImageFix" />
           <feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feGaussianBlur
-            stdDeviation={33.375}
-            result="effect1_foregroundBlur_840_2403"
-          />
+          <feGaussianBlur stdDeviation={33.375} result="effect1_foregroundBlur_840_2403" />
         </filter>
         <filter
           id="c"
@@ -1200,10 +1108,7 @@ export function LightSvg({ className }: { className?: string }) {
         >
           <feFlood floodOpacity={0} result="BackgroundImageFix" />
           <feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feGaussianBlur
-            stdDeviation={33.375}
-            result="effect1_foregroundBlur_840_2403"
-          />
+          <feGaussianBlur stdDeviation={33.375} result="effect1_foregroundBlur_840_2403" />
         </filter>
         <filter
           id="e"
@@ -1216,10 +1121,7 @@ export function LightSvg({ className }: { className?: string }) {
         >
           <feFlood floodOpacity={0} result="BackgroundImageFix" />
           <feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feGaussianBlur
-            stdDeviation={33.375}
-            result="effect1_foregroundBlur_840_2403"
-          />
+          <feGaussianBlur stdDeviation={33.375} result="effect1_foregroundBlur_840_2403" />
         </filter>
         <filter
           id="g"
@@ -1232,10 +1134,7 @@ export function LightSvg({ className }: { className?: string }) {
         >
           <feFlood floodOpacity={0} result="BackgroundImageFix" />
           <feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feGaussianBlur
-            stdDeviation={33.375}
-            result="effect1_foregroundBlur_840_2403"
-          />
+          <feGaussianBlur stdDeviation={33.375} result="effect1_foregroundBlur_840_2403" />
         </filter>
         <filter
           id="i"
@@ -1248,10 +1147,7 @@ export function LightSvg({ className }: { className?: string }) {
         >
           <feFlood floodOpacity={0} result="BackgroundImageFix" />
           <feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feGaussianBlur
-            stdDeviation={33.375}
-            result="effect1_foregroundBlur_840_2403"
-          />
+          <feGaussianBlur stdDeviation={33.375} result="effect1_foregroundBlur_840_2403" />
         </filter>
         <filter
           id="k"
@@ -1264,10 +1160,7 @@ export function LightSvg({ className }: { className?: string }) {
         >
           <feFlood floodOpacity={0} result="BackgroundImageFix" />
           <feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feGaussianBlur
-            stdDeviation={33.375}
-            result="effect1_foregroundBlur_840_2403"
-          />
+          <feGaussianBlur stdDeviation={33.375} result="effect1_foregroundBlur_840_2403" />
         </filter>
         <filter
           id="m"
@@ -1280,10 +1173,7 @@ export function LightSvg({ className }: { className?: string }) {
         >
           <feFlood floodOpacity={0} result="BackgroundImageFix" />
           <feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feGaussianBlur
-            stdDeviation={56.25}
-            result="effect1_foregroundBlur_840_2403"
-          />
+          <feGaussianBlur stdDeviation={56.25} result="effect1_foregroundBlur_840_2403" />
         </filter>
         <filter
           id="o"
@@ -1296,10 +1186,7 @@ export function LightSvg({ className }: { className?: string }) {
         >
           <feFlood floodOpacity={0} result="BackgroundImageFix" />
           <feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feGaussianBlur
-            stdDeviation={56.25}
-            result="effect1_foregroundBlur_840_2403"
-          />
+          <feGaussianBlur stdDeviation={56.25} result="effect1_foregroundBlur_840_2403" />
         </filter>
         <filter
           id="q"
@@ -1312,10 +1199,7 @@ export function LightSvg({ className }: { className?: string }) {
         >
           <feFlood floodOpacity={0} result="BackgroundImageFix" />
           <feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feGaussianBlur
-            stdDeviation={56.25}
-            result="effect1_foregroundBlur_840_2403"
-          />
+          <feGaussianBlur stdDeviation={56.25} result="effect1_foregroundBlur_840_2403" />
         </filter>
       </defs>
     </svg>

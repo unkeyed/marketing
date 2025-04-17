@@ -20,11 +20,7 @@ export function RateLimits() {
           <p>6</p>
         </div>
         <div className="flex w-full pl-8 font-mono text-xs leading-8 text-white whitespace-pre ratelimits-editor-bg-gradient-2 rounded-br-xl">
-          {JSON.stringify(
-            { rateLimit: { limit: 10, interval: 1000 } },
-            null,
-            2,
-          )}
+          {JSON.stringify({ rateLimit: { limit: 10, interval: 1000 } }, null, 2)}
         </div>
       </div>
       <div className="flex flex-col mt-8 ratelimits-fade-gradient">
@@ -198,11 +194,7 @@ export function RateLimits() {
                   type="matrix"
                   values="0 0 0 0 0.431373 0 0 0 0 0.337255 0 0 0 0 0.811765 0 0 0 1 0"
                 />
-                <feBlend
-                  mode="normal"
-                  in2="BackgroundImageFix"
-                  result="effect1_dropShadow_61_98"
-                />
+                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_61_98" />
                 <feBlend
                   mode="normal"
                   in="SourceGraphic"
@@ -241,9 +233,8 @@ export function RateLimitsText() {
         <h3 className="ml-4 text-lg font-medium text-white">Rate Limits</h3>
       </div>
       <p className="mt-4 leading-6 text-white/60">
-        Per IP, per user, per API key, or any identifier that matters to you.
-        Enforced on the edge, as close to your users as possible, delivering
-        fast and reliable rate limiting.
+        Per IP, per user, per API key, or any identifier that matters to you. Enforced on the edge,
+        as close to your users as possible, delivering fast and reliable rate limiting.
       </p>
     </div>
   );

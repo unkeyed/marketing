@@ -68,16 +68,8 @@ export default function SVGAccelerateMini(props: {
             colorInterpolationFilters="sRGB"
           >
             <feFlood floodOpacity="0" result="BackgroundImageFix" />
-            <feBlend
-              mode="normal"
-              in="SourceGraphic"
-              in2="BackgroundImageFix"
-              result="shape"
-            />
-            <feGaussianBlur
-              stdDeviation="12"
-              result="effect1_foregroundBlur_5190_171"
-            />
+            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+            <feGaussianBlur stdDeviation="12" result="effect1_foregroundBlur_5190_171" />
           </filter>
           <radialGradient
             id="paint0_angular_5190_171"
@@ -188,16 +180,8 @@ export default function SVGAccelerateMini(props: {
             colorInterpolationFilters="sRGB"
           >
             <feFlood floodOpacity="0" result="BackgroundImageFix" />
-            <feBlend
-              mode="normal"
-              in="SourceGraphic"
-              in2="BackgroundImageFix"
-              result="shape"
-            />
-            <feGaussianBlur
-              stdDeviation="12"
-              result="effect1_foregroundBlur_5190_448"
-            />
+            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+            <feGaussianBlur stdDeviation="12" result="effect1_foregroundBlur_5190_448" />
           </filter>
           <radialGradient
             id="paint0_angular_5190_448"
@@ -308,16 +292,8 @@ export default function SVGAccelerateMini(props: {
             colorInterpolationFilters="sRGB"
           >
             <feFlood floodOpacity="0" result="BackgroundImageFix" />
-            <feBlend
-              mode="normal"
-              in="SourceGraphic"
-              in2="BackgroundImageFix"
-              result="shape"
-            />
-            <feGaussianBlur
-              stdDeviation="12"
-              result="effect1_foregroundBlur_5190_448"
-            />
+            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+            <feGaussianBlur stdDeviation="12" result="effect1_foregroundBlur_5190_448" />
           </filter>
           <radialGradient
             id="paint0_angular_5190_448"
@@ -428,16 +404,8 @@ export default function SVGAccelerateMini(props: {
             colorInterpolationFilters="sRGB"
           >
             <feFlood floodOpacity="0" result="BackgroundImageFix" />
-            <feBlend
-              mode="normal"
-              in="SourceGraphic"
-              in2="BackgroundImageFix"
-              result="shape"
-            />
-            <feGaussianBlur
-              stdDeviation="12"
-              result="effect1_foregroundBlur_5190_521"
-            />
+            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+            <feGaussianBlur stdDeviation="12" result="effect1_foregroundBlur_5190_521" />
           </filter>
           <radialGradient
             id="paint0_angular_5190_521"
@@ -572,16 +540,8 @@ export default function SVGAccelerateMini(props: {
             colorInterpolationFilters="sRGB"
           >
             <feFlood floodOpacity="0" result="BackgroundImageFix" />
-            <feBlend
-              mode="normal"
-              in="SourceGraphic"
-              in2="BackgroundImageFix"
-              result="shape"
-            />
-            <feGaussianBlur
-              stdDeviation="12"
-              result="effect1_foregroundBlur_5190_660"
-            />
+            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+            <feGaussianBlur stdDeviation="12" result="effect1_foregroundBlur_5190_660" />
           </filter>
           <radialGradient
             id="paint0_angular_5190_660"
@@ -709,16 +669,8 @@ export default function SVGAccelerateMini(props: {
             colorInterpolationFilters="sRGB"
           >
             <feFlood floodOpacity="0" result="BackgroundImageFix" />
-            <feBlend
-              mode="normal"
-              in="SourceGraphic"
-              in2="BackgroundImageFix"
-              result="shape"
-            />
-            <feGaussianBlur
-              stdDeviation="12"
-              result="effect1_foregroundBlur_5190_741"
-            />
+            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+            <feGaussianBlur stdDeviation="12" result="effect1_foregroundBlur_5190_741" />
           </filter>
           <radialGradient
             id="paint0_angular_5190_741"
