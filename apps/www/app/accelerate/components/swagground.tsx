@@ -4,8 +4,8 @@ export function AccelerateSwaggroundIcon() {
       <path
         d="M18 12.5C20.4853 12.5 22.5 10.4853 22.5 8C22.5 5.51472 20.4853 3.5 18 3.5C15.5147 3.5 13.5 5.51472 13.5 8C13.5 10.4853 15.5147 12.5 18 12.5Z"
         stroke="white"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M18.5 12.5C18.5 12.2239 18.2761 12 18 12C17.7239 12 17.5 12.2239 17.5 12.5H18.5ZM17.5 12.5V19H18.5V12.5H17.5Z"

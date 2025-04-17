@@ -134,7 +134,7 @@ export function RateLimits() {
                 height="24"
                 rx="6"
                 fill="#6E56CF"
-                shape-rendering="crispEdges"
+                shapeRendering="crispEdges"
               />
               <rect
                 x="30"
@@ -144,7 +144,7 @@ export function RateLimits() {
                 rx="6"
                 fill="black"
                 fillOpacity="0.15"
-                shape-rendering="crispEdges"
+                shapeRendering="crispEdges"
               />
               <rect
                 x="30.375"
@@ -153,21 +153,21 @@ export function RateLimits() {
                 height="23.25"
                 rx="5.625"
                 stroke="white"
-                stroke-opacity="0.1"
-                stroke-width="0.75"
-                shape-rendering="crispEdges"
+                strokeWidth="0.75"
+                strokeOpacity="0.1"
+                shapeRendering="crispEdges"
               />
               <path
                 d="M46.9 38H38.1C37.4925 38 37 38.4477 37 39V45C37 45.5523 37.4925 46 38.1 46H46.9C47.5075 46 48 45.5523 48 45V39C48 38.4477 47.5075 38 46.9 38Z"
                 stroke="white"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
               <path
                 d="M48 40L43.0665 42.8519C42.8967 42.9487 42.7004 43 42.5 43C42.2996 43 42.1033 42.9487 41.9335 42.8519L37 40"
                 stroke="white"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
             </g>
             <defs>
@@ -178,9 +178,9 @@ export function RateLimits() {
                 width="84"
                 height="84"
                 filterUnits="userSpaceOnUse"
-                color-interpolation-filters="sRGB"
+                colorInterpolationFilters="sRGB"
               >
-                <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                <feFlood floodOpacity="0" result="BackgroundImageFix" />
                 <feColorMatrix
                   in="SourceAlpha"
                   type="matrix"
