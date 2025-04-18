@@ -28,7 +28,7 @@
     "@types/js-yaml": "^4.0.9",
     "ai": "^3.4.7",
     "drizzle-orm": "^0.33.0",
-    "drizzle-zod": "^0.5.1",
+    "drizzle-zod": "^0.7.1",
     "exa-js": "^1.4.10",
     "github-slugger": "^2.0.0",
     "js-yaml": "^4.1.0",
