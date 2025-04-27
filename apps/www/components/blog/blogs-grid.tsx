@@ -7,11 +7,11 @@ import { BlogPagination } from "./blog-pagination";
 type Props = {
   posts: Post[];
   className?: string;
-
   searchParams?: {
     tag?: string;
     page?: number;
   };
+  updateSearchParams?: (params: { tag?: string; page?: number }) => void;
 };
 
 function getAllTags(posts: Post[]) {
@@ -27,7 +27,12 @@ function getAllTags(posts: Post[]) {
   return tempTags;
 }
 
-export const BlogGrid: React.FC<Props> = ({ className, posts, searchParams }) => {
+export const BlogGrid: React.FC<Props> = ({
+  className,
+  posts,
+  searchParams,
+  updateSearchParams,
+}) => {
   const blogsPerPage: number = 15;
   const allTags = getAllTags(posts);
   const selectedTag = searchParams?.tag;
@@ -37,7 +42,10 @@ export const BlogGrid: React.FC<Props> = ({ className, posts, searchParams }) =>
       : posts;
 
   const page = Number(searchParams?.page ?? 1);
-  const visiblePosts = filteredPosts.slice(blogsPerPage * (page - 1), blogsPerPage * page);
+  const visiblePosts = filteredPosts.slice(
+    blogsPerPage * (page - 1),
+    blogsPerPage * page,
+  );
 
   return (
     <div>
@@ -47,23 +55,44 @@ export const BlogGrid: React.FC<Props> = ({ className, posts, searchParams }) =>
           className,
         )}
       >
-        {allTags.map((tag) => (
-          <Link
-            scroll={false}
-            key={tag}
-            prefetch
-            href={tag === "all" ? "/blog" : `/blog?tag=${tag}`}
-            className={cn(
-              tag === (selectedTag ?? "all")
-                ? "bg-white text-black"
-                : "bg-[rgb(26,26,26)] hover:bg-neutral-800 text-white/60",
-              " px-3 rounded-lg h-7 duration-150 ease-out content-center sm:text-sm",
-              className,
-            )}
-          >
-            {tag.charAt(0).toUpperCase() + tag.slice(1)}
-          </Link>
-        ))}
+        {allTags.map((tag) =>
+          updateSearchParams ? (
+            <button
+              key={tag}
+              onClick={() =>
+                updateSearchParams({
+                  tag: tag === "all" ? undefined : tag,
+                  page: 1,
+                })
+              }
+              className={cn(
+                tag === (selectedTag ?? "all")
+                  ? "bg-white text-black"
+                  : "bg-[rgb(26,26,26)] hover:bg-neutral-800 text-white/60",
+                " px-3 rounded-lg h-7 duration-150 ease-out content-center sm:text-sm",
+                className,
+              )}
+            >
+              {tag.charAt(0).toUpperCase() + tag.slice(1)}
+            </button>
+          ) : (
+            <Link
+              scroll={false}
+              key={tag}
+              prefetch
+              href={tag === "all" ? "/blog" : `/blog?tag=${tag}`}
+              className={cn(
+                tag === (selectedTag ?? "all")
+                  ? "bg-white text-black"
+                  : "bg-[rgb(26,26,26)] hover:bg-neutral-800 text-white/60",
+                " px-3 rounded-lg h-7 duration-150 ease-out content-center sm:text-sm",
+                className,
+              )}
+            >
+              {tag.charAt(0).toUpperCase() + tag.slice(1)}
+            </Link>
+          ),
+        )}
       </div>
       <div
         className={cn(
@@ -97,6 +126,11 @@ export const BlogGrid: React.FC<Props> = ({ className, posts, searchParams }) =>
 
             return `/blog?${newParams.toString()}`;
           }}
+          updateSearchParams={
+            updateSearchParams
+              ? (p: number) => updateSearchParams({ page: p, tag: selectedTag })
+              : undefined
+          }
         />
       </div>
     </div>

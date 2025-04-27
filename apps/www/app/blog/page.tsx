@@ -1,11 +1,16 @@
 import { BlogHero } from "@/components/blog/blog-hero";
-import { BlogGrid } from "@/components/blog/blogs-grid";
+import { ClientBlogGrid } from "@/components/blog/client-blog-grid";
 import { CTA } from "@/components/cta";
-import { TopLeftShiningLight, TopRightShiningLight } from "@/components/svg/background-shiny";
+import {
+  TopLeftShiningLight,
+  TopRightShiningLight,
+} from "@/components/svg/background-shiny";
 import { MeteorLinesAngular } from "@/components/ui/meteorLines";
 import { authors } from "@/content/blog/authors";
 import { type Post, allPosts } from "content-collections";
 import Link from "next/link";
+
+export const dynamic = "force-static";
 
 export const metadata = {
   title: "Blog | Unkey",
@@ -32,18 +37,13 @@ export const metadata = {
   },
 };
 
-type Props = {
-  searchParams?: {
-    tag?: string;
-    page?: number;
-  };
-};
-
-export default async function Blog(props: Props) {
+export default async function Blog() {
   const posts = allPosts.sort((a: Post, b: Post) => {
     return new Date(b.date).getTime() - new Date(a.date).getTime();
   });
+  const featuredPost = posts[0];
   const blogGridPosts = posts.slice(1, posts.length);
+  
   return (
     <>
       <div className="container w-full pt-48 mx-auto overflow-hidden scroll-smooth">
@@ -112,21 +112,24 @@ export default async function Blog(props: Props) {
           <TopRightShiningLight />
         </div>
 
-        {posts.length > 0 ? (
+        {featuredPost ? (
           <div className="w-full px-0 mx-0 rounded-3xl">
-            <Link href={`${posts[0].url}`} key={posts[0].url}>
+            <Link href={`${featuredPost.url}`} key={featuredPost.url}>
               <BlogHero
-                tags={posts[0].tags}
-                imageUrl={posts[0].image ?? "/images/blog-images/defaultBlog.png"}
-                title={posts[0].title}
-                subTitle={posts[0].description}
-                author={authors[posts[0].author]}
-                publishDate={posts[0].date}
+                tags={featuredPost.tags}
+                imageUrl={
+                  featuredPost.image ?? "/images/blog-images/defaultBlog.png"
+                }
+                title={featuredPost.title}
+                subTitle={featuredPost.description}
+                author={authors[featuredPost.author]}
+                publishDate={featuredPost.date}
               />
             </Link>
           </div>
         ) : null}
-        <BlogGrid posts={blogGridPosts} searchParams={props.searchParams} />
+        
+        <ClientBlogGrid posts={blogGridPosts} />
         <CTA />
       </div>
     </>
