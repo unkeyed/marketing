@@ -1,10 +1,7 @@
 import { BlogHero } from "@/components/blog/blog-hero";
 import { ClientBlogGrid } from "@/components/blog/client-blog-grid";
 import { CTA } from "@/components/cta";
-import {
-  TopLeftShiningLight,
-  TopRightShiningLight,
-} from "@/components/svg/background-shiny";
+import { TopLeftShiningLight, TopRightShiningLight } from "@/components/svg/background-shiny";
 import { MeteorLinesAngular } from "@/components/ui/meteorLines";
 import { authors } from "@/content/blog/authors";
 import { type Post, allPosts } from "content-collections";
@@ -43,7 +40,7 @@ export default async function Blog() {
   });
   const featuredPost = posts[0];
   const blogGridPosts = posts.slice(1, posts.length);
-  
+
   return (
     <>
       <div className="container w-full pt-48 mx-auto overflow-hidden scroll-smooth">
@@ -117,9 +114,7 @@ export default async function Blog() {
             <Link href={`${featuredPost.url}`} key={featuredPost.url}>
               <BlogHero
                 tags={featuredPost.tags}
-                imageUrl={
-                  featuredPost.image ?? "/images/blog-images/defaultBlog.png"
-                }
+                imageUrl={featuredPost.image ?? "/images/blog-images/defaultBlog.png"}
                 title={featuredPost.title}
                 subTitle={featuredPost.description}
                 author={authors[featuredPost.author]}
@@ -128,7 +123,7 @@ export default async function Blog() {
             </Link>
           </div>
         ) : null}
-        
+
         <ClientBlogGrid posts={blogGridPosts} />
         <CTA />
       </div>

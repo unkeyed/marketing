@@ -42,10 +42,7 @@ export const BlogGrid: React.FC<Props> = ({
       : posts;
 
   const page = Number(searchParams?.page ?? 1);
-  const visiblePosts = filteredPosts.slice(
-    blogsPerPage * (page - 1),
-    blogsPerPage * page,
-  );
+  const visiblePosts = filteredPosts.slice(blogsPerPage * (page - 1), blogsPerPage * page);
 
   return (
     <div>
@@ -58,6 +55,7 @@ export const BlogGrid: React.FC<Props> = ({
         {allTags.map((tag) =>
           updateSearchParams ? (
             <button
+              type="button"
               key={tag}
               onClick={() =>
                 updateSearchParams({
