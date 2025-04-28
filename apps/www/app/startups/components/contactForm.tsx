@@ -23,6 +23,21 @@ export const ContactForm = () => {
 
   const form = useForm({
     ...formOpts,
+    validators: {
+      // This stops the form from being submitted without all fields.
+      onChange({ value }) {
+        if (!value.Email) {
+          return "We need an email address";
+        }
+        if (!value["Full Name"]) {
+          return "We need a full name";
+        }
+        if (!value["Working With"]) {
+          return "We need a working with";
+        }
+        return undefined;
+      },
+    },
   });
 
   const formErrors = useStore(
@@ -129,6 +144,14 @@ export const ContactForm = () => {
           <div className="space-y-2 relative">
             <form.Field
               name="Working With"
+              validators={{
+                onChangeAsyncDebounceMs: 500,
+                onChangeAsync: async ({ value }) => {
+                  if (!value) {
+                    return "VC or accelerator is required, select other if you don't have one";
+                  }
+                },
+              }}
               children={(field) => {
                 return (
                   <FormSelect
@@ -222,14 +245,28 @@ export const ContactForm = () => {
                 loading,
                 state.isPristine,
                 state.isSubmitting,
+                state.isFieldsValid,
+                state.f,
               ]}
-              children={([canSubmit, loading, isPristine, isSubmitting]) => (
+              children={([
+                canSubmit,
+                loading,
+                isPristine,
+                isSubmitting,
+                isFieldsValid,
+              ]) => (
                 <Button
                   size="lg"
                   className="dark w-full bg-orange-500 hover:bg-orange-400 inset-x-0 bottom-0 "
                   type="submit"
                   loading={loading}
-                  disabled={!canSubmit || loading || isPristine || isSubmitting}
+                  disabled={
+                    !canSubmit ||
+                    loading ||
+                    isPristine ||
+                    isSubmitting ||
+                    !isFieldsValid
+                  }
                 >
                   Submit
                 </Button>

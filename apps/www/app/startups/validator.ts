@@ -12,10 +12,13 @@ export const formOpts = formOptions({
 });
 
 export const vcAcceleratorOptions = [
+  "Arc",
   "Essence",
-  "Uncork",
+  "Seedcamp",
+  "Preston Warner",
   "Sunflower Capital",
   "Techstars",
+  "Uncork",
   "YC",
   "Other",
 ];
