@@ -62,11 +62,7 @@ export function DesktopLogoCloud() {
 export const MobileLogoCloud = () => {
   return (
     <div className="md:hidden w-full flex flex-col items-center">
-      <span
-        className={cn("font-mono text-sm md:text-md text-white/50 text-center")}
-      >
-        Powering
-      </span>
+      <span className={cn("font-mono text-sm md:text-md text-white/50 text-center")}>Powering</span>
 
       <div className="w-full px-4 md:px-8">
         <div
@@ -81,7 +77,7 @@ export const MobileLogoCloud = () => {
               key={`logo-group-${groupIndex}`}
               className="flex shrink-0 animate-logo-cloud flex-row justify-around gap-6"
             >
-              {logos.map((logo, logoIndex) => (
+              {logos.map((logo, _logoIndex) => (
                 <div
                   key={`${groupIndex}-${logo.name}`}
                   className="relative w-[229px] aspect-[229/36]"
