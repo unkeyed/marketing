@@ -34,7 +34,7 @@ export function DesktopLogoCloud() {
       </span>
 
       <div className="flex w-full flex-col items-center justify-center px-4 md:px-8">
-        <div className="mt-10 grid grid-cols-5 gap-x-6">
+        <div className="mt-10 grid grid-cols-3 gap-x-6">
           {logos.map((logo, idx) => (
             <div
               key={String(idx)}
