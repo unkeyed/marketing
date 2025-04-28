@@ -15,9 +15,7 @@ export type ServerResponse =
   | { status: "error"; errors: string[] }
   | { status: "success"; submitted: boolean };
 
-export default async function create(
-  formData: FormData,
-): Promise<ServerResponse> {
+export default async function create(formData: FormData): Promise<ServerResponse> {
   try {
     const result = await createPlain(formData);
     if (result.error) {

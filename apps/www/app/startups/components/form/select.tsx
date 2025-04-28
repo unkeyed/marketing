@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { cva, type VariantProps } from "class-variance-authority";
+import { type VariantProps, cva } from "class-variance-authority";
 import * as React from "react";
 import { OptionalTag, RequiredTag } from "./form-textarea";
 
@@ -63,10 +63,7 @@ export type FormSelectProps = {
 } & Omit<React.ComponentPropsWithoutRef<typeof SelectTrigger>, "onChange"> &
   VariantProps<typeof selectTriggerVariants>;
 
-export const FormSelect = React.forwardRef<
-  React.ElementRef<typeof SelectTrigger>,
-  FormSelectProps
->(
+export const FormSelect = React.forwardRef<React.ElementRef<typeof SelectTrigger>, FormSelectProps>(
   (
     {
       label,
@@ -90,13 +87,10 @@ export const FormSelect = React.forwardRef<
     const descriptionId = `${inputId}-helper`;
     const errorId = `${inputId}-error`;
 
-    const isObjectOptions =
-      options.length > 0 && typeof options[0] !== "string";
+    const isObjectOptions = options.length > 0 && typeof options[0] !== "string";
 
     return (
-      <fieldset
-        className={cn("flex flex-col gap-1.5 border-0 m-0 p-0", className)}
-      >
+      <fieldset className={cn("flex flex-col gap-1.5 border-0 m-0 p-0", className)}>
         {label && (
           <label
             id={`${inputId}-label`}
@@ -122,9 +116,7 @@ export const FormSelect = React.forwardRef<
                 selectTriggerVariants({ variant: inputVariant }),
                 "px-3 py-2 [&>span]:flex [&>span]:items-center",
               )}
-              aria-describedby={
-                error ? errorId : description ? descriptionId : undefined
-              }
+              aria-describedby={error ? errorId : description ? descriptionId : undefined}
               aria-invalid={!!error}
               aria-required={required}
               {...props}
@@ -135,20 +127,12 @@ export const FormSelect = React.forwardRef<
               <SelectGroup>
                 {isObjectOptions
                   ? (options as SelectOption[]).map((option) => (
-                      <SelectItem
-                        key={option.value}
-                        value={option.value}
-                        className="dark "
-                      >
+                      <SelectItem key={option.value} value={option.value} className="dark ">
                         {option.label || option.value}
                       </SelectItem>
                     ))
                   : (options as string[]).map((option) => (
-                      <SelectItem
-                        key={option}
-                        value={option}
-                        className="dark hover:bg-gray-5"
-                      >
+                      <SelectItem key={option} value={option} className="dark hover:bg-gray-5">
                         {option}
                       </SelectItem>
                     ))}
@@ -159,15 +143,8 @@ export const FormSelect = React.forwardRef<
         {(description || error) && (
           <div className="text-[13px] leading-5">
             {error ? (
-              <div
-                id={errorId}
-                role="alert"
-                className="text-error-11 flex gap-2 items-center"
-              >
-                <TriangleWarning2
-                  className="flex-shrink-0"
-                  aria-hidden="true"
-                />
+              <div id={errorId} role="alert" className="text-error-11 flex gap-2 items-center">
+                <TriangleWarning2 className="flex-shrink-0" aria-hidden="true" />
                 <span className="flex-1">{error}</span>
               </div>
             ) : description ? (
