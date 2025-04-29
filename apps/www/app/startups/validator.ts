@@ -15,7 +15,7 @@ export const vcAcceleratorOptions = [
   "Arc",
   "Essence",
   "Seedcamp",
-  "Preston Warner",
+  "Preston Werner Ventures",
   "Sunflower Capital",
   "Techstars",
   "Uncork",
