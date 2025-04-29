@@ -483,13 +483,7 @@ export const reviewContentTask = task({
       metadata.set("error", typeof error === "object" ? JSON.stringify(error) : String(error));
       metadata.set("completedAt", new Date().toISOString());
 
-      // Fallback with original content if review fails
-      return {
-        markdown: content,
-        rating: 5,
-        improvements: ["Review failed due to an error"],
-        reasoning: "Review process failed due to an error",
-      };
+      throw new AbortTaskRunError(`Content review failed for term: ${term}`);
     }
   },
 });
