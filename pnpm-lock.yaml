@@ -21,7 +21,7 @@ importers:
         specifier: 5.8.2
         version: 5.8.2
 
-  'apps/generator ':
+  apps/generator:
     dependencies:
       '@agentic/serper':
         specifier: ^7.0.0
