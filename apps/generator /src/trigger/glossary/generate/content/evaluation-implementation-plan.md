@@ -5,15 +5,15 @@ This plan outlines the steps to implement a modular evaluation system for genera
 
 ## Implementation Steps
 
-### 1. Define Test Cases
-- Create `evaluations-test.ts` file with test cases for:
+### 1. Define Test Cases ✅ (Implemented)
+- **[Done]** Created `evaluations-test.ts` file with test cases for:
   - Technical evaluation (existing functionality)
   - SEO evaluation (new functionality)
   - Combined evaluation task
-- Use sample content for a glossary entry to test evaluations
-- Follow pattern from `update-takeaways-test.ts` and `update-content-test.ts` for testing trigger.dev tasks using the "@/lib/test" imports
-- Define expected output schemas for each evaluation type
-- Include test for handling evaluation failures
+- **[Done]** Used sample content for a glossary entry to test evaluations
+- **[Done]** Followed pattern from `update-takeaways-test.ts` and `update-content-test.ts` for testing trigger.dev tasks using the `@/lib/test` imports
+- **[Done]** Defined expected output schemas for each evaluation type
+- **[Done]** Included test for handling evaluation failures
 
 ### 2. Create Evaluations Module
 - Create new file: `evaluations.ts`
