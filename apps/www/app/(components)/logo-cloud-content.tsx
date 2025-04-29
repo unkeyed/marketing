@@ -2,19 +2,23 @@ import Image from "next/image";
 import type { CSSProperties } from "react";
 
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 const logos = [
   {
     name: "Fireworks",
     url: "/images/logo-cloud/fireworks-ai.svg",
+    href: "https://fireworks.ai",
   },
   {
     name: "cal.com",
     url: "/images/logo-cloud/calcom.svg",
+    href: "https://cal.com",
   },
   {
     name: "Mintlify",
     url: "/images/logo-cloud/mintlify.svg",
+    href: "https://mintlify.com",
   },
 ];
 
@@ -44,7 +48,9 @@ export function DesktopLogoCloud() {
                 } as CSSProperties
               }
             >
-              <Image src={logo.url} alt={logo.name} fill />
+              <Link href={logo.href} target="_blank">
+                <Image src={logo.url} alt={logo.name} fill />
+              </Link>
             </div>
           ))}
         </div>
@@ -66,20 +72,23 @@ export const MobileLogoCloud = () => {
               "linear-gradient(to left, transparent 0%, black 20%, black 80%, transparent 95%)",
           }}
         >
-          {Array(5)
-            .fill(null)
-            .map((index) => (
-              <div
-                key={index}
-                className="flex shrink-0 animate-logo-cloud flex-row justify-around gap-6"
-              >
-                {logos.map((logo, key) => (
-                  <div key={String(key)} className="relative w-[229px] aspect-[229/36]">
+          {[0, 1, 2].map((groupIndex) => (
+            <div
+              key={`logo-group-${groupIndex}`}
+              className="flex shrink-0 animate-logo-cloud flex-row justify-around gap-6"
+            >
+              {logos.map((logo, _logoIndex) => (
+                <div
+                  key={`${groupIndex}-${logo.name}`}
+                  className="relative w-[229px] aspect-[229/36]"
+                >
+                  <Link href={logo.href} target="_blank">
                     <Image src={logo.url} alt={logo.name} fill />
-                  </div>
-                ))}
-              </div>
-            ))}
+                  </Link>
+                </div>
+              ))}
+            </div>
+          ))}
         </div>
       </div>
     </div>

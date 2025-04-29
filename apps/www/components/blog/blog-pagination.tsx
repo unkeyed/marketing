@@ -13,10 +13,12 @@ export function BlogPagination({
   currentPage,
   numPages,
   buildPath,
+  updateSearchParams,
 }: {
   currentPage: number;
   numPages: number;
   buildPath: (page: number) => string;
+  updateSearchParams?: (page: number) => void;
 }) {
   if (numPages <= 1) {
     return null;
@@ -30,9 +32,13 @@ export function BlogPagination({
     if (rangeStart > 1) {
       content.push(
         <PaginationItem key="1">
-          <Link href={buildPath(1)} prefetch>
-            <PaginationLink>1</PaginationLink>
-          </Link>
+          {updateSearchParams ? (
+            <PaginationLink onClick={() => updateSearchParams(1)}>1</PaginationLink>
+          ) : (
+            <Link href={buildPath(1)} prefetch>
+              <PaginationLink>1</PaginationLink>
+            </Link>
+          )}
         </PaginationItem>,
       );
       if (rangeStart > 2) {
@@ -43,9 +49,15 @@ export function BlogPagination({
     for (let i = rangeStart; i <= rangeEnd; i++) {
       content.push(
         <PaginationItem key={i}>
-          <Link href={buildPath(i)} prefetch>
-            <PaginationLink isActive={currentPage === i}>{i}</PaginationLink>
-          </Link>
+          {updateSearchParams ? (
+            <PaginationLink isActive={currentPage === i} onClick={() => updateSearchParams(i)}>
+              {i}
+            </PaginationLink>
+          ) : (
+            <Link href={buildPath(i)} prefetch>
+              <PaginationLink isActive={currentPage === i}>{i}</PaginationLink>
+            </Link>
+          )}
         </PaginationItem>,
       );
     }
@@ -56,9 +68,13 @@ export function BlogPagination({
       }
       content.push(
         <PaginationItem key={numPages}>
-          <Link href={buildPath(numPages)} prefetch>
-            <PaginationLink>{numPages}</PaginationLink>
-          </Link>
+          {updateSearchParams ? (
+            <PaginationLink onClick={() => updateSearchParams(numPages)}>{numPages}</PaginationLink>
+          ) : (
+            <Link href={buildPath(numPages)} prefetch>
+              <PaginationLink>{numPages}</PaginationLink>
+            </Link>
+          )}
         </PaginationItem>,
       );
     }
@@ -71,9 +87,15 @@ export function BlogPagination({
       <PaginationContent>
         <PaginationItem>
           {currentPage > 1 ? (
-            <Link href={buildPath(Math.max(1, currentPage - 1))} prefetch>
-              <PaginationPrevious />
-            </Link>
+            updateSearchParams ? (
+              <PaginationPrevious
+                onClick={() => updateSearchParams(Math.max(1, currentPage - 1))}
+              />
+            ) : (
+              <Link href={buildPath(Math.max(1, currentPage - 1))} prefetch>
+                <PaginationPrevious />
+              </Link>
+            )
           ) : (
             <PaginationPrevious disabled />
           )}
@@ -81,9 +103,15 @@ export function BlogPagination({
         <PageButtons />
         <PaginationItem>
           {currentPage < numPages ? (
-            <Link href={buildPath(Math.min(numPages, currentPage + 1))} prefetch>
-              <PaginationNext />
-            </Link>
+            updateSearchParams ? (
+              <PaginationNext
+                onClick={() => updateSearchParams(Math.min(numPages, currentPage + 1))}
+              />
+            ) : (
+              <Link href={buildPath(Math.min(numPages, currentPage + 1))} prefetch>
+                <PaginationNext />
+              </Link>
+            )
           ) : (
             <PaginationNext disabled />
           )}
