@@ -42,8 +42,8 @@ importers:
         specifier: ^1.16.0
         version: 1.19.0
       '@trigger.dev/sdk':
-        specifier: 4.0.0-v4-beta.6
-        version: 4.0.0-v4-beta.6(ai@4.3.9(react@19.1.0)(zod@3.24.2))(zod@3.24.2)
+        specifier: 4.0.0-v4-beta.10
+        version: 4.0.0-v4-beta.10(ai@4.3.9(react@19.1.0)(zod@3.24.2))(zod@3.24.2)
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -2171,12 +2171,12 @@ packages:
   '@team-plain/typescript-sdk@2.19.0':
     resolution: {integrity: sha512-BloaZrzHLS2jfgdM9Q/wvpmkHw8ZoVCNaq3z5YsR8NOgbDuVNdzmAUzGqMDmdCRiZ5xbD8CUILHxap1AAJrY5A==}
 
-  '@trigger.dev/core@4.0.0-v4-beta.6':
-    resolution: {integrity: sha512-QN5mqUQVZNs9o5RgDnnbHnHZux+s28EDEmQCRbS5Vtsn79Axp3rgY1b2aFudDqhZVFozkS/L2kD/eUVRyZOr8w==}
+  '@trigger.dev/core@4.0.0-v4-beta.10':
+    resolution: {integrity: sha512-3l6/FA/V2ehgQgO8rH+q4XvWZL0cIwj2kvZzM8QBIxKWGcE+kff5SJ88Wt5GStDxIdyYiApMX/ozXrSkM7BiCw==}
     engines: {node: '>=18.20.0'}
 
-  '@trigger.dev/sdk@4.0.0-v4-beta.6':
-    resolution: {integrity: sha512-3zzJ1pIPC+1Ngj1d5mVl6fourLxwTIoJB0O+FTQvHsTyeKssZfhABLa0ZqMXg+RF6CIAaCMvfPjFGShijQoEtg==}
+  '@trigger.dev/sdk@4.0.0-v4-beta.10':
+    resolution: {integrity: sha512-zBiRSX6JU/b9BDbv7ZZ9peh9DlTRol/NwPDfHHeBpaMSCY7TQXnJU4jj6nWTPCnr68vRRo1PcGvP4nGoJflX+A==}
     engines: {node: '>=18.20.0'}
     peerDependencies:
       ai: ^4.2.0
@@ -6730,7 +6730,7 @@ snapshots:
       graphql: 16.10.0
       zod: 3.24.2
 
-  '@trigger.dev/core@4.0.0-v4-beta.6':
+  '@trigger.dev/core@4.0.0-v4-beta.10':
     dependencies:
       '@bugsnag/cuid': 3.2.1
       '@electric-sql/client': 1.0.0-beta.1
@@ -6769,12 +6769,12 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@trigger.dev/sdk@4.0.0-v4-beta.6(ai@4.3.9(react@19.1.0)(zod@3.24.2))(zod@3.24.2)':
+  '@trigger.dev/sdk@4.0.0-v4-beta.10(ai@4.3.9(react@19.1.0)(zod@3.24.2))(zod@3.24.2)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/api-logs': 0.52.1
       '@opentelemetry/semantic-conventions': 1.25.1
-      '@trigger.dev/core': 4.0.0-v4-beta.6
+      '@trigger.dev/core': 4.0.0-v4-beta.10
       chalk: 5.4.1
       cronstrue: 2.59.0
       debug: 4.4.0
