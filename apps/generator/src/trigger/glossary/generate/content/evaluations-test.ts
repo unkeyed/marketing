@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { type TestCase, createTestRunner, errorResultSchema, okResultSchema } from "@/lib/test";
-import { technicalReviewTask, evaluationResultSchema } from "./evaluations";
+import { evaluationResultSchema, technicalReviewSchema, technicalReviewTask } from "./evaluations";
 
 // Sample content for testing evaluations
 const sampleGlossaryContent = {
@@ -10,7 +10,7 @@ const sampleGlossaryContent = {
 
 // Schema for combined evaluation results
 const combinedEvaluationSchema = z.object({
-  technical: evaluationResultSchema,
+  technical: technicalReviewSchema,
   seo: evaluationResultSchema,
   passed: z.boolean(),
   summary: z.string(),
