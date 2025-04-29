@@ -15,26 +15,26 @@ This plan outlines the steps to implement a modular evaluation system for genera
 - **[Done]** Defined expected output schemas for each evaluation type
 - **[Done]** Included test for handling evaluation failures
 
-### 2. Create Evaluations Module
-- Create new file: `evaluations.ts`
-- Copy existing `reviewContentTask` (rename to `technicalReviewTask`) -- it's currently inside /Users/richardpoelderl/marketing/apps/generator/src/trigger/glossary/generate/content/generate-content.ts but should be inside evaluations.ts
-- Add JSDoc comments explaining each task's purpose
-- Define schemas for each evaluation type
+### 2. Create Evaluations Module ✅ (Implemented)
+- **[Done]**Create new file: `evaluations.ts`
+- **[Done]**Copy existing `reviewContentTask` (rename to `technicalReviewTask`) -- it's currently inside /Users/richardpoelderl/marketing/apps/generator/src/trigger/glossary/generate/content/generate-content.ts but should be inside evaluations.ts
+- **[Done]**Add JSDoc comments explaining each task's purpose
+- **[Done]**Define schemas for each evaluation type
 
-### 3. Implement SEO Evaluation
-- Create `seoReviewTask` with:
+### 3. Implement SEO Evaluation ✅ (Implemented)
+- **[Done]** Create `seoReviewTask` with:
   - Same input/output structure as technical review 
   - SEO-focused system prompt and evaluation criteria
   - Appropriate metadata tracking
 
-### 4. Create Combined Evaluation Task
-- Implement `reviewGenerationTask` that:
+### 4. Create Combined Evaluation Task ✅ (Implemented)
+- **[Done]** Implement `reviewGenerationTask` that:
   - Runs both evaluations in parallel
   - Tracks status of each evaluation in metadata
   - Handles partial failures (complete with available results)
   - Returns combined results
 
-### 5. Update Main Generation Task
+### 5. Update Main Generation Task (Outstanding)
 - Update `generateContentTask` to use new combined evaluation
 - Replace call to `reviewContentTask` with `reviewGenerationTask`
 - Update result handling

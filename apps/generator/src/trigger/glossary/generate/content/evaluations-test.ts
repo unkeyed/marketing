@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { type TestCase, createTestRunner, errorResultSchema, okResultSchema } from "@/lib/test";
-import { evaluationResultSchema, technicalReviewSchema, technicalReviewTask } from "./evaluations";
+import { evaluationResultSchema, reviewGenerationTask, technicalReviewTask } from "./evaluations";
 
 // Sample content for testing evaluations
 const sampleGlossaryContent = {
@@ -10,13 +10,13 @@ const sampleGlossaryContent = {
 
 // Schema for combined evaluation results
 const combinedEvaluationSchema = z.object({
-  technical: technicalReviewSchema,
+  technical: evaluationResultSchema,
   seo: evaluationResultSchema,
   passed: z.boolean(),
   summary: z.string(),
 });
 
-const testCases: TestCase<typeof technicalReviewTask>[] = [
+const testCases: TestCase<typeof reviewGenerationTask>[] = [
   {
     name: "combinedEvaluationTest",
     input: {
@@ -46,9 +46,9 @@ const testCases: TestCase<typeof technicalReviewTask>[] = [
 
       // Validate that both technical and SEO evaluations were performed
       const { technical, seo } = outputValidation.data;
-      if (!technical.feedback.length || !seo.feedback.length) {
+      if (!technical?.improvements?.length || !seo?.improvements?.length) {
         console.warn(
-          `Test '${this.name}' failed. Both technical and SEO evaluations should provide feedback.`,
+          `Test '${this.name}' failed. Both technical and SEO evaluations should provide improvements.`,
         );
         return false;
       }
@@ -81,7 +81,7 @@ const testCases: TestCase<typeof technicalReviewTask>[] = [
 // Create and export the test runner
 export const evaluationTests = {
   id: "evaluations",
-  task: technicalReviewTask,
+  task: reviewGenerationTask,
   testCases,
 };
 
