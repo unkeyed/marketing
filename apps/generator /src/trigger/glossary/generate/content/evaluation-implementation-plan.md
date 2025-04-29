@@ -17,7 +17,7 @@ This plan outlines the steps to implement a modular evaluation system for genera
 
 ### 2. Create Evaluations Module
 - Create new file: `evaluations.ts`
-- Move existing `reviewContentTask` (rename to `technicalReviewTask`)
+- Copy existing `reviewContentTask` (rename to `technicalReviewTask`) -- it's currently inside /Users/richardpoelderl/marketing/apps/generator /src/trigger/glossary/generate/content/generate-content.ts but should be inside evaluations.ts
 - Add JSDoc comments explaining each task's purpose
 - Define schemas for each evaluation type
 
