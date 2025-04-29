@@ -49,6 +49,10 @@ export const ContactForm = () => {
 
         <form
           action={async (formData) => {
+            const workingWithValue = form.state.values["Working With"];
+            if (workingWithValue) {
+              formData.set("Working With", workingWithValue);
+            }
             const result = await create(formData);
             setServerState(result);
             if (result.status === "success") {
