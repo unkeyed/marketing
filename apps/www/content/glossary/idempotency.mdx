@@ -1,0 +1,123 @@
+---
+title: "Idempotency in APIs: Comprehensive Guide"
+description: Understand idempotency in API development. Learn key characteristics, real-world applications, and why PUT is idempotent while POST is not. Dive in now.
+h1: "Idempotency in API Development: Key Characteristics & Implementation"
+term: Idempotency
+categories: []
+takeaways:
+  tldr: Idempotency is the property of certain operations in mathematics and computer science, that can be applied multiple times without changing the result beyond the initial application.
+  definitionAndStructure:
+    - key: Idempotency
+      value: Repeatable Operations
+    - key: HTTP Methods
+      value: GET, PUT, DELETE
+    - key: Non-Idempotent Methods
+      value: POST, PATCH
+  historicalContext:
+    - key: Introduced
+      value: Est. ~1990s
+    - key: Origin
+      value: Web Services (Idempotency)
+    - key: Evolution
+      value: Standardized Idempotency
+  usageInAPIs:
+    tags:
+      - Idempotency
+      - HTTP Methods
+      - API Design
+    description: Idempotency is crucial in API design to ensure that repeated requests do not lead to unintended side effects. It is particularly important for operations like PUT and DELETE. Non-idempotent methods like POST can be made idempotent using unique idempotency keys.
+  bestPractices:
+    - Use idempotent methods (GET, PUT, DELETE) where possible to ensure repeatable operations.
+    - For non-idempotent methods (POST, PATCH), use unique idempotency keys to prevent duplicate operations.
+    - Implement error handling to allow clients to safely retry requests without the risk of duplicating actions.
+  recommendedReading:
+    - url: https://medium.com/understanding-idempotency-and-safety-in-api-design
+      title: Understanding Idempotency and Safety in API Design
+    - url: https://restfulapi.net/idempotent-rest-apis/
+      title: Idempotent REST APIs
+    - url: https://www.baeldung.com/cs/rest-api-idempotency
+      title: Idempotency in the context of REST APIs
+  didYouKnow: The term 'idempotent' comes from the Latin 'idem', meaning 'the same', and 'potent', meaning 'powerful'. In the context of APIs, it refers to the power of an operation to produce the same result, no matter how many times it's repeated.
+faq:
+  - question: Which API method is not idempotent?
+    answer: The HTTP POST method is not idempotent. Idempotency refers to the property of certain operations in mathematics and computer science, where they can be applied multiple times without changing the result beyond the initial application. In the context of APIs, if a method is idempotent, it means that no matter how many times it's called, the server state remains the same. However, with the POST method, each call can result in a different server state. For instance, if you use POST to create a new resource on the server, each call will create a new resource, hence changing the server state.
+  - question: Why is HTTP put idempotent?
+    answer: The HTTP PUT method is idempotent because it overwrites the current state of the resource on the server with the state defined in the request. This means that no matter how many times you call the PUT method with the same request, the server state will remain the same after the first call. For example, if you use PUT to update a resource's data on the server, calling it once will update the data, and calling it again with the same data will not change anything. This lack of side effects is what makes the PUT method idempotent.
+updatedAt: 2025-04-30T15:35:37.000Z
+slug: idempotency
+---
+
+**Idempotency** is a fundamental concept in API development, ensuring that multiple identical requests have the same effect as a single request. This principle is crucial for building reliable and predictable APIs, particularly in distributed systems where requests might be repeated due to network failures or other issues.
+
+## Understanding Idempotency in API Development
+
+**Idempotency in API development** refers to the ability of an API to handle multiple identical requests such that the same operation produces the same result, regardless of how many times it is performed. This property is essential for achieving fault tolerance and consistency in API interactions, making it a key aspect of designing robust APIs.
+
+## Idempotent REST API: Key Characteristics
+
+When working with an **idempotent REST API**, consider the following key characteristics:
+
+- **Consistency**: Regardless of the number of times a request is made, the server's state remains consistent.
+- **Safety**: Idempotent operations do not cause unintended changes or side effects beyond the first application.
+- **Retry-able**: If a request fails or is uncertain, it can be safely retried without the risk of performing the same operation multiple times.
+
+## Idempotent REST API Example
+
+Here’s a practical example of an **idempotent REST API** call using TypeScript:
+
+```typescript
+import { HttpClient } from '@angular/common/http';
+
+// Example of an idempotent GET request
+const fetchData = async (url: string) => {
+  try {
+    const response = await HttpClient.get(url);
+    console.log('Data fetched successfully:', response);
+  } catch (error) {
+    console.error('Failed to fetch data:', error);
+  }
+};
+
+// Example of an idempotent DELETE request
+const deleteData = async (url: string) => {
+  try {
+    const response = await HttpClient.delete(url);
+    console.log('Data deleted successfully:', response);
+  } catch (error) {
+    console.error('Failed to delete data:', error);
+  }
+};
+```
+
+## Why PUT is Idempotent and POST is Not
+
+Understanding **why PUT is idempotent and POST is not** is crucial for API developers. PUT is considered idempotent because it replaces the target resource with a new body and will always yield the same result, no matter how many times it is executed. Conversely, POST is used to create new resources, and calling it multiple times typically results in multiple resources being created, which is why it is not idempotent.
+
+## Implementing Idempotency in Spring Boot APIs
+
+To implement **idempotency in Spring Boot APIs**, you can use a unique key (like a UUID) sent by the client with each request. This key can be stored temporarily on the server to check whether the request has been received before. If the same key is found, the server can skip processing the request and return the same response as before.
+
+```typescript
+import { Request, Response } from 'express';
+
+const idempotentPost = (req: Request, res: Response) => {
+  const key = req.header('Idempotency-Key');
+  const result = checkForKeyAndProcess(key, req.body);
+  res.send(result);
+};
+
+const checkForKeyAndProcess = (key: string, data: any) => {
+  // Logic to check the key and process data
+  return { status: 'Processed', data: data };
+};
+```
+
+## Real-World Applications of Idempotency
+
+**Idempotency** is crucial in financial transactions where duplicate requests could lead to erroneous multiple transactions. It is also vital in cloud services, where API calls might be repeated due to network interruptions, ensuring that the state of cloud resources does not become inconsistent.
+
+By understanding and implementing **idempotency in API development**, developers can create more reliable and user-friendly APIs that handle errors gracefully and maintain consistent states across multiple requests.
+
+---
+
+This optimized content incorporates the keywords naturally while providing valuable information for API developers seeking to understand the concept of idempotency.
