@@ -108,7 +108,7 @@ export const createPrTask = task({
     });
 
     const owner = "unkeyed";
-    const repo = "unkey";
+    const repo = "marketing";
     const branch = `richard/add-${input.replace(/\s+/g, "-").toLowerCase()}`;
     const path = `apps/www/content/glossary/${input.replace(/\s+/g, "-").toLowerCase()}.mdx`;
 
