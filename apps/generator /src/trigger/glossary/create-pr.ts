@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import GithubSlugger from "github-slugger";
 import yaml from "js-yaml"; // install @types/js-yaml?
 import type { CacheStrategy } from "./_generate-glossary-entry";
+import { tryCatch } from "@/lib/utils/try-catch";
 
 export const createPrTask = task({
   id: "create_pr",
@@ -201,18 +202,21 @@ export const createPrTask = task({
     await octokit.git.createRef({
       owner,
       repo,
-      ref: `refs/heads/${branch}`,
+      ref: `refs/heads/${branch}-${Date.now()}`, // TODO: we should probably reuse branches instead of timestamping the branch name to avoid duplicates
       sha: mainRef.data.object.sha,
     });
 
     // Commit the MDX file to the new branch
     console.info(`2.3 📦 Committing the MDX file to the new branch "${branch}"`);
     // get the existing file's sha (if exists):
-    const existingFile = await octokit.repos.getContent({
+    const { data: existingFile, error } = await tryCatch(octokit.repos.getContent({
       owner,
       repo,
       path,
-    });
+    }));
+    if (error) {
+      console.error(error);
+    }
     await octokit.repos.createOrUpdateFileContents({
       owner,
       repo,
@@ -220,7 +224,7 @@ export const createPrTask = task({
       message: `feat(glossary): Add ${input}.mdx to glossary`,
       content: Buffer.from(await file.arrayBuffer()).toString("base64"),
       branch,
-      ...("sha" in existingFile.data && { sha: existingFile.data.sha }),
+      ...(existingFile && "sha" in existingFile.data && { sha: existingFile.data.sha }),
     });
 
     console.info("2.4 📝 Creating the pull request");
