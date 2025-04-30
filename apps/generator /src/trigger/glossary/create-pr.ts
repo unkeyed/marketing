@@ -1,12 +1,12 @@
 import { db } from "@/lib/db-marketing/client";
 import { entries } from "@/lib/db-marketing/schemas";
+import { tryCatch } from "@/lib/utils/try-catch";
 import { Octokit } from "@octokit/rest";
 import { AbortTaskRunError, task } from "@trigger.dev/sdk/v3";
 import { eq } from "drizzle-orm";
 import GithubSlugger from "github-slugger";
 import yaml from "js-yaml"; // install @types/js-yaml?
 import type { CacheStrategy } from "./_generate-glossary-entry";
-import { tryCatch } from "@/lib/utils/try-catch";
 
 export const createPrTask = task({
   id: "create_pr",
@@ -209,11 +209,13 @@ export const createPrTask = task({
     // Commit the MDX file to the new branch
     console.info(`2.3 📦 Committing the MDX file to the new branch "${branch}"`);
     // get the existing file's sha (if exists):
-    const { data: existingFile, error } = await tryCatch(octokit.repos.getContent({
-      owner,
-      repo,
-      path,
-    }));
+    const { data: existingFile, error } = await tryCatch(
+      octokit.repos.getContent({
+        owner,
+        repo,
+        path,
+      }),
+    );
     if (error) {
       console.error(error);
     }

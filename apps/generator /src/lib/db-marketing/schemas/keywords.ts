@@ -18,14 +18,12 @@ export const keywords = mysqlTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
-  (table) => ([
+  (table) => [
     index("input_term_idx").on(table.inputTerm),
     index("keyword_idx").on(table.keyword),
     index("source_url_idx").on(table.sourceUrl),
-    unique("keywords_input_term_keyword_hash_unique").on(
-      table.inputTermAndKeywordHash,
-    ),
-  ]),
+    unique("keywords_input_term_keyword_hash_unique").on(table.inputTermAndKeywordHash),
+  ],
 );
 
 export const insertKeywordsSchema = createInsertSchema(keywords).extend({}).omit({ id: true });
