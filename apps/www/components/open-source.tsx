@@ -36,7 +36,7 @@ export const OpenSource: React.FC = () => {
             label="oss/acc"
           >
             <div className="flex mt-10 space-x-6">
-              <Link href="https://github.com/unkeyed/unkey" className="group">
+              <Link href="https://go.unkey.com/github" className="group">
                 <PrimaryButton IconLeft={Star} label="Star us on GitHub" shiny />
               </Link>
             </div>

@@ -24,7 +24,7 @@ const navigation = [
       },
       {
         title: "Source Code",
-        href: "/github",
+        href: "https://go.unkey.com/github",
         external: true,
       },
       {
@@ -64,7 +64,6 @@ const navigation = [
         href: "https://go.unkey.com/discord",
         external: true,
       },
-      { title: "GitHub", href: "https://go.unkey.com/github", external: true },
       { title: "OSS Friends", href: "/oss-friends" },
       {
         title: "Book a Call",
