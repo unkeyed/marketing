@@ -24,10 +24,11 @@ import { CodeExamples } from "./code-examples";
 
 export const metadata = {
   title: "Unkey",
-  description: "Build better APIs faster",
+  description: "Modern APIs, Effortless Development",
+  keywords: ["unkey", "api", "api development", "api security"],
   openGraph: {
     title: "Unkey",
-    description: "Build better APIs faster",
+    description: "Modern APIs, Effortless Development",
     url: "https://unkey.com/",
     siteName: "unkey.com",
     images: [
@@ -65,11 +66,6 @@ export default async function Landing() {
           <Section>
             <Hero />
           </Section>
-          {/* <Section className="mt-16 md:mt-32">
-            <Suspense fallback={null}>
-              <Stats />
-            </Suspense>
-          </Section> */}
           <Section className="mt-16 md:mt-32">
             <DesktopLogoCloud />
             <MobileLogoCloud />
@@ -142,7 +138,7 @@ export default async function Landing() {
               {/* TODO: horizontal scroll */}
               <SectionTitle
                 className="mt-8 md:mt-16 lg:mt-32 xl:mt-48"
-                title="Leveled-up API management"
+                title="Leveled-up API development"
                 text="With enhanced security, low latency, and better control, you can seamlessly integrate into your APIs and protect your data like never before."
                 label="Features"
               >

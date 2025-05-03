@@ -2,10 +2,10 @@ import { GlossaryClient } from "./client";
 
 export const metadata = {
   title: "Glossary | Unkey",
-  description: "Jumpstart your API development with our pre-built solutions.",
+  description: "Learn about all the important parts of API and API development.",
   openGraph: {
     title: "Glossary | Unkey",
-    description: "Jumpstart your API development with our pre-built solutions.",
+    description: "Learn about all the important parts of API and API development.",
     url: "https://unkey.com/glossary",
     siteName: "unkey.com",
     images: [

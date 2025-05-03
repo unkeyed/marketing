@@ -129,7 +129,12 @@ function MobileLinks({ className }: { className?: string }) {
                 <MobileNavLink onClick={() => setIsOpen(false)} href="/docs" label="Docs" />
               </li>
               <li>
-                <MobileNavLink onClick={() => setIsOpen(false)} href="/discord" label="Discord" />
+                <MobileNavLink
+                  onClick={() => setIsOpen(false)}
+                  href="https://go.unkey.com/discord"
+                  label="Discord"
+                  external
+                />
               </li>
             </ul>
           </div>
@@ -180,7 +185,7 @@ const DesktopLinks: React.FC<{ className: string }> = ({ className }) => (
       <DesktopNavLink href="/docs" label="Docs" />
     </li>
     <li>
-      <DesktopNavLink href="/discord" label="Discord" external />
+      <DesktopNavLink href="https://go.unkey.com/discord" label="Discord" external />
     </li>
   </ul>
 );
