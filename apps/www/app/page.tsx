@@ -1,10 +1,10 @@
-import { Hero } from "@/app/hero";
 import { AnalyticsBento } from "@/components/analytics/analytics-bento";
 import { AuditLogsBento } from "@/components/audit-logs-bento";
 import { PrimaryButton, SecondaryButton } from "@/components/button";
 import { CTA } from "@/components/cta";
 import { FeatureGrid } from "@/components/feature/feature-grid";
 import { HashedKeysBento } from "@/components/hashed-keys-bento";
+import { Hero } from "@/components/hero/hero";
 import { ImageWithBlur } from "@/components/image-with-blur";
 import { IpWhitelistingBento } from "@/components/ip-whitelisting-bento";
 import { LatencyBento } from "@/components/latency-bento";
