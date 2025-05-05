@@ -4,437 +4,60 @@ date: 2025-04-30,
 tags: ["product"]
 ---
 
-## New Features
+## Create Key wizard
 
+<ImageZoom src="/images/changelog/2025-05-01/create-key-clean.png" alt="Key Creation Wizard" width="1920" height="1080"/>
 
+Our Create Key wizard just got better! Enjoy these new and improved features:
 
+- Instant feedback during key creation
+- Apply multiple rate limits per key
+- Easy-to-use JSON formatter for metadata
+- Clear warning about one-time key display
 
-# AI-Enhanced Changelog
+<ImageZoom src="/images/changelog/2025-05-01/create-key-touched.png" alt="Key Creation Wizard with error" width="1920" height="1080"/>
 
-Changes from 2025-01-24 to 2025-04-29
+## API settings update
 
-## Summary
+Our new API Settings screen is designed for intuitive control over your API configurations.
+Adjust default bytes, prefixes, and manage security settings seamlessly.
 
-This release focuses on enhancing the user experience, improving performance and stability, and introducing new features while refining the underlying infrastructure.  Significant improvements have been made to the UI with fixes for tooltip timestamps, table regressions, key name overflows, and improved responsiveness on various pages. The user interface has also been improved with a new key creation wizard, redesigned user button, a workspace list instead of a select, and general UI fixes.
+<ImageZoom src="/images/changelog/2025-05-01/api-settings.jpeg" alt="API Settings" width="1920" height="1080"/>
 
-A substantial effort has been dedicated to backend enhancements, with the introduction of a new API server (v2), and new API endpoints for identity management. Performance optimizations are achieved by preventing unnecessary revalidation of logs and charts. Stability and reliability have been addressed through fixes for broken tests, session handling issues, and error formatting of AI searches. The rate limiting mechanism has been refined with an improved metrics collection. Furthermore, the codebase has undergone significant refactoring to remove unnecessary code and dependencies, improving efficiency.
 
-Security and access control have been fortified by restricting access to membership list fetching to the current organization context and enhancing error handling for expired pending sessions. Audit logging has been improved with added details to key deletion events. The codebase has also been updated to address security vulnerabilities, ensuring compliance.
+## Roles returned as part of verifyKey
 
-Finally, efforts have been made to enrich documentation.  API guides have been enhanced with authentication and error handling instructions. Also, guides on RESTful API design, API Documentation-Driven Design, and an explanation of how delete protection works have been added. The ratelimit SDK has been moved to a more appropriate repository, and CI/CD workflows have been optimized for efficiency, reducing test times by running only relevant tests based on code changes.
+The `/v1/keys.verifyKey` endpoint has been updated to include a list of roles associated with the key in the verification response, enabling applications to easily determine the user's roles during key verification and make more informed authorization decisions. This simplifies role-based access control implementation and requires one less API request.
 
+## Seeding local development
 
-## 🚀 Features
+We have introduced proper seeding for log pages and metrics, enhancing the ability to generate realistic test data and improving the development and testing experience. You can easily seed a workspace by running `pnpm local` and selecting `seed`. Our CLI will then ask a series of questions about what you would like to seed and how much test data you want.
 
-### [#2832](https://github.com/unkeyed/unkey/pull/2832): feat: api v2 init (by @chronark, @coderabbitai[bot])
+<ImageZoom src="/images/changelog/2025-05-01/seed-data.png" alt="Seed example" width="1920" height="1080"/>
 
-This pull request introduces a new API server (v2) with improved error handling, structured logging, and a robust fault management system, offering a more reliable and maintainable foundation for the application. This includes OpenAPI specifications for rate limiting and liveness, enhancing API discoverability and monitoring capabilities.
+## Other PRs
 
-### [#3156](https://github.com/unkeyed/unkey/pull/3156): feat: keys create wizard (by @ogzhanolguncu, @coderabbitai[bot], @perkinsjr)
+###  Bug Fixes
 
-This pull request introduces a multi-step wizard for creating new keys, simplifying the key creation process and guiding users through setting various parameters like rate limits, usage limits, expiration, and metadata. This enhancement improves the user experience by providing a structured and intuitive way to manage key configurations.
+- [#3189](https://github.com/unkeyed/unkey/pull/3189): Tooltip now shows the correct time interval
+- [#3115](https://github.com/unkeyed/unkey/pull/3115): Improve keyboard combinations
+- [#3187](https://github.com/unkeyed/unkey/pull/3187): Ensure charts and logs data count match
+- [#3157](https://github.com/unkeyed/unkey/pull/3157): Ensure username doesn't overflow sidebar
+- [#3118](https://github.com/unkeyed/unkey/pull/3118): Show timestamp correctly on click
+- [#3119](https://github.com/unkeyed/unkey/pull/3119): Usage chart colors and fix layout shift issue
+- [#3104](https://github.com/unkeyed/unkey/pull/3104): Only allow access membership list fetching to current org context.
+- [#3099](https://github.com/unkeyed/unkey/pull/3099): Prevent cancellations if the org has multiple members
+- [#3094](https://github.com/unkeyed/unkey/pull/3094): Improve errors when using natural language searches
+- [#3080](https://github.com/unkeyed/unkey/pull/3080): Make confirmation dialog trigger correctly on workspace members page.
+- [#3079](https://github.com/unkeyed/unkey/pull/3079): Pagination issue and improve fetch logic
+- [#3037](https://github.com/unkeyed/unkey/pull/3037): navbar-popover active state
+- [#3055](https://github.com/unkeyed/unkey/pull/3055): Use only time as cursor
+- [#3054](https://github.com/unkeyed/unkey/pull/3054): Query clickhouse by time
 
-### [#3198](https://github.com/unkeyed/unkey/pull/3198): feat: Move settings card and new inline link (by @MichaelUnkey, @coderabbitai[bot], @ogzhanolguncu)
+### Documentation
 
-This pull request introduces a new settings card, likely within the Unkey UI, and implements a new inline link functionality, enhancing user configuration options and improving navigation within the application. The changes contribute to a more user-friendly and efficient experience.
+- [#3173](https://github.com/unkeyed/unkey/pull/3173): Explain how delete protection works
 
-### [#3196](https://github.com/unkeyed/unkey/pull/3196): refactor: add proper logging to key delete (by @ogzhanolguncu, @coderabbitai[bot], @perkinsjr)
+### Other Changes
 
-This pull request enhances the key deletion process by adding detailed logging to the tRPC endpoint and audit insertion, improving traceability and debugging capabilities for key deletion operations. This will provide better insights into when and why keys are being deleted.
-
-### [#3072](https://github.com/unkeyed/unkey/pull/3072): feat: updated api settings page (by @MichaelUnkey, @coderabbitai[bot], @chronark)
-
-This pull request introduces an updated API settings page, likely improving the user interface and functionality for configuring API access and ratelimits. The changes likely enhance the user experience and provide more control over API usage.
-
-### [#3192](https://github.com/unkeyed/unkey/pull/3192): chore: Add timestamp to unkey UI (by @MichaelUnkey, @coderabbitai[bot], @ogzhanolguncu)
-
-This pull request adds a timestamp to the unkey UI, likely improving monitoring and debugging capabilities by providing a clear record of when events or actions occurred. The changes involved updating UI elements, handling timestamps, and updating documentation.
-
-### [#3180](https://github.com/unkeyed/unkey/pull/3180): feat(buffer): add prometheus metrics and type identification (by @imeyer, @coderabbitai[bot], @chronark)
-
-This pull request enhances the observability of the buffer system by adding Prometheus metrics to track insertion attempts, dropped items, and buffer consumption, and improves performance by consolidating metrics and caching buffer type names. This enables better monitoring and understanding of buffer behavior, leading to improved system stability and performance optimization.
-
-### [#3151](https://github.com/unkeyed/unkey/pull/3151): feat: v2/identitiesDeleteIdentity (by @Flo4604, @coderabbitai[bot], @chronark)
-
-This PR introduces the ability to soft-delete identities through a new API endpoint, `v2/identitiesDeleteIdentity`, which includes necessary database changes to support this functionality and addresses related issues like index correction and permission handling. This enables a more controlled and reversible way to remove identities from the system.
-
-### [#3171](https://github.com/unkeyed/unkey/pull/3171): feat:  include roles in /v1/keys.verifyKey response (by @chronark, @ogzhanolguncu)
-
-This pull request enhances the `/v1/keys.verifyKey` endpoint by including a list of roles associated with the key in the verification response, enabling applications to easily determine the user's roles during key verification and make more informed authorization decisions. This improves security and simplifies role-based access control implementation.
-
-### [#3092](https://github.com/unkeyed/unkey/pull/3092): feat: improve responsiveness of /api/[apiID] page (by @revogabe, @coderabbitai[bot], @chronark)
-
-This pull request enhances the mobile experience of the /api/[apiID] page by improving responsiveness, replacing overflowing popovers with drawer components for filters and calendars, and optimizing chart display and UI elements for smaller screens. This makes the API details page more usable and visually appealing on mobile devices.
-
-### [#3169](https://github.com/unkeyed/unkey/pull/3169): feat: add circuitbreaker metrics (by @chronark, @coderabbitai[bot])
-
-This pull request introduces circuit breaker metrics, providing insights into the state and performance of circuit breakers within the system. This enhancement enables better monitoring and understanding of system resilience, facilitating proactive identification and resolution of potential issues.
-
-### [#3124](https://github.com/unkeyed/unkey/pull/3124): feat: dogfood our aws api for ratelimiting (by @chronark, @coderabbitai[bot], @ogzhanolguncu)
-
-Pull Request #3124 introduces a new rate limiting mechanism by leveraging the company's own AWS API, enabling internal teams to dogfood and validate its performance and reliability. This change also incorporates bug fixes, documentation updates, and dependency updates to improve the rate limiting feature and its integration.
-
-### [#3077](https://github.com/unkeyed/unkey/pull/3077): feat(billing): update the keyword-research (by @p6l-richard, @coderabbitai[bot], @perkinsjr)
-
-This pull request significantly enhances the keyword research capabilities within the billing system by increasing the number of related keywords and improving data quality through Google Keyword Planner integration, enabling better SEO prioritization with the addition of keyword metrics like volume, CPC, and competition. This update allows for more comprehensive and effective keyword analysis for billing-related content.
-
-### [#3035](https://github.com/unkeyed/unkey/pull/3035): feat: api keys list (by @ogzhanolguncu, @coderabbitai[bot])
-
-This pull request introduces a new API Keys page with a list view, usage charts, and improved filtering and searching capabilities (including AI search) to enhance the management and monitoring of API keys within the Unkey platform. This provides users with better visibility and control over their API keys and their usage.
-
-### [#3074](https://github.com/unkeyed/unkey/pull/3074): fix: name added to details in audit logs (by @MichaelUnkey, @coderabbitai[bot], @chronark)
-
-This pull request fixes issue #2939 and Eng-1654 by adding the name of the affected entity to the details section of audit logs, improving their clarity and making it easier to identify who or what triggered a particular audit event. This enhancement makes audit logs more informative and actionable.
-
-### [#3110](https://github.com/unkeyed/unkey/pull/3110): feat: errors v2 (by @chronark, @coderabbitai[bot])
-
-Pull Request #3110 introduces a new `/v2/apis/createApi` endpoint and a comprehensive, structured error handling system (errors v2) across the API. This provides clearer error messages and documentation, enabling developers to more easily understand and resolve issues encountered when interacting with the API.
-
-### [#3108](https://github.com/unkeyed/unkey/pull/3108): feat: /v2/apis/createApi endpoint (by @chronark, @coderabbitai[bot])
-
-Pull Request #3108 introduces a new API endpoint, `/v2/apis/createApi`, enabling users to programmatically create APIs with structured requests, responses, and improved validation. This provides developers with a more streamlined and reliable way to integrate API creation into their workflows.
-
-### [#3084](https://github.com/unkeyed/unkey/pull/3084): feat: show list of workspaces instead of select (by @chronark, @coderabbitai[bot], @mcstepp, @ogzhanolguncu)
-
-This pull request replaces the organization selection dropdown with a more intuitive list of interactive buttons, improving the user experience when choosing a workspace. The remembered last-used organization and alphabetical sorting further streamline the workflow.
-
-### [#3089](https://github.com/unkeyed/unkey/pull/3089): feat: Add proper seeding for log pages (by @ogzhanolguncu, @coderabbitai[bot], @chronark)
-
-This pull request introduces proper seeding for log pages and metrics, enhancing the ability to generate realistic test data and improving the development and testing experience. This includes documentation updates, improved data distribution, and checks to ensure data integrity during the seeding process.
-
-### [#2955](https://github.com/unkeyed/unkey/pull/2955): feat: api v2 identities.createIdentity (by @Flo4604, @coderabbitai[bot])
-
-This pull request introduces a new API endpoint (`/v2/identities`) that allows the creation of identities, enhancing the platform's identity management capabilities. It includes features like audit logging, rate limiting, workspace validation, and duplicate handling, improving security, observability, and overall user experience.
-
-### [#3090](https://github.com/unkeyed/unkey/pull/3090): feat: redesigned user button (by @chronark, @coderabbitai[bot], @ogzhanolguncu, @mcstepp)
-
-Pull Request #3090 introduces a redesigned user button and sidebar navigation, providing easier access to help resources, improved feedback mechanisms, and a more streamlined user experience with updated iconography. This enhancement simplifies navigation and makes it easier for users to find support and submit feedback.
-
-### [#3091](https://github.com/unkeyed/unkey/pull/3091): feat: improve error handling for expired pending session (by @mcstepp, @coderabbitai[bot], @ogzhanolguncu)
-
-This pull request improves the user experience when a pending authentication session expires due to workspace selection delay. It now provides clear error messaging to the user on the sign-in page, informing them that the session has expired and preventing silent failures.
-
-### [#3033](https://github.com/unkeyed/unkey/pull/3033): feat: add new load more component (by @ogzhanolguncu, @coderabbitai[bot], @chronark)
-
-This PR introduces a "load more" component to the table, enabling users to load more data in chunks and improving performance by initially loading a smaller dataset. To support this feature, the ClickHouse queries for logs and ratelimit data were updated to include the total count of available data.
-
-### [#2957](https://github.com/unkeyed/unkey/pull/2957): feat: add usage-insight on the desktop-sidebar (by @revogabe, @coderabbitai[bot], @ogzhanolguncu, @chronark, @perkinsjr)
-
-This pull request introduces usage insights to the desktop sidebar, providing users with a clear view of their resource consumption and plan details directly within the application's interface, enhancing awareness and potentially guiding upgrade decisions. The PR also includes refactoring and fixes to improve the overall codebase and address layout and UI issues related to the sidebar.
-
-### [#3070](https://github.com/unkeyed/unkey/pull/3070): chore: Add impersonation check to main layout for banner warning (by @perkinsjr, @chronark, @mcstepp)
-
-This pull request adds a banner at the top of the screen when a user is being impersonated, providing a clear visual indicator to prevent accidental actions performed as the impersonated user. This enhances security and reduces the risk of unintended consequences during impersonation scenarios.
-
-### [#3081](https://github.com/unkeyed/unkey/pull/3081): chore: clean up after changing ratelimit implementation (by @chronark, @coderabbitai[bot])
-
-Pull Request #3081 cleans up the codebase after a change to the rate limiting implementation, and introduces new API configuration options and CLI flags for improved deployment and monitoring. This enhances flexibility and manageability for users deploying and managing the Unkey service.
-
-### [#3027](https://github.com/unkeyed/unkey/pull/3027): feat: add new nested routes (by @ogzhanolguncu, @coderabbitai[bot], @chronark)
-
-This pull request introduces new nested routes within the application, improving navigation and organization, particularly within the sidebar. This enhances user experience by providing a more structured and intuitive way to access different sections of the application.
-
-### [#3017](https://github.com/unkeyed/unkey/pull/3017): feat(glossary): add field-level takeaways generation & update (by @p6l-richard, @coderabbitai[bot], @chronark)
-
-This pull request introduces a new "takeaways" generation and update system using Google's Gemini model, enabling dynamic field-level updates for more granular control over the generated content. This allows for more targeted and efficient knowledge extraction and summarization within the glossary.
-
-### [#3071](https://github.com/unkeyed/unkey/pull/3071): feat: reworked data responses (by @chronark, @coderabbitai[bot])
-
-This pull request significantly improves the API by reworking data responses to include detailed metadata for better traceability and consistency, and enhances rate limiting with new override capabilities. The update also includes comprehensive API documentation that addresses authentication, error handling, security best practices, key management, and rate limiting.
-
-### [#3068](https://github.com/unkeyed/unkey/pull/3068): feat: customer feedback sdk permissions (by @chronark, @coderabbitai[bot], @perkinsjr)
-
-This feature enhances the customer feedback SDK by adding the ability to manage permissions and roles programmatically, streamlining access control and improving security. This allows for more granular control over who can perform actions within the customer feedback system.
-
-### [#3044](https://github.com/unkeyed/unkey/pull/3044): feat: dogfood aws ratelimiting (by @chronark, @coderabbitai[bot])
-
-Pull Request #3044 introduces improved rate limiting functionality, enhancing the stability and reliability of the Unkey service by implementing identifier-based "jail time" for abusive requests and refining rate limiting metrics. It also updates default API endpoints and provides documentation improvements.
-
-### [#2879](https://github.com/unkeyed/unkey/pull/2879): feat: Query logs component (by @MichaelUnkey, @coderabbitai[bot], @chronark, @ogzhanolguncu)
-
-This pull request introduces a new "Query Logs component" that allows users to view and analyze query logs, enabling better monitoring and debugging of application usage. This new feature enhances observability and provides insights into query performance and behavior.
-
-### [#2680](https://github.com/unkeyed/unkey/pull/2680): chore: Add RESTful API to API documentation (by @chronark, @coderabbitai[bot])
-
-This pull request introduces a new guide to the API documentation explaining RESTful API design and best practices. This enhances the documentation by providing developers with a comprehensive resource for understanding and utilizing RESTful APIs.
-
-### [#2682](https://github.com/unkeyed/unkey/pull/2682): chore: Add API Documentation-Driven Design to API documentation (by @chronark, @coderabbitai[bot], @p6l-richard)
-
-This pull request introduces a new guide, "API Documentation-Driven Design," to the API documentation. This provides best practices, templates, and examples to improve API design by focusing on clear and effective documentation.
-
-
-## 🐛 Bug Fixes
-
-### [#3189](https://github.com/unkeyed/unkey/pull/3189): fix: tooltip showing wrong time interval (by @ogzhanolguncu, @chronark)
-
-This PR fixes a bug where chart tooltips displayed an incorrect timestamp, leading to confusion when analyzing data. By ensuring the tooltip timestamp matches the corresponding data point and log data, users can now accurately interpret chart information and debug effectively.
-
-### [#3115](https://github.com/unkeyed/unkey/pull/3115): fix: keyboard shortcut hijack issues (by @ogzhanolguncu, @coderabbitai[bot], @chronark)
-
-PR #3115 resolves keyboard shortcut hijacking issues by implementing a more robust `option+shift+key` combination for shortcuts, ensuring intended application functionality is not overridden by OS or browser default behaviors, and improving usability. This fix makes keyboard shortcuts more reliable and predictable for users.
-
-### [#3197](https://github.com/unkeyed/unkey/pull/3197): fix: table regression and key name overflow (by @ogzhanolguncu, @coderabbitai[bot], @perkinsjr)
-
-This bug fix resolves issues in the table component, addressing a regression that made virtual tables unusable due to a fixed height and preventing overflow of key names within the table. This improves the usability and visual presentation of tables.
-
-### [#3187](https://github.com/unkeyed/unkey/pull/3187): fix: charts and logs data count (by @ogzhanolguncu, @coderabbitai[bot], @chronark)
-
-This PR fixes a discrepancy between the data displayed in charts and logs, ensuring that the counts align and provide a consistent view of the data. By aligning the data fetching intervals, users will no longer be misled by differing data representations between the two views.
-
-### [#3161](https://github.com/unkeyed/unkey/pull/3161): fix: do not send 4x as many rows to clickhouse (by @chronark, @coderabbitai[bot])
-
-This pull request fixes a bug where four times the intended number of rows were being sent to ClickHouse. The fix is validated by new integration tests that assert the correct number of rows are inserted into ClickHouse.
-
-### [#3125](https://github.com/unkeyed/unkey/pull/3125): fix: broken pnpm local step (by @ogzhanolguncu, @chronark, @coderabbitai[bot])
-
-This pull request fixes a broken `pnpm local` build process, ensuring that required packages are built only once, thus improving efficiency and stability. It also removes an unnecessary main call from the prepare script, further streamlining the process.
-
-### [#3157](https://github.com/unkeyed/unkey/pull/3157): fix: ensure username doesn't overflow sidebar (by @hmacr, @chronark)
-
-This bug fix prevents long usernames from overflowing the sidebar, improving the UI by ensuring user information is displayed correctly and preventing layout issues. This enhances the user experience by making the sidebar more readable and visually appealing.
-
-### [#3118](https://github.com/unkeyed/unkey/pull/3118): fix: show timestamp on click (by @ogzhanolguncu, @coderabbitai[bot], @chronark)
-
-This pull request fixes an issue where the timestamp was not being displayed when clicked. The fix improves the user experience by ensuring the timestamp is visible when a user interacts with it.
-
-### [#3120](https://github.com/unkeyed/unkey/pull/3120): fix: ordering of left menu (by @ogzhanolguncu, @chronark)
-
-This pull request fixes an issue with the incorrect ordering of items in the left menu, improving user navigation and overall usability. The changes ensure menu items are displayed in the intended and logical sequence.
-
-### [#3119](https://github.com/unkeyed/unkey/pull/3119): fix: usage chart colors and layout shift issue (by @ogzhanolguncu, @chronark)
-
-This pull request fixes inconsistent colors in the usage chart and a minor layout shift issue, improving the visual clarity and overall user experience of the application. This makes the usage data easier to understand and the interface feel more polished.
-
-### [#3117](https://github.com/unkeyed/unkey/pull/3117): fix: wiggle issue (by @ogzhanolguncu, @mcstepp, @chronark)
-
-This PR fixes a "wiggle" or visual jumping issue in the table layout. The issue occurred when the table keys used `px-0` spacing (for borders) because the table's default `px-2` spacing compensation was incorrectly applied, causing misalignment. Disabling the compensation resolves this.
-
-### [#3128](https://github.com/unkeyed/unkey/pull/3128): fix: use counter for cache reads (by @chronark, @coderabbitai[bot])
-
-This bug fix replaces two gauges tracking cache reads with a single counter to enable accurate calculation of the cache hit ratio. This change improves the ability to monitor and understand cache performance, which was previously difficult due to limitations of the original gauge implementation.
-
-### [#3127](https://github.com/unkeyed/unkey/pull/3127): fix: null check latest verification (by @ogzhanolguncu, @chronark)
-
-This pull request fixes a bug where the `limit` parameter was missing from the latest verification request. This omission could have led to unexpected behavior or incorrect results when fetching the latest verification data, and the fix ensures the request is complete and returns the expected data.
-
-### [#3121](https://github.com/unkeyed/unkey/pull/3121): fix: broken tests (by @ogzhanolguncu, @mcstepp)
-
-This pull request fixes broken tests, likely preventing failures in the continuous integration pipeline or revealing underlying issues in the codebase. Resolving these failures ensures the reliability and stability of the project.
-
-### [#3113](https://github.com/unkeyed/unkey/pull/3113): fix: don't log warnings when data was not found (by @chronark, @ogzhanolguncu)
-
-This bug fix prevents the application from logging unnecessary warning messages when data is not found, leading to cleaner, more actionable logs and improved system monitoring by reducing noise. It clarifies the log output to highlight truly problematic issues.
-
-### [#3104](https://github.com/unkeyed/unkey/pull/3104): fix: only allow access membership list fetching to current org context (by @mcstepp, @ogzhanolguncu, @chronark)
-
-This pull request fixes a security vulnerability (ENG-1716) by ensuring that users can only access membership lists for the organization they are currently authenticated within, preventing unauthorized access to other organizations' membership data. The fix enforces context-aware access control, preventing users from querying membership lists outside of their current organization context.
-
-### [#3111](https://github.com/unkeyed/unkey/pull/3111): fix: secret hover (by @chronark)
-
-PR #3111 fixes an issue where secret hover information was hidden, improving the user experience by ensuring users can properly view and interact with secret details. This enhancement provides better clarity and accessibility of sensitive information within the application.
-
-### [#3102](https://github.com/unkeyed/unkey/pull/3102): fix: formatting for openapi (by @Flo4604, @chronark)
-
-This pull request fixes formatting issues in the OpenAPI specification, resolving issue #3101. This improves the readability and maintainability of the OpenAPI documentation, potentially aiding developers who rely on it for understanding and integrating with the API.
-
-### [#3098](https://github.com/unkeyed/unkey/pull/3098): fix: ignore orphaned relations (by @chronark, @ogzhanolguncu)
-
-This bug fix improves the application's robustness by preventing errors that could occur when processing permissions associated with non-existent (orphaned) relationships. By filtering out these invalid entries, the application now handles permissions more reliably, ensuring smoother operation and preventing potential crashes or unexpected behavior.
-
-### [#3099](https://github.com/unkeyed/unkey/pull/3099): fix: prevent cancellations if the org has multiple members (by @chronark, @coderabbitai[bot], @perkinsjr)
-
-This bug fix prevents unintended subscription downgrades for organizations with multiple members by ensuring that only single-member organizations can successfully downgrade to the free plan. This prevents unexpected disruption for multi-member organizations and guides them towards the correct cancellation process.
-
-### [#3096](https://github.com/unkeyed/unkey/pull/3096): fix(chproxy): Update reader interval to 60s (by @imeyer, @chronark)
-
-This change optimizes telemetry reporting by increasing the data read interval to 60 seconds, which reduces the data points per minute (DPM) rate sent to Grafana Cloud, leading to improved efficiency and cost savings. The service version has also been updated to reflect the new release.
-
-### [#3078](https://github.com/unkeyed/unkey/pull/3078): fix: broken dashboard tests (by @ogzhanolguncu, @coderabbitai[bot], @chronark)
-
-This pull request fixes broken dashboard tests, ensuring the dashboard functionality is properly validated and preventing regressions. The changes also include updates to the CI/CD pipeline to improve efficiency and reliability of the testing process.
-
-### [#3083](https://github.com/unkeyed/unkey/pull/3083): fix: improve session handling to avoid calling session refresh logic consecutively (by @mcstepp, @coderabbitai[bot], @chronark, @perkinsjr)
-
-This pull request fixes an issue where the session refresh logic was being called repeatedly due to edge middleware, potentially invalidating refresh tokens. By leveraging RSC caching and moving session handling logic out of the middleware, the update makes session management more efficient and prevents unintended token invalidations.
-
-### [#3094](https://github.com/unkeyed/unkey/pull/3094): fix: error formatting of ai searches (by @ogzhanolguncu, @coderabbitai[bot], @chronark)
-
-This pull request fixes the formatting of error messages displayed after AI searches, improving user understanding and debugging when searches fail. The changes ensure errors are presented clearly, which enhances the user experience and facilitates quicker identification of search-related issues.
-
-### [#3085](https://github.com/unkeyed/unkey/pull/3085): fix: rate limit details showing 's' instead of 'ms' (by @ogzhanolguncu, @chronark, @mcstepp)
-
-This bug fix corrects the rate limit display to accurately show milliseconds ('ms') instead of seconds ('s'), providing developers with precise information about rate limit durations. This improvement enhances debugging and optimization efforts by giving a clearer understanding of rate limit behavior.
-
-### [#3080](https://github.com/unkeyed/unkey/pull/3080): fix: Make confirmation dialog trigger correctly. (by @perkinsjr, @ogzhanolguncu)
-
-This bug fix resolves an issue where the confirmation dialog on the members page was not triggering when a button was clicked. By correctly configuring the dialog's triggers, users can now properly interact with and utilize the confirmation dialog functionality.
-
-### [#3079](https://github.com/unkeyed/unkey/pull/3079): fix: pagination issue and improve fetch logic (by @ogzhanolguncu, @chronark)
-
-This pull request resolves a pagination issue, ensuring users can navigate through data sets correctly. It also improves the data fetching logic, likely enhancing performance and reliability.
-
-### [#3037](https://github.com/unkeyed/unkey/pull/3037): fix: navbar-popover active state (by @ogzhanolguncu, @chronark)
-
-This pull request fixes an issue where the navbar popover was not correctly indicating its active state, improving the user experience by providing accurate visual feedback. This ensures users can easily identify which popover is currently open and active.
-
-### [#3065](https://github.com/unkeyed/unkey/pull/3065): fix: oauth from request.url (by @perkinsjr)
-
-This pull request fixes an issue related to OAuth authentication by extracting the necessary information directly from the request URL. This likely resolves a problem where OAuth authentication was failing or incomplete, improving the reliability and security of the authentication process.
-
-### [#3064](https://github.com/unkeyed/unkey/pull/3064): chore: Biome fixes (by @perkinsjr, @coderabbitai[bot])
-
-This pull request improves code quality and accessibility by addressing unused code, standardizing formatting, and enabling accessibility warnings to ensure future improvements align with best practices. It also removes unnecessary logging to streamline internal processes.
-
-### [#3059](https://github.com/unkeyed/unkey/pull/3059): fix(org-selector): force auth page into dark mode (by @mcstepp)
-
-This PR fixes a bug where the authentication page in the organization selector was not correctly displaying in dark mode, leading to a visual inconsistency. By directly applying a dark mode class, the authentication page now consistently respects the user's dark mode preference, improving the user experience.
-
-### [#3061](https://github.com/unkeyed/unkey/pull/3061): fix: Update code to infer Vercel URL for WorkOS redirect (by @mcstepp, @perkinsjr, @coderabbitai[bot])
-
-This pull request fixes an issue where the WorkOS redirect URL was not correctly inferred, resolving a bug reported in Linear ticket ENG-1694. By creating a global `baseUrl` function and updating the SSO callback and TRPC endpoints, the application now reliably uses the correct redirect URL, ensuring a smooth authentication flow with WorkOS on Vercel.
-
-### [#3060](https://github.com/unkeyed/unkey/pull/3060): fix: sign out (by @mcstepp, @perkinsjr)
-
-This pull request fixes an issue where signing out on localhost or staging environments was using incorrect WorkOS wildcard configurations. The fix ensures that signing out always uses a relative path to sign-in, resolving a potential authentication problem and improving the user experience on these environments.
-
-### [#3057](https://github.com/unkeyed/unkey/pull/3057): fix: remove clerk again (by @chronark, @coderabbitai[bot], @mcstepp)
-
-This pull request removes Clerk, a third-party authentication and user management library, from the project to streamline dependencies and potentially improve performance. The change removes features related to Clerk's user management, opting for a more consistent and self-managed user data approach.
-
-### [#3055](https://github.com/unkeyed/unkey/pull/3055): fix: use only time as cursos (by @chronark)
-
-This bug fix improves the audit log experience by ensuring that pagination and ordering are solely based on time, presenting a more intuitive and chronologically accurate view of audit events. It also refines the styling of legal links on the authentication page for better user experience.
-
-### [#3054](https://github.com/unkeyed/unkey/pull/3054): fix: query by time (by @chronark, @perkinsjr)
-
-This bug fix improves the efficiency and accuracy of audit log queries by leveraging the existing index on the `time` field. This ensures faster and more precise retrieval of audit logs when filtering by time.
-
-### [#3053](https://github.com/unkeyed/unkey/pull/3053): Fix URLs for terms (by @perkinsjr, @coderabbitai[bot])
-
-This pull request fixes broken URLs associated with terms on the website.  This ensures users can access the correct definitions and information related to specific terms, improving the overall user experience and accuracy of the site.
-
-### [#3050](https://github.com/unkeyed/unkey/pull/3050): fix: Biome fixes (by @perkinsjr, @coderabbitai[bot], @chronark)
-
-This pull request resolves various Biome-related issues throughout the codebase, improving code quality and consistency without altering existing functionality. This includes fixing labels, Ally properties, key management, `useEffect` usage, and import sorting.
-
-
-## 📚 Documentation
-
-### [#3173](https://github.com/unkeyed/unkey/pull/3173): chore: docs page to explain how delete protection works (by @MichaelUnkey, @coderabbitai[bot], @chronark)
-
-This pull request introduces a new documentation page explaining the delete protection feature, addressing issue ENG-1768. This enhances user understanding of the security mechanism and helps prevent accidental data loss.
-
-
-## 🔄 Other Changes
-
-### [#3191](https://github.com/unkeyed/unkey/pull/3191): refactor: prevent revalidation (by @ogzhanolguncu, @coderabbitai[bot], @perkinsjr)
-
-This pull request optimizes performance by preventing unnecessary re-fetching of log and chart data when the requested time range remains the same. Additionally, it includes a fix for a broken test introduced during the revalidation optimization process.
-
-### [#3178](https://github.com/unkeyed/unkey/pull/3178): chore: move ratelimit sdk to unkeyed/sdks (by @chronark, @perkinsjr)
-
-This change reorganizes the codebase by moving the ratelimit SDK to a new directory (unkeyed/sdks), improving code organization and maintainability. This is a technical improvement that doesn't directly affect functionality but helps with long-term code health.
-
-### [#3176](https://github.com/unkeyed/unkey/pull/3176): chore: CI improvements part 1. (by @perkinsjr, @coderabbitai[bot], @imeyer, @chronark, @github-advanced-security[bot])
-
-The PR workflow (`pr.yaml`) now includes a `wait_for_autofix` job that runs before other tests, preventing redundant test executions when the autofix workflow modifies the code. This saves CI resources and time by avoiding unnecessary test runs on code that will be automatically corrected.
-
-### [#3185](https://github.com/unkeyed/unkey/pull/3185): Goreleaser (by @chronark)
-
-This pull request introduces Goreleaser, a tool that automates the release process for Go projects. This streamlines the creation of release artifacts, making it easier to distribute and manage Go applications.
-
-### [#3181](https://github.com/unkeyed/unkey/pull/3181): chore(release): version packages (by @github-actions[bot])
-
-The API package has been updated to version 0.4.0, adding the functionality to return user roles as part of the verification process. This enhancement provides more comprehensive user information during verification, potentially enabling more granular access control and personalized experiences.
-
-### [#3179](https://github.com/unkeyed/unkey/pull/3179): chore(release): version packages (by @github-actions[bot], @chronark)
-
-The change to the `api` package introduces a new feature where user roles are now included as part of verification results. This provides more comprehensive user context during verification processes, potentially improving security and authorization decisions.
-
-### [#3147](https://github.com/unkeyed/unkey/pull/3147): refactor: RQ hook for ratelimits logs (by @ogzhanolguncu, @chronark, @coderabbitai[bot])
-
-The change memoizes the timestamp used in ratelimit queries to prevent unnecessary refetches caused by page navigation, improving performance and reducing server load. This ensures data is only refreshed when needed, enhancing the user experience.
-
-### [#3175](https://github.com/unkeyed/unkey/pull/3175): chore(deps): bump resend from 4.0.0 to 4.4.0 (by @dependabot[bot], @chronark)
-
-This pull request updates the `resend` dependency from version 4.0.0 to 4.4.0, incorporating new features, bug fixes, and performance improvements included in the minor version update to enhance email sending capabilities. This upgrade aims to leverage the latest enhancements within the Resend email service.
-
-### [#3138](https://github.com/unkeyed/unkey/pull/3138): chore(deps): bump golang.org/x/net from 0.35.0 to 0.38.0 in /apps/agent (by @dependabot[bot], @chronark)
-
-This PR updates the `golang.org/x/net` dependency in the `/apps/agent` directory from version 0.35.0 to 0.38.0, incorporating bug fixes and potential performance improvements present in the newer version, enhancing the stability and efficiency of the agent application. Specifically, the commit logs indicate fixes related to HTML parsing and HTTP/3 implementation, suggesting improvements in web-related functionality within the agent.
-
-### [#3148](https://github.com/unkeyed/unkey/pull/3148): refactor: remove autofocus (by @ogzhanolguncu, @chronark)
-
-This change refactors the AI search component by removing the autofocus feature. This enhancement aims to improve the user experience by preventing the search bar from automatically gaining focus upon loading, potentially disrupting workflow and providing more control to the user.
-
-### [#3155](https://github.com/unkeyed/unkey/pull/3155): chore: change case for keys table header (by @hmacr, @perkinsjr)
-
-This pull request standardizes the capitalization of headers in the keys table, improving the visual consistency and overall user experience. This change addresses a minor inconsistency in the UI, enhancing the polish of the application.
-
-### [#3088](https://github.com/unkeyed/unkey/pull/3088): chore: Monorepos RFC (by @perkinsjr, @chronark, @coderabbitai[bot])
-
-This pull request introduces initial work towards a monorepo structure, potentially consolidating multiple related projects into a single repository. This effort aims to improve code sharing, dependency management, and collaboration.
-
-### [#3122](https://github.com/unkeyed/unkey/pull/3122): chore: Removing everything to do with www, play or glossary aka billing (by @perkinsjr, @chronark)
-
-This pull request eliminates the `www`, `play`, and `glossary` (billing) applications from the monorepo, including related code, documentation, and ownership configurations, streamlining the codebase and potentially simplifying future development and maintenance efforts.
-
-### [#3114](https://github.com/unkeyed/unkey/pull/3114): chore: upgrade dependencies for security reasons (by @chronark, @ogzhanolguncu)
-
-This pull request updates the project's dependencies to address potential security vulnerabilities and improve overall stability. While there are no direct changes to user features, the upgrade enhances the project's security posture and ensures compatibility with the latest libraries.
-
-### [#3093](https://github.com/unkeyed/unkey/pull/3093): refactor: remove request_id from cursors (by @ogzhanolguncu, @coderabbitai[bot], @chronark)
-
-This pull request refactors the codebase to remove the `request_id` from various cursor implementations related to logging, rate limiting, and API interactions. Removing the `request_id` simplifies cursor management and likely improves performance or reduces storage overhead.
-
-### [#3106](https://github.com/unkeyed/unkey/pull/3106): chore(deps): bump github.com/ClickHouse/ch-go from 0.64.1 to 0.65.0 in /apps/agent (by @dependabot[bot], @chronark)
-
-This PR updates the `github.com/ClickHouse/ch-go` dependency in the `/apps/agent` directory from version 0.64.1 to 0.65.0, potentially bringing performance improvements and new features related to data compression, as suggested by the release notes. This upgrade ensures the agent utilizes the latest version of the ClickHouse Go client library, possibly improving efficiency and compatibility with ClickHouse.
-
-### [#3109](https://github.com/unkeyed/unkey/pull/3109): chore: upgrade wrangler (by @chronark)
-
-Besides upgrading Wrangler, this pull request also refactors dashboard visualizations by removing legacy chart components and related libraries, simplifying the charting experience for potentially improved performance and maintainability.
-
-### [#3097](https://github.com/unkeyed/unkey/pull/3097): chore: remove old columns (by @chronark)
-
-The change updated logging methods during data seeding to provide more consistent and informative output, improving the clarity and reliability of the seeding process.
-
-### [#3095](https://github.com/unkeyed/unkey/pull/3095): chore: remove clerk #1 (by @chronark)
-
-The removal of the clerk tenant ID streamlines resource creation and simplifies workspace management by eliminating an unnecessary internal identifier. This improves efficiency and reduces complexity in the system.
-
-### [#3086](https://github.com/unkeyed/unkey/pull/3086): chore(deps-dev): bump @cloudflare/vitest-pool-workers from 0.4.1 to 0.8.12 (by @dependabot[bot], @chronark)
-
-This pull request updates the `@cloudflare/vitest-pool-workers` development dependency from version 0.4.1 to 0.8.12, bringing in potentially new features, bug fixes, and performance improvements related to testing in the Cloudflare Workers environment. This upgrade is likely aimed at enhancing the reliability and efficiency of the project's testing infrastructure.
-
-### [#3082](https://github.com/unkeyed/unkey/pull/3082): chore: Changelog march 2025 (by @perkinsjr, @coderabbitai[bot], @chronark)
-
-This pull request adds a changelog entry for March 2025, incorporating various details and adjustments, including updating a picture to one with relevant data. This ensures users are informed about changes and improvements made to the software during that period.
-
-### [#3066](https://github.com/unkeyed/unkey/pull/3066): spring cleaning (by @chronark, @perkinsjr)
-
-The pull request enhances the service discovery documentation by providing clearer guidance, examples, and explanations on configuration, thread safety, and error handling, ultimately improving the user experience and simplifying the implementation of service discovery mechanisms.
-
-### [#3076](https://github.com/unkeyed/unkey/pull/3076): chore: Remove logs (by @perkinsjr)
-
-This pull request removes unnecessary logging statements from the codebase, likely to improve performance and reduce noise in the logs. It also includes a formatting change to adhere to code style guidelines, ensuring consistency and readability.
-
-### [#3075](https://github.com/unkeyed/unkey/pull/3075): wip: redis based ratelimiting (by @chronark)
-
-The commit "fix: remove panic" improves the stability and reliability of the Redis-based rate limiting feature by preventing the application from crashing due to unexpected errors. This ensures continued service availability and a better user experience.
-
-### [#3069](https://github.com/unkeyed/unkey/pull/3069): chore(release): version packages (by @github-actions[bot])
-
-The "@unkey/api" package has been updated to version 0.35.0, introducing the new "permissions" feature, allowing for more granular control over access and capabilities within the Unkey API. This update also prompted a dependency update in the "@unkey/hono" package to ensure compatibility and leverage the new permissions feature.
-
-### [#3056](https://github.com/unkeyed/unkey/pull/3056): chore: remove clerk (by @chronark)
-
-The user details structure in the dashboard logs was simplified, now prioritizing only username and profile image for clearer and more efficient logging. This streamlining helps reduce unnecessary data while maintaining essential user identification in dashboard logs.
-
-### [#2912](https://github.com/unkeyed/unkey/pull/2912): Update takeaways for API Caching (by @chronark, @coderabbitai[bot])
-
-The `didYouKnow` takeaway for API Caching was updated to emphasize the broader benefit of enabling Progressive Web Apps (PWAs) to function offline, directly improving user experience, and to simplify the language. This makes the takeaway more concise and highlights the real-world value of caching in modern web applications.
-
-### [#2833](https://github.com/unkeyed/unkey/pull/2833): chore: Custom api costs post (by @perkinsjr)
-
-This pull request introduces a new blog post focused on custom API costs. It aims to educate users and provide insights on managing and understanding the expenses associated with custom APIs.
+- [#3191](https://github.com/unkeyed/unkey/pull/3191): Prevent revalidation of logs and charts to improve dashboard performance.
