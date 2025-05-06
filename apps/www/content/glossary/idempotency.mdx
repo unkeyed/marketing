@@ -93,9 +93,11 @@ const deleteData = async (url: string) => {
 
 Understanding **why PUT is idempotent and POST is not** is crucial for API developers. PUT is considered idempotent because it replaces the target resource with a new body and will always yield the same result, no matter how many times it is executed. Conversely, POST is used to create new resources, and calling it multiple times typically results in multiple resources being created, which is why it is not idempotent.
 
-## Implementing Idempotency in Spring Boot APIs
+## Implementing Idempotency in Node APIs
 
-To implement **idempotency in Spring Boot APIs**, you can use a unique key (like a UUID) sent by the client with each request. This key can be stored temporarily on the server to check whether the request has been received before. If the same key is found, the server can skip processing the request and return the same response as before.
+To implement **idempotency in Node APIs**, you can use a unique key (like a UUID) sent by the client with each request. This key can be stored temporarily on the server to check whether the request has been received before. If the same key is found, the server can skip processing the request and return the same response as before.
+
+Here is an example in Express
 
 ```typescript
 import { Request, Response } from 'express';
@@ -117,7 +119,3 @@ const checkForKeyAndProcess = (key: string, data: any) => {
 **Idempotency** is crucial in financial transactions where duplicate requests could lead to erroneous multiple transactions. It is also vital in cloud services, where API calls might be repeated due to network interruptions, ensuring that the state of cloud resources does not become inconsistent.
 
 By understanding and implementing **idempotency in API development**, developers can create more reliable and user-friendly APIs that handle errors gracefully and maintain consistent states across multiple requests.
-
----
-
-This optimized content incorporates the keywords naturally while providing valuable information for API developers seeking to understand the concept of idempotency.
