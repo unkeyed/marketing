@@ -4,7 +4,7 @@ date: 2025-04-30,
 tags: ["product"]
 ---
 
-## Create Key wizard
+## Create Key Wizard
 
 <ImageZoom src="/images/changelog/2025-05-01/create-key-clean.png" alt="Key Creation Wizard" width="1920" height="1080"/>
 
@@ -17,7 +17,7 @@ Our Create Key wizard just got better! Enjoy these new and improved features:
 
 <ImageZoom src="/images/changelog/2025-05-01/create-key-touched.png" alt="Key Creation Wizard with error" width="1920" height="1080"/>
 
-## API settings update
+## API Settings Update
 
 Our new API Settings screen is designed for intuitive control over your API configurations.
 Adjust default bytes, prefixes, and manage security settings seamlessly.
@@ -25,13 +25,13 @@ Adjust default bytes, prefixes, and manage security settings seamlessly.
 <ImageZoom src="/images/changelog/2025-05-01/api-settings.jpeg" alt="API Settings" width="1920" height="1080"/>
 
 
-## Roles returned as part of verifyKey
+## Roles Returned as Part of `verifyKey`
 
 The `/v1/keys.verifyKey` endpoint has been updated to include a list of roles associated with the key in the verification response, enabling applications to easily determine the user's roles during key verification and make more informed authorization decisions. This simplifies role-based access control implementation and requires one less API request.
 
-## Seeding local development
+## Seeding Local Development
 
-We have introduced proper seeding for log pages and metrics, enhancing the ability to generate realistic test data and improving the development and testing experience. You can easily seed a workspace by running `pnpm local` and selecting `seed`. Our CLI will then ask a series of questions about what you would like to seed and how much test data you want.
+We have introduced proper seeding for log pages and metrics, enhancing the ability to generate realistic test data and improving the development and testing experience. You can easily seed a workspace by running `pnpm local` and selecting `Seed Clickhouse/DB`. Our CLI will then ask a series of questions about what you would like to seed and how much test data you want.
 
 <ImageZoom src="/images/changelog/2025-05-01/seed-data.png" alt="Seed example" width="1920" height="1080"/>
 
