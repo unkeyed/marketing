@@ -3,10 +3,14 @@ import { entries } from "@/lib/db-marketing/schemas";
 import { tryCatch } from "@/lib/utils/try-catch";
 import { Octokit } from "@octokit/rest";
 import { AbortTaskRunError, task } from "@trigger.dev/sdk/v3";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 import GithubSlugger from "github-slugger";
 import yaml from "js-yaml"; // install @types/js-yaml?
 import type { CacheStrategy } from "./_generate-glossary-entry";
+
+// =====================
+// GLOSSARY PR CREATION WORKFLOW (IDEMPOTENT, CASE-BASED)
+// =====================
 
 export const createPrTask = task({
   id: "create_pr",
@@ -17,7 +21,7 @@ export const createPrTask = task({
     input,
     onCacheHit = "stale" as CacheStrategy,
   }: { input: string; onCacheHit?: CacheStrategy }) => {
-    // Add check for existing PR URL
+    // 1. Check for existing PR URL in DB (cache hit)
     const existing = await db.query.entries.findFirst({
       where: eq(entries.inputTerm, input),
       columns: {
@@ -28,14 +32,11 @@ export const createPrTask = task({
       },
       orderBy: (entries, { asc }) => [asc(entries.createdAt)],
     });
-
     if (existing?.githubPrUrl && onCacheHit === "stale") {
-      return {
-        entry: existing,
-      };
+      return { entry: existing };
     }
 
-    // ==== 1. Prepare MDX file ====
+    // 2. Prepare MDX file content
     const entry = await db.query.entries.findFirst({
       where: eq(entries.inputTerm, input),
       orderBy: (entries, { asc }) => [asc(entries.createdAt)],
@@ -51,7 +52,7 @@ export const createPrTask = task({
       );
     }
     const slugger = new GithubSlugger();
-    // Convert the object to YAML, ensuring the structure matches our schema
+    const slug = slugger.slug(entry.inputTerm);
     const yamlString = yaml.dump(
       {
         title: entry.metaTitle,
@@ -59,208 +60,222 @@ export const createPrTask = task({
         h1: entry.metaH1,
         term: entry.inputTerm,
         categories: entry.categories,
-        takeaways: {
-          tldr: entry.takeaways.tldr,
-          definitionAndStructure: entry.takeaways.definitionAndStructure,
-          historicalContext: entry.takeaways.historicalContext,
-          usageInAPIs: {
-            tags: entry.takeaways.usageInAPIs.tags,
-            description: entry.takeaways.usageInAPIs.description,
-          },
-          bestPractices: entry.takeaways.bestPractices,
-          recommendedReading: entry.takeaways.recommendedReading,
-          didYouKnow: entry.takeaways.didYouKnow,
-        },
+        takeaways: entry.takeaways,
         faq: entry.faq,
         updatedAt: entry.updatedAt,
-        slug: slugger.slug(entry.inputTerm),
+        slug,
       },
       {
-        sortKeys: (a, b) => {
-          // Ensure that 'question' always comes first
-          if (a === "question" || b === "question") {
-            return a === "question" ? -1 : 1;
-          }
-          return 0;
-        },
+        sortKeys: (a, b) => (a === "question" ? -1 : b === "question" ? 1 : 0),
         lineWidth: -1,
         noRefs: true,
         quotingType: '"',
       },
     );
-
-    // Create frontmatter
     const frontmatter = `---\n${yamlString}---\n`;
-
     const mdxContent = `${frontmatter}${entry.dynamicSectionsContent}`;
-    const blob = new Blob([mdxContent], { type: "text/markdown" });
-
-    // Create a File object from the Blob
-    const file = new File([blob], `${input.replace(/\s+/g, "-").toLowerCase()}.mdx`, {
-      type: "text/markdown",
-    });
-    console.info("1. MDX file created");
-
-    // ==== 2. Handle GitHub: create branch, file content & PR ====
-
-    console.info(`2. ⏳ Creating PR for entry to term: "${input}"`);
-    const octokit = new Octokit({
-      auth: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
-    });
-
-    const owner = "unkeyed";
+    const contentBase64 = Buffer.from(mdxContent).toString("base64");
+    const owner = process.env.NODE_ENV === "production" ? "unkeyed" : "p6l-richard";
     const repo = "marketing";
-    const branch = `richard/add-${input.replace(/\s+/g, "-").toLowerCase()}`;
-    const path = `apps/www/content/glossary/${input.replace(/\s+/g, "-").toLowerCase()}.mdx`;
+    const baseBranch = "main";
+    const branchPrefix = `richard/add_${slug}`;
+    const filePath = `apps/www/content/glossary/${slug}.mdx`;
+    const commitMessage = `feat(glossary): Add or update ${input}.mdx in glossary`;
+    const prTitle = `Add or update ${input} in Glossary`;
+    const prBody = `This PR adds or updates the ${input}.mdx file in the API documentation.`;
+    const octokit = new Octokit({ auth: process.env.GITHUB_PERSONAL_ACCESS_TOKEN });
 
-    const existingPr = await octokit.rest.pulls.list({
-      owner,
-      repo,
-      base: "main",
-      head: `${owner}:${branch}`,
-      state: "open",
-    });
-
-    if (existingPr?.data?.length > 0) {
-      console.info("2.1 ⏩︎ Pending (open) PR found. Updating the content of the file directly...");
-
-      console.info(`this is for debugging, check if the file actually exists or not in the github ui: ${existingPr.data[0].head.ref}
-        URL: https://github.com/unkeyed/unkey/pull/${existingPr.data[0].number}`);
-      // get the blob sha of the file being replaced:
-      const existingFile = await octokit.repos.getContent({
-        owner,
-        repo,
-        ref: existingPr.data[0].head.ref,
-        path,
-      });
-      // if an open PR exists, update the content of the file directly
-      await octokit.repos.createOrUpdateFileContents({
-        owner,
-        repo,
-        path,
-        message: `feat(glossary): Update ${input}.mdx`,
-        content: Buffer.from(await file.arrayBuffer()).toString("base64"),
-        branch,
-        committer: {
-          name: "Richard Poelderl",
-          email: "richard.poelderl@gmail.com",
-        },
-        ...("sha" in existingFile.data && { sha: existingFile.data.sha }),
-      });
-
-      console.info("2.2 💽 PR updated. Storing the URL...");
-      // update the entry in the database with the PR URL
-      await db
-        .update(entries)
-        .set({ githubPrUrl: existingPr.data[0].html_url })
-        .where(eq(entries.inputTerm, input));
-
-      const updated = await db.query.entries.findFirst({
-        columns: {
-          id: true,
-          inputTerm: true,
-          githubPrUrl: true,
-        },
-        where: eq(entries.inputTerm, input),
-        orderBy: (entries, { desc }) => [desc(entries.createdAt)],
-      });
-
-      console.info("2.3 🎉 PR updated. Returning the entry...");
-
-      return {
-        entry: updated,
-      };
-    }
-
-    // if there's no open PR, we have to handle the merged PR case:
-    const existingMergedPr = await octokit.rest.pulls.list({
-      owner,
-      repo,
-      base: "main",
-      head: `${owner}:${branch}`,
-      state: "closed",
-    });
-
-    if (existingMergedPr?.data?.length > 0) {
-      console.info("2.1 ⚠️ Merged PR found. Deleting the stale branch...");
-      // if a merged PR exists, we can delete the branch to create a new one & commit the file
-      await octokit.git.deleteRef({
-        owner,
-        repo,
-        ref: `heads/${branch}`,
-      });
-    }
-
-    console.info("2.2 🛣️ Creating the new branch");
-    // create a new branch off of main
-    const mainRef = await octokit.git.getRef({
-      owner,
-      repo,
-      ref: "heads/main",
-    });
-    // create a new branch off of main
-    await octokit.git.createRef({
-      owner,
-      repo,
-      ref: `refs/heads/${branch}-${Date.now()}`, // TODO: we should probably reuse branches instead of timestamping the branch name to avoid duplicates
-      sha: mainRef.data.object.sha,
-    });
-
-    // Commit the MDX file to the new branch
-    console.info(`2.3 📦 Committing the MDX file to the new branch "${branch}"`);
-    // get the existing file's sha (if exists):
-    const { data: existingFile, error } = await tryCatch(
-      octokit.repos.getContent({
-        owner,
-        repo,
-        path,
-      }),
+    // 3. Check if file exists in main branch and if content is identical
+    const mainFileResult = await tryCatch(
+      octokit.repos.getContent({ owner, repo, path: filePath, ref: baseBranch })
     );
-    if (error) {
-      console.error(error);
+    let fileExistsInMain = false;
+    let fileIsIdenticalInMain = false;
+    let mainFileSha: string | undefined = undefined;
+    if (mainFileResult.data && !mainFileResult.error) {
+      const mainFile = mainFileResult.data.data;
+      if (mainFile && typeof mainFile === "object" && "content" in mainFile) {
+        fileExistsInMain = true;
+        const mainFileContent = (mainFile.content as string).replace(/\n/g, "");
+        fileIsIdenticalInMain = mainFileContent === contentBase64;
+        mainFileSha = (mainFile as any).sha;
+      }
     }
-    await octokit.repos.createOrUpdateFileContents({
-      owner,
-      repo,
-      path,
-      message: `feat(glossary): Add ${input}.mdx to glossary`,
-      content: Buffer.from(await file.arrayBuffer()).toString("base64"),
-      branch,
-      ...(existingFile && "sha" in existingFile.data && { sha: existingFile.data.sha }),
-    });
+    if (fileExistsInMain && fileIsIdenticalInMain) {
+      console.info("File already exists with identical content in main branch. Early return.");
+      return { entry };
+    }
 
-    console.info("2.4 📝 Creating the pull request");
-    // Create a pull request
-    const pr = await octokit.pulls.create({
-      owner,
-      repo,
-      title: `Add ${input} to Glossary`,
-      head: branch,
-      base: "main",
-      body: `This PR adds the ${input}.mdx file to the API documentation.`,
-    });
+    // 4. List all branches and filter for relevant ones (reuse branches)
+    const branchListResult = await tryCatch(
+      octokit.repos.listBranches({ owner, repo })
+    );
+    if (branchListResult.error) {
+      throw new AbortTaskRunError(`Failed to list branches: ${branchListResult.error}`);
+    }
+    const allBranches = branchListResult.data?.data || [];
+    const relevantBranches = allBranches
+      .filter((b: any) => b.name.startsWith(branchPrefix))
+      .map((b: any) => b.name);
+    console.info(`Found ${relevantBranches.length} relevant branches for slug '${slug}'.`);
 
-    console.info("2.5 💽 PR created. Storing the URL...");
-    // Update the entry in the database with the PR URL
-    await db
-      .update(entries)
-      .set({ githubPrUrl: pr.data.html_url })
-      .where(eq(entries.inputTerm, input));
+    // 5. For each relevant branch, check file content and PR status in parallel
+    const branchProcessResults = await Promise.all(
+      relevantBranches.map(async (branch) => {
+        // Get file content in this branch (if it exists)
+        const fileResult = await tryCatch(
+          octokit.repos.getContent({ owner, repo, path: filePath, ref: branch })
+        );
+        let branchFileExists = false;
+        let branchFileIsIdentical = false;
+        let branchFileSha: string | undefined = undefined;
+        if (fileResult.data && !fileResult.error) {
+          const branchFile = fileResult.data.data;
+          if (branchFile && typeof branchFile === "object" && "content" in branchFile) {
+            branchFileExists = true;
+            const branchFileContent = (branchFile.content as string).replace(/\n/g, "");
+            branchFileIsIdentical = branchFileContent === contentBase64;
+            branchFileSha = (branchFile as any).sha;
+          }
+        }
+        // Check for open PRs from this branch
+        const prsResult = await tryCatch(
+          octokit.rest.pulls.list({ owner, repo, head: `${owner}:${branch}`, base: baseBranch, state: "open" })
+        );
+        const prs = prsResult.data?.data || [];
+        const prExists = prs.length > 0;
+        const openPr = prExists ? prs[0] : null;
+        return { branch, branchFileExists, branchFileIsIdentical, branchFileSha, prExists, openPr };
+      })
+    );
 
-    const updated = await db.query.entries.findFirst({
-      columns: {
-        id: true,
-        inputTerm: true,
-        githubPrUrl: true,
-      },
-      where: eq(entries.inputTerm, input),
-      orderBy: (entries, { asc }) => [asc(entries.createdAt)],
-    });
+    // 6. Case-based handling logic (6 cases)
+    for (const result of branchProcessResults) {
+      const { branch, branchFileExists, branchFileIsIdentical, branchFileSha, prExists, openPr } = result;
+      const caseKey = `${branchFileExists ? (branchFileIsIdentical ? "identical" : "different") : "missing"}:${prExists ? "pr-exists" : "no-pr"}`;
+      console.info(`Handling case for branch ${branch}: ${caseKey}`);
+      switch (caseKey) {
+        case "identical:pr-exists":
+          // Case 1: File exists, is identical, and PR exists
+          console.info("File is identical and PR exists, returning existing PR");
+          if (openPr && openPr.html_url) {
+            await db.update(entries).set({ githubPrUrl: openPr.html_url }).where(eq(entries.inputTerm, input));
+          }
+          return { entry: { ...entry, githubPrUrl: openPr?.html_url } };
+        case "identical:no-pr":
+          // Case 2: File exists, is identical, but no PR
+          console.info("File is identical but no PR exists, creating PR");
+          const newPr1Result = await tryCatch(
+            octokit.pulls.create({ owner, repo, title: prTitle, body: prBody, head: branch, base: baseBranch })
+          );
+          if (!newPr1Result.data) {
+            console.info("Failed to create PR, trying next branch");
+            continue;
+          }
+          await db.update(entries).set({ githubPrUrl: newPr1Result.data.data.html_url }).where(eq(entries.inputTerm, input));
+          return { entry: { ...entry, githubPrUrl: newPr1Result.data.data.html_url } };
+        case "different:pr-exists":
+          // Case 3: File exists, is different, and PR exists
+          console.info("File is different and PR exists, updating file");
+          const updateResult1 = await tryCatch(
+            octokit.repos.createOrUpdateFileContents({ owner, repo, path: filePath, message: commitMessage, content: contentBase64, branch, sha: branchFileSha })
+          );
+          if (!updateResult1.data) {
+            console.info("Failed to update file, trying next branch");
+            continue;
+          }
+          if (openPr && openPr.html_url) {
+            await db.update(entries).set({ githubPrUrl: openPr.html_url }).where(eq(entries.inputTerm, input));
+          }
+          return { entry: { ...entry, githubPrUrl: openPr?.html_url } };
+        case "different:no-pr":
+          // Case 4: File exists, is different, and no PR
+          console.info("File is different and no PR exists, updating file and creating PR");
+          const updateResult2 = await tryCatch(
+            octokit.repos.createOrUpdateFileContents({ owner, repo, path: filePath, message: commitMessage, content: contentBase64, branch, sha: branchFileSha })
+          );
+          if (!updateResult2.data) {
+            console.info("Failed to update file, trying next branch");
+            continue;
+          }
+          const newPr2Result = await tryCatch(
+            octokit.pulls.create({ owner, repo, title: prTitle, body: prBody, head: branch, base: baseBranch })
+          );
+          if (!newPr2Result.data) {
+            console.info("Failed to create PR, trying next branch");
+            continue;
+          }
+          await db.update(entries).set({ githubPrUrl: newPr2Result.data.data.html_url }).where(eq(entries.inputTerm, input));
+          return { entry: { ...entry, githubPrUrl: newPr2Result.data.data.html_url } };
+        case "missing:pr-exists":
+          // Case 5: File doesn't exist, but PR exists
+          console.info("File doesn't exist but PR exists, creating file in branch");
+          const createResult1 = await tryCatch(
+            octokit.repos.createOrUpdateFileContents({ owner, repo, path: filePath, message: commitMessage, content: contentBase64, branch })
+          );
+          if (!createResult1.data) {
+            console.info("Failed to create file, trying next branch");
+            continue;
+          }
+          if (openPr && openPr.html_url) {
+            await db.update(entries).set({ githubPrUrl: openPr.html_url }).where(eq(entries.inputTerm, input));
+          }
+          return { entry: { ...entry, githubPrUrl: openPr?.html_url } };
+        case "missing:no-pr":
+          // Case 6: File doesn't exist and no PR
+          console.info("File doesn't exist and no PR exists, creating file and PR");
+          const createResult2 = await tryCatch(
+            octokit.repos.createOrUpdateFileContents({ owner, repo, path: filePath, message: commitMessage, content: contentBase64, branch })
+          );
+          if (!createResult2.data) {
+            console.info("Failed to create file, trying next branch");
+            continue;
+          }
+          const newPr3Result = await tryCatch(
+            octokit.pulls.create({ owner, repo, title: prTitle, body: prBody, head: branch, base: baseBranch })
+          );
+          if (!newPr3Result.data) {
+            console.info("Failed to create PR, trying next branch");
+            continue;
+          }
+          await db.update(entries).set({ githubPrUrl: newPr3Result.data.data.html_url }).where(eq(entries.inputTerm, input));
+          return { entry: { ...entry, githubPrUrl: newPr3Result.data.data.html_url } };
+      }
+    }
 
-    console.info("2.6 🎉 PR created. Returning the entry...");
-
-    return {
-      entry: updated,
-    };
+    // 7. No usable branch found, create new branch and PR
+    console.info("No usable branch found, creating new branch and PR");
+    const timestamp = Date.now();
+    const newBranchName = `${branchPrefix}_${timestamp}`;
+    // Get the SHA of the latest commit on the base branch
+    const refResult = await tryCatch(
+      octokit.git.getRef({ owner, repo, ref: `heads/${baseBranch}` })
+    );
+    if (!refResult.data) {
+      throw new AbortTaskRunError(`Failed to get ref for base branch ${baseBranch}`);
+    }
+    // Create new branch
+    const createBranchResult = await tryCatch(
+      octokit.git.createRef({ owner, repo, ref: `refs/heads/${newBranchName}`, sha: refResult.data.data.object.sha })
+    );
+    if (!createBranchResult.data) {
+      throw new AbortTaskRunError(`Failed to create branch ${newBranchName}`);
+    }
+    // Create file in the new branch
+    const createFileResult = await tryCatch(
+      octokit.repos.createOrUpdateFileContents({ owner, repo, path: filePath, message: commitMessage, content: contentBase64, branch: newBranchName })
+    );
+    if (!createFileResult.data) {
+      throw new AbortTaskRunError(`Failed to create file ${filePath} in branch ${newBranchName}`);
+    }
+    // Create PR
+    const createPrResult = await tryCatch(
+      octokit.pulls.create({ owner, repo, title: prTitle, body: prBody, head: newBranchName, base: baseBranch })
+    );
+    if (!createPrResult.data) {
+      throw new AbortTaskRunError(`Failed to create PR from branch ${newBranchName}`);
+    }
+    await db.update(entries).set({ githubPrUrl: createPrResult.data.data.html_url }).where(eq(entries.inputTerm, input));
+    return { entry: { ...entry, githubPrUrl: createPrResult.data.data.html_url } };
   },
 });
