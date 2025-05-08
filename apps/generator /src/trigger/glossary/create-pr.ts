@@ -132,7 +132,6 @@ export const createPrTask = task({
     console.info(`🌿 [createPrTask][term:${input}] Found ${relevantBranches.length} branches for slug '${slug}'`);
 
     // 5. For each relevant branch, check file content and PR status (only first branch)
-    let branchProcessResult = null;
     if (relevantBranches.length > 0) {
       const branch = relevantBranches[0];
       console.info(`🔄 [createPrTask][branch:${branch}] Start branch check`);
@@ -164,12 +163,6 @@ export const createPrTask = task({
       const caseKey = `${branchExists ? 'branch-existant' : 'branch-inexistant'}:${branchFileIsIdentical ? 'fileDiff-unchanged' : branchFileExists ? 'fileDiff-changed' : 'fileDiff-unchanged'}:${prExists ? 'pr-existant' : 'pr-inexistant'}`;
       // Branch summary log
       console.info(`🔄 [createPrTask][branch:${branch}] file:${branchFileExists ? (branchFileIsIdentical ? 'unchanged' : 'changed') : 'missing'} pr:${prExists ? 'open' : 'none'}`);
-      branchProcessResult = { branch, branchFileExists, branchFileIsIdentical, branchFileSha, prExists, openPr, caseKey };
-    }
-
-    // 6. Case-based handling logic (now using expanded caseKey)
-    if (branchProcessResult) {
-      const { branch, branchFileExists, branchFileIsIdentical, branchFileSha, prExists, openPr, caseKey } = branchProcessResult;
       console.info(`⚡ [createPrTask][branch:${branch}] Case: ${caseKey}`);
       switch (caseKey) {
         case "branch-existant:fileDiff-unchanged:pr-existant":
