@@ -7,7 +7,7 @@ The Update Workflow is responsible for updating glossary content on the website.
 ## File Structure
 
 ```sh
-apps/billing/src/trigger/glossary/update/
+apps/generator/src/trigger/glossary/update/
 ├── update-content.ts # Core task for updating glossary content
 ├── update-content-cleanup.ts # Task for cleaning up PRs and branches
 └── update-content.test.ts # Test harness for the update content task
@@ -25,7 +25,7 @@ These files work together to provide a complete workflow for updating glossary c
 
 ### Update Content Task
 
-**File:** `apps/billing/src/trigger/glossary/update/update-content.ts`
+**File:** `apps/generator/src/trigger/glossary/update/update-content.ts`
 
 **Purpose:** Updates glossary content on the website by creating a GitHub PR.
 
@@ -45,7 +45,7 @@ These files work together to provide a complete workflow for updating glossary c
 
 ### Clean Up Task
 
-**File:** `apps/billing/src/trigger/glossary/update/cleanup-update.ts`
+**File:** `apps/generator/src/trigger/glossary/update/cleanup-update.ts`
 
 **Purpose:** Cleans up resources created by the update content task, specifically GitHub PRs and branches.
 
@@ -64,7 +64,7 @@ These files work together to provide a complete workflow for updating glossary c
 
 ### Testing Task
 
-**File:** `apps/billing/src/trigger/glossary/update/test-update-content.ts`
+**File:** `apps/generator/src/trigger/glossary/update/test-update-content.ts`
 
 **Purpose:** Provides a comprehensive test harness for the update content task.
 
@@ -94,7 +94,7 @@ These files work together to provide a complete workflow for updating glossary c
 ## Running the Workflow
 
 1. **Development Testing:**
-   - Start the Trigger.dev CLI: `pnpm -F billing dev`
+   - Start the Trigger.dev CLI: `pnpm -F generator dev`
    - Navigate to the Trigger.dev dashboard
    - Trigger the test task (`glossary-update-content-test-all`) without any input
    - View test results in the dashboard
