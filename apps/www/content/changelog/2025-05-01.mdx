@@ -1,0 +1,63 @@
+---
+title: April Product Update
+date: 2025-04-30,
+tags: ["product"]
+---
+
+## Create Key Wizard
+
+<ImageZoom src="/images/changelog/2025-05-01/create-key-clean.png" alt="Key Creation Wizard" width="1920" height="1080"/>
+
+Our Create Key wizard just got better! Enjoy these new and improved features:
+
+- Instant feedback during key creation
+- Apply multiple rate limits per key
+- Easy-to-use JSON formatter for metadata
+- Clear warning about one-time key display
+
+<ImageZoom src="/images/changelog/2025-05-01/create-key-touched.png" alt="Key Creation Wizard with error" width="1920" height="1080"/>
+
+## API Settings Update
+
+Our new API Settings screen is designed for intuitive control over your API configurations.
+Adjust default bytes, prefixes, and manage security settings seamlessly.
+
+<ImageZoom src="/images/changelog/2025-05-01/api-settings.jpeg" alt="API Settings" width="1920" height="1080"/>
+
+
+## Roles Returned as Part of `verifyKey`
+
+The `/v1/keys.verifyKey` endpoint has been updated to include a list of roles associated with the key in the verification response, enabling applications to easily determine the user's roles during key verification and make more informed authorization decisions. This simplifies role-based access control implementation and requires one less API request.
+
+## Seeding Local Development
+
+We have introduced proper seeding for log pages and metrics, enhancing the ability to generate realistic test data and improving the development and testing experience. You can easily seed a workspace by running `pnpm local` and selecting `Seed Clickhouse/DB`. Our CLI will then ask a series of questions about what you would like to seed and how much test data you want.
+
+<ImageZoom src="/images/changelog/2025-05-01/seed-data.png" alt="Seed example" width="1920" height="1080"/>
+
+## Other PRs
+
+###  Bug Fixes
+
+- [#3189](https://github.com/unkeyed/unkey/pull/3189): Tooltip now shows the correct time interval
+- [#3115](https://github.com/unkeyed/unkey/pull/3115): Improve keyboard combinations
+- [#3187](https://github.com/unkeyed/unkey/pull/3187): Ensure charts and logs data count match
+- [#3157](https://github.com/unkeyed/unkey/pull/3157): Ensure username doesn't overflow sidebar
+- [#3118](https://github.com/unkeyed/unkey/pull/3118): Show timestamp correctly on click
+- [#3119](https://github.com/unkeyed/unkey/pull/3119): Usage chart colors and fix layout shift issue
+- [#3104](https://github.com/unkeyed/unkey/pull/3104): Only allow access membership list fetching to current org context.
+- [#3099](https://github.com/unkeyed/unkey/pull/3099): Prevent cancellations if the org has multiple members
+- [#3094](https://github.com/unkeyed/unkey/pull/3094): Improve errors when using natural language searches
+- [#3080](https://github.com/unkeyed/unkey/pull/3080): Make confirmation dialog trigger correctly on workspace members page.
+- [#3079](https://github.com/unkeyed/unkey/pull/3079): Pagination issue and improve fetch logic
+- [#3037](https://github.com/unkeyed/unkey/pull/3037): navbar-popover active state
+- [#3055](https://github.com/unkeyed/unkey/pull/3055): Use only time as cursor
+- [#3054](https://github.com/unkeyed/unkey/pull/3054): Query clickhouse by time
+
+### Documentation
+
+- [#3173](https://github.com/unkeyed/unkey/pull/3173): Explain how delete protection works
+
+### Other Changes
+
+- [#3191](https://github.com/unkeyed/unkey/pull/3191): Prevent revalidation of logs and charts to improve dashboard performance.
