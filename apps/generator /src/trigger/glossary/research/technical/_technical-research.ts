@@ -3,17 +3,39 @@ import Exa from "exa-js";
 import { evaluateSearchResults } from "./evaluate-search-results";
 import { domainCategories, exaDomainSearchTask } from "./exa-domain-search";
 import type { ExaCosts } from "./types";
+import { db } from "@/lib/db-marketing/client";
+import { entries, TechnicalResearch } from "@/lib/db-marketing/schemas/entries";
+import { eq } from "drizzle-orm";
+import { CacheStrategy } from "../../_generate-glossary-entry";
 
 export const technicalResearchTask = task({
   id: "technical_research",
   run: async ({
     inputTerm,
+    onCacheHit = "stale" as CacheStrategy,
   }: {
     inputTerm: string;
+    onCacheHit: CacheStrategy;
   }) => {
     console.info("Starting domain research:", {
       query: inputTerm,
     });
+
+    const existing = await db.query.entries.findFirst({
+      where: eq(entries.inputTerm, inputTerm),
+      columns: {
+        technicalResearch: true,
+      },
+    });
+
+    if (
+      existing?.technicalResearch?.included &&
+      existing?.technicalResearch?.included.length > 0 &&
+      onCacheHit === "stale"
+    ) {
+      console.info("✓ Technical research already exists in DB, returning cached results");
+      return existing.technicalResearch;
+    }
 
     // we perform a search for each search category in parallel:
     const { runs } = await batch.triggerByTaskAndWait(
@@ -21,6 +43,7 @@ export const technicalResearchTask = task({
         task: exaDomainSearchTask,
         payload: {
           inputTerm,
+          onCacheHit: process.env.NODE_ENV === "production" ? onCacheHit : "stale",
           numResults: 10,
           domain: domainCategory.name,
         },
@@ -33,38 +56,8 @@ export const technicalResearchTask = task({
     // Filter out failed searches and combine results
     const searchResults = runs.filter((result) => result.ok).flatMap((result) => result.output);
 
-    // log the costs for the exa responses:
-    const searchCosts = searchResults.flatMap((result) => ({
-      ...result.costDollars,
-      category: result.category,
-    }));
-    console.info(`💰 Exa API costs for initial search:
-      Total: $${searchCosts.reduce((acc, cost) => acc + cost.total, 0)}
-      Search: $${searchCosts.reduce(
-        (acc, cost) => acc + (cost.search?.neural || cost.search?.keyword || 0),
-        0,
-      )} | ${searchCosts.length} requests made @ $0.0025/request | should result in $${
-        searchCosts.length * 0.0025
-      }
-      Summaries: $${searchCosts.reduce(
-        (acc, cost) => acc + (cost.contents?.summary || 0),
-        0,
-      )} | ${searchResults.reduce(
-        (acc, result) => acc + result.results.length,
-        0,
-      )} summaries @ $0.001/summary | should result in $${
-        searchResults.reduce((acc, result) => acc + result.results.length, 0) * 0.001
-      }
-    `);
-
-    // process our results for the evaluation step (flatten & dedupe)
-    const results = searchResults.flatMap((searchResult) =>
-      searchResult.results.map((result) => ({
-        ...result,
-      })),
-    );
     // dedupe the results based on `url`:
-    const dedupedResults = results.filter(
+    const dedupedResults = searchResults.filter(
       (result, index, self) => index === self.findIndex((t) => t.url === result.url),
     );
 
@@ -79,17 +72,14 @@ export const technicalResearchTask = task({
     }
 
     const evaluationResults = evaluationRun.output;
-    console.info(`💰 Evaluation costs:
-      Total: $${evaluationResults.costs.total}
-      Input: $${evaluationResults.costs.input}
-      Output: $${evaluationResults.costs.output}
-    `);
+    
 
     // Step 3: Scrape the content of the results
     const exa = new Exa(process.env.EXA_API_KEY || "");
     const contentResults = await exa.getContents(
       evaluationResults.included.flatMap((result) => result.url),
     );
+    
 
     // log the costs for the exa responses:
     const scrapingCosts = (contentResults as unknown as typeof contentResults & ExaCosts)
@@ -99,29 +89,32 @@ export const technicalResearchTask = task({
       Summaries: $${scrapingCosts.contents?.text} texts @ $0.001/text
     `);
 
-    return {
+    const output = {
+      inputTerm,
       summary: evaluationResults.evaluationSummary,
-      included: contentResults,
-      costs: {
-        total:
-          scrapingCosts.total +
-          evaluationResults.costs.total +
-          searchCosts.reduce((acc, cost) => acc + cost.total, 0),
-        search: {
-          search: searchCosts.reduce(
-            (acc, cost) => acc + (cost.search?.neural || cost.search?.keyword || 0),
-            0,
-          ),
-          summary: searchCosts.reduce((acc, cost) => acc + (cost.contents?.summary || 0), 0),
-        },
-        evaluation: {
-          input: evaluationResults.costs.input,
-          output: evaluationResults.costs.output,
-        },
-        contents: {
-          text: scrapingCosts.contents?.text,
-        },
-      },
+      included: contentResults.results.map((result) => ({
+        ...result,
+        ...searchResults.find((c) => c.url === result.url),
+      })),
+      excluded: evaluationResults.excluded.map((result) => ({
+        ...result,
+        ...searchResults.find((c) => c.url === result.url),
+      })),
     };
+
+    // Persist technical research output to db
+    await db.update(entries)
+      .set({ technicalResearch: output as unknown as TechnicalResearch })
+      .where(eq(entries.inputTerm, inputTerm));
+    console.info("✓ Technical research completed and persisted");
+
+    const updatedEntry = await db.query.entries.findFirst({
+      columns: {
+        technicalResearch: true,
+      },
+      where: eq(entries.inputTerm, inputTerm),
+    });
+
+    return updatedEntry?.technicalResearch;
   },
 });

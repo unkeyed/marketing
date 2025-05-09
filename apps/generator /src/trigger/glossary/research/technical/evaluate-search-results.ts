@@ -11,7 +11,7 @@ const evaluationSchema = z.object({
 });
 
 type EvaluateSearchOptions = {
-  searchResults: TaskOutput<typeof exaDomainSearchTask>["results"];
+  searchResults: TaskOutput<typeof exaDomainSearchTask>;
   inputTerm: string;
 };
 
@@ -80,7 +80,7 @@ export const evaluateSearchResults = task({
       OUTPUT: $${costs.output}
       TOTAL: $${costs.total}
       `);
-
+    
     const evaluations = geminiResponse.object;
     if (!Array.isArray(evaluations)) {
       throw new Error("Invalid evaluation response from Gemini: Not an array");

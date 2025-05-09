@@ -10,6 +10,7 @@ import { generateFaqsTask } from "./generate-faqs";
 import { generateOutlineTask } from "./generate-outline";
 import { keywordResearchTask } from "./keyword-research";
 import { seoMetaTagsTask } from "./seo-meta-tags";
+import { technicalResearchTask } from "./research/technical/_technical-research";
 
 export type CacheStrategy = "revalidate" | "stale";
 /**
@@ -19,11 +20,12 @@ export type CacheStrategy = "revalidate" | "stale";
  *
  * This workflow runs multiple steps sequentially:
  * 1. Keyword Research
- * 2. Generate Outline
- * 3. Draft Sections & Content Takeaways (in parallel)
- * 4. Generate SEO Meta Tags
- * 5. Generate FAQs
- * 6. Create PR
+ * 2. Technical Research
+ * 3. Generate Outline
+ * 4. Draft Sections & Content Takeaways (in parallel)
+ * 5. Generate SEO Meta Tags
+ * 6. Generate FAQs
+ * 7. Create PR
  *
  * Each workflow step generates output that's stored in the database (with the exception of create PR, which stores the MDX output in the GitHub repository).
  * The default behaviour of every task is to always return a cached output if available.
@@ -85,6 +87,18 @@ export const generateGlossaryEntryTask = task({
     console.info(
       `✓ Keyword research completed with ${keywordResearch.output.keywords.length} keywords`,
     );
+
+    // Step 1.5: Technical Research
+    console.info("Step 1.5 - Starting technical research...");
+    const technicalResearch = await technicalResearchTask.triggerAndWait({
+      inputTerm: term,
+      onCacheHit,
+    });
+    if (!technicalResearch.ok) {
+      throw new AbortTaskRunError(`Technical research failed for term: ${term}`);
+    }
+    
+    console.info("✓ Technical research completed and persisted");
 
     // Step 2: Generate Outline
     console.info("Step 2 - Generating outline...");
