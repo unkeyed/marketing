@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "dotenv-cli": "^8.0.0",
-    "@types/node": "^20.14.9",
+    "@types/node": "^22.15.17",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
     "drizzle-kit": "^0.30.0",
