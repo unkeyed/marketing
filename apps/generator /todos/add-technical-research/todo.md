@@ -33,141 +33,171 @@
     - Trigger a glossary entry generation and verify that the technical research output is present and persisted in the database for the entry.
 
 
-## Add full technical reserach or summarized research to Drafting &  Review in outline & content generation
+## Replace Firecrawl Consumers with Technical Research Context
+**Status**: Ready to implement
+**Task**
+  - Replace Firecrawl-based context with Technical Research in content-generation workflows.
 
-- [ ] **Replace firecrawlResponses with Technical Research Output in Outline Generation**
-  - Use `exaResults` from technical research instead of firecrawl summaries.
-  - **Before:**
-    ```ts
-    const organicResults = await db.query.firecrawlResponses.findMany({ ... });
-    const summaries = await Promise.all(organicResults.map(...getOrCreateSummary...));
-    const topRankingContent = summaries.map(...).join(...);
-    ```
-  - **After:**
-    ```ts
-    const technicalResearch = await getTechnicalResearchForTerm(term);
-    const summaries = await Promise.all(technicalResearch.included.map(result => summarizeText(result.text, ...)));
-    const technicalResearchSummaries = summaries.map(...).join(...);
-    ```
+1. Context
+   - Current:
+     > We currently fetch top organic search results via `db.query.firecrawlResponses.findMany` and use those in each consumer task.
+   - After:
+     > We will query `entries.technicalResearch.included` (populated by the `technicalResearchTask`) for `url` and `summary`, and feed those into each consumer.
+     ```ts
+     const { technicalResearch } = await db.query.entries.findFirst({
+       where: eq(entries.inputTerm, term),
+       columns: { technicalResearch },
+     });
+     // Use `technicalResearch.included` instead of `firecrawlResponses`
+     ```
+   - Goal: Swap out Firecrawl-based context for our new Technical Research output.
+   - Test for acceptance:
+     1. Run `generateOutlineTask`, `draftSectionsTask`, and `contentTakeawaysTask` with a sample term.  
+     2. Inspect DB queries to confirm they read from `entries.technicalResearch` instead of `firecrawlResponses`.  
+     3. Verify each task still returns valid context summaries.
 
-- [ ] **Update getOrCreateSummary to Summarize Technical Research Texts**
-  - **Before:**
-    ```ts
-    getOrCreateSummary({ url, connectTo, onCacheHit }) // uses firecrawl markdown
-    ```
-  - **After:**
-    ```ts
-    summarizeText({ text, term }) // uses technical research text
-    ```
+2. Todos  
+**Note on sequential and parallel execution**:  
+We must first update summary generation, then swap in each consumer task. Steps 2 and 3 can run in parallel.
 
-- [ ] **Update performTechnicalEvalTask to  Remove Caching**
-  - **Before:**
-    ```ts
-    const existing = await db.query.evals.findFirst({ ... });
-    if (existing && onCacheHit === "stale") { ... return ... }
-    // context: summaries or none
-    ```
-  - **After:**
-    ```ts
-    // context: technicalResearchSummaries
-    ```
+  - [ ] **Update getOrCreateSummary to support Technical Research output**  
+       File: `apps/generator /src/lib/firecrawl.ts` (lines 130–155)  
+       Replace:
+       ```ts
+       // 1. Check for existing Firecrawl summary
+       const existing = await db.query.firecrawlResponses.findFirst({
+         where: eq(firecrawlResponses.sourceUrl, url),
+       });
+       const firecrawlResponse = await getOrCreateFirecrawlResponse({ url, connectTo });
+       ```
+       With:
+       ```ts
+       // Query the stored Technical Research entries
+       const { technicalResearch } = await db.query.entries.findFirst({
+         where: eq(entries.inputTerm, connectTo.term),
+         columns: { technicalResearch },
+       });
+       const existing = technicalResearch.included.find(r => r.url === url);
+       // Removed getOrCreateFirecrawlResponse usage
+       ```
+       - Changes:
+         - Removed Firecrawl API and DB queries.  
+         - Queried `entries.technicalResearch.included` for summaries.  
+       - Test for acceptance:
+         1. Call `getOrCreateSummary({ url, connectTo })` and confirm it returns the correct object from `entries.technicalResearch.included`.  
+         2. Ensure no `db.query.firecrawlResponses` calls remain in this function.
 
-- [ ] **Update contentTakeawaysTask to Use Technical Research Output**
-  - **Before:**
-    ```ts
-    // context: firecrawlResponses summaries
-    ```
-  - **After:**
-    ```ts
-    // context: technicalResearchSummaries
-    ```
+  - [ ] **Update generateOutlineTask to use Technical Research**  
+       File: `apps/generator /src/trigger/glossary/generate-outline.ts` (lines 70–77)  
+       Replace:
+       ```ts
+       const organicResults = await db.query.firecrawlResponses.findMany({
+         where: eq(firecrawlResponses.inputTerm, term),
+         with: { serperOrganicResult: { columns: { position: true } } },
+       });
+       const summaries = await Promise.all(
+         organicResults.map(result =>
+           getOrCreateSummary({ url: result.sourceUrl, connectTo: { term }, onCacheHit }),
+         ),
+       );
+       ```
+       With:
+       ```ts
+       const { technicalResearch } = await db.query.entries.findFirst({
+         where: eq(entries.inputTerm, term),
+         columns: { technicalResearch },
+       });
+       const summaries = await Promise.all(
+         technicalResearch.included.map(result =>
+           getOrCreateSummary({ url: result.url, connectTo: { term }, onCacheHit }),
+         ),
+       );
+       ```
+       - Changes:
+         - Switched context source to `technicalResearch.included`.  
+       - Test for acceptance:
+         1. Run `generateOutlineTask` and query the DB entry to verify each included item has a `summary` next to its `text` field.  
+         2. Confirm no references to `firecrawlResponses` remain in this file.
 
-- [ ] **Update performTechnicalEvalTask to Use Full Technical Research Texts and Remove Caching**
-  - **Before:**
-    ```ts
-    const existing = await db.query.evals.findFirst({ ... });
-    if (existing && onCacheHit === "stale") { ... return ... }
-    // context: summaries or none
-    ```
-  - **After:**
-    ```ts
-    // No cache check, always run eval
-    // context: technicalResearch.included.map(r => r.text)
-    ```
+  - [ ] **Update draftSectionsTask to use Technical Research**  
+       File: `apps/generator /src/trigger/glossary/draft-sections.ts` (lines 170–178)  
+       Replace:
+       ```ts
+       const organicResults = await db.query.firecrawlResponses.findMany({
+         where: eq(firecrawlResponses.inputTerm, term),
+         limit: 3,
+       });
+       // …
+       ${organicResults.map(r => `Source URL: ${r.sourceUrl}\nSummary: ${r.summary}`).join("\n")}
+       ```
+       With:
+       ```ts
+       const { technicalResearch } = await db.query.entries.findFirst({
+         where: eq(entries.inputTerm, term),
+         columns: { technicalResearch },
+       });
+       const organicResults = technicalResearch.included.slice(0, 3);
+       // …
+       ${organicResults.map(r => `Source URL: ${r.url}\nSummary: ${r.summary}`).join("\n")}
+       ```
+       - Changes:
+         - Updated to use `technicalResearch.included`.  
+       - Test for acceptance:
+         1. Run `draftSectionsTask` and inspect OTEL traces to ensure summaries match those in the DB.  
+         2. Confirm removal of all `firecrawlResponses` queries.
 
-- [ ] **Update reviewContent in draftSectionsTask to Use Full Technical Research Texts and Gemini**
-  - **Before:**
-    ```ts
-    // context: firecrawl summaries, model: gpt-4o-mini
-    ```
-  - **After:**
-    ```ts
-    // context: technicalResearch.included.map(r => r.text), model: gemini
-    ```
+  - [ ] **Update contentTakeawaysTask to use Technical Research**  
+       File: `apps/generator /src/trigger/glossary/content-takeaways.ts` (lines 35–42)  
+       Replace:
+       ```ts
+       const scrapedContent = await db.query.firecrawlResponses.findMany({
+         where: eq(firecrawlResponses.inputTerm, term),
+         columns: { markdown: true, summary: true },
+       });
+       // …
+       ${scrapedContent.map(c => c.summary).join("\n\n")}
+       ```
+       With:
+       ```ts
+       const { technicalResearch } = await db.query.entries.findFirst({
+         where: eq(entries.inputTerm, term),
+         columns: { technicalResearch },
+       });
+       const scrapedContent = technicalResearch.included;
+       // …
+       ${scrapedContent.map(r => r.summary).join("\n\n")}
+       ```
+       - Changes:
+         - Switched to `technicalResearch.included`.  
+       - Test for acceptance:
+         1. Run `contentTakeawaysTask` and verify AI SDK traces to confirm correct summaries.
 
-- [ ] **Audit Outline Revision Flow**
-  - Ensure correct outline is passed between all eval steps and technical research context is available.
-  - **Before:**
-    ```ts
-    // outline passed as is, context may be missing
-    ```
-  - **After:**
-    ```ts
-    // outline and technicalResearch context passed explicitly between steps
-    ```
+3. **Exclusions**
+   > The following code paths are related but out of scope for this PR:
+   - `apps/generator /src/trigger/glossary/keyword-research.ts`  
+     ```ts
+     const keywordsFromHeaders = await getOrCreateKeywordsFromHeaders({ term });
+     ```
+     Reason: Keyword extraction is not part of replacing context in generation workflows.
 
-- [ ] **How to test**
-  - For drafting steps (outline, draft sections, takeaways): Confirm that only technical research summaries are used as context and firecrawl data is not referenced anywhere.
-  - For review/evaluation steps (technical eval, reviewContent): Confirm that the full technical research texts are used as context and the Gemini model is used for review/eval.
-  - For outline revision: Confirm that the correct outline and technical research context are passed between all evaluation steps.
+   - `apps/generator /src/trigger/glossary/seo-meta-tags.ts`  
+     ```ts
+     const topRankingPages = await db.query.firecrawlResponses.findMany({
+       where: eq(firecrawlResponses.inputTerm, term),
+     });
+     ```
+     Reason: SEO meta tag generation remains unchanged in this pass.
 
-## Improved Results Evaluation
+   - `apps/generator /src/trigger/glossary/evals.ts`  
+     ```ts
+     export const getOrCreateRatingsTask = task({ … });
+     ```
+     Reason: Evaluation tasks will be refactored in a subsequent PR.
 
-- [ ] **Filter Technical Research Results in evaluateSearchResults**
-  - Update prompt to exclude irrelevant URLs (e.g., GitHub code repos, OWASP, MDN Add-ons).
-  - **Before:**
-    ```txt
-    Evaluate these search results for relevance to: "${inputTerm}"
-    // ...
-    - Only give high ratings (7+) to older content if it's truly foundational
-    ```
-  - **After:**
-    ```txt
-    Evaluate these search results for relevance to: "${inputTerm}"
-    // ...
-    - Exclude results that are code repositories, security lists, or not explanatory for API development (e.g., GitHub repos, OWASP, MDN Add-ons)
-    ```
-  - **How to test**
-    - Run technical research for the input term "sdk" and compare the number of included results to the previous output in @technical_research-output.json; the number of relevant results should increase and irrelevant ones (e.g., GitHub, OWASP, MDN Add-ons) should be excluded.
-
-- [ ] **General/Refactoring: Remove firecrawlReferences and Update DB Schema if Needed**
-  - **Before:**
-    ```ts
-    // firecrawl references and queries
-    ```
-  - **After:**
-    ```ts
-    // technical research references and queries
-    ```
-
-- [ ] **Naming/Code Hygiene**
-  - Rename variables, arguments, and comments to reflect technical research as the new context source.
-  - **Before:**
-    ```ts
-    // topRankingContent, firecrawlSummaries
-    ```
-  - **After:**
-    ```ts
-    // technicalResearchSummaries
-    ```
-
-- [ ] **Testing/Validation**
-  - Add/update tests to ensure only relevant technical research results are included and context is passed correctly.
-  - **Before:**
-    ```ts
-    // tests reference firecrawl context
-    ```
-  - **After:**
-    ```ts
-    // tests reference technical research context
-    ``` 
+4. **Rules**
+   - Cited rules:
+     1. Avoid nested `if/else`; use Trigger.dev's built-in error handling (`tryCatch`) if needed.  
+     2. Prefer TypeScript type inference; avoid explicit type annotations.  
+   - Mentioned patterns:
+     - Trigger.dev `.triggerAndWait` for workflow steps.  
+     - Drizzle-ORM query methods (`findFirst`, `findMany`).  
