@@ -5,7 +5,7 @@ export const DetailsComponent = () => {
     <div className="space-y-8">
       <div className="space-y-4">
         <h1 className="bg-gradient-to-br text-pretty text-transparent bg-gradient-stop bg-clip-text from-white via-white via-30% to-white/30 max-w-sm sm:max-w-none xl:max-w-lg font-medium text-[32px] leading-none sm:text-[56px] md:text-[64px] xl:text-[64px] tracking-tighter">
-          One year free for YC W25
+          One year free for current YC batch
         </h1>
         <p className="text-lg text-gray-400">
           Alumni batches get one year at 50% off. Eligibility expires after raising $5 million.
