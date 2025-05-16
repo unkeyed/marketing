@@ -2,9 +2,9 @@ import { z } from "zod";
 
 /**
  * @description Schema for glossary entry takeaways
- * @warning This is a duplicate of apps/billing/src/lib/db-marketing/schemas/takeaways-schema.ts
- * @todo Extract this schema into a shared package to ensure consistency with the billing app
- * @see apps/billing/src/lib/db-marketing/schemas/takeaways-schema.ts for the source of truth
+ * @warning This is a duplicate of apps/generator/src/lib/db-marketing/schemas/takeaways-schema.ts
+ * @todo Extract this schema into a shared package to ensure consistency with the generator app
+ * @see apps/generator/src/lib/db-marketing/schemas/takeaways-schema.ts for the source of truth
  */
 export const takeawaysSchema = z.object({
   tldr: z.string(),

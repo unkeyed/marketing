@@ -42,4 +42,9 @@ export const authors: Authors = {
     role: "Developer",
     image: { src: "/images/team/oz.jpeg" },
   },
+  meg: {
+    name: "Meg Stepp",
+    role: "Senior Engineer",
+    image: { src: "/images/team/meg.jpg", alt: "Meg Stepp" },
+  },
 };

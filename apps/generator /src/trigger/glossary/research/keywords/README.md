@@ -33,7 +33,7 @@ research/keywords/
 To run the tests:
 
 ```bash
-pnpm -F billing dev
+pnpm -F generator dev
 ```
 
 Go into Trigger's [Test Pane](https://cloud.trigger.dev/orgs/unkey-9e78/projects/billing-IzvK/env/dev/test) and run the `research_keywords_test` test with an empty payload.

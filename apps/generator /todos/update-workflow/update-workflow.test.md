@@ -117,7 +117,7 @@ The test task includes:
 
 ## Running Tests
 
-1. Start the Trigger.dev CLI: `pnpm -F billing dev`
+1. Start the Trigger.dev CLI: `pnpm -F generator dev`
 2. Navigate to the Trigger.dev dashboard
 3. Find the test task (e.g., `glossary-update-content-test-all`)
 4. Trigger the task without any input
