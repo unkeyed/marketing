@@ -65,13 +65,10 @@ When working with an **idempotent REST API**, consider the following key charact
 
 Here’s a practical example of an **idempotent REST API** call using TypeScript:
 
-import { HttpClient } from '@angular/common/http';
-
 // Example of an idempotent GET request
 const fetchData = async (url: string) => {
   try {
--    const response = await HttpClient.get(url);
-+    const response = await fetch(url);
+    const response = await fetch(url);
     console.log('Data fetched successfully:', response);
   } catch (error) {
     console.error('Failed to fetch data:', error);
@@ -81,8 +78,7 @@ const fetchData = async (url: string) => {
 // Example of an idempotent DELETE request
 const deleteData = async (url: string) => {
   try {
--    const response = await HttpClient.delete(url);
-+    const response = await fetch(url, { method: 'DELETE' });
+    const response = await fetch(url, { method: 'DELETE' });
     console.log('Data deleted successfully:', response);
   } catch (error) {
     console.error('Failed to delete data:', error);
