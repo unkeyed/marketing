@@ -14,11 +14,8 @@ import { z } from "zod";
 import { searchQueries } from "./searchQuery";
 import { sections } from "./sections";
 import type { Takeaways } from "./takeaways-schema";
-import type { domainCategories } from "@/trigger/glossary/research/technical/exa-domain-search";
-import type Exa from "exa-js";
-import { composeSearchOptions } from "@/lib/exa";
-import type { TaskOutput } from "@trigger.dev/sdk/v3";
-import type { evaluateSearchResults } from "@/trigger/glossary/research/technical/evaluate-search-results";
+import { exaScrapedResults, technicalResearch } from "./technical-research";
+import type { TechnicalResearch } from "./technical-research";
 
 export const entryStatus = ["ARCHIVED", "PUBLISHED"] as const;
 export type EntryStatus = (typeof entryStatus)[number];
@@ -31,20 +28,6 @@ export const faqSchema = z.array(
 
 export type FAQ = z.infer<typeof faqSchema>;
 
-export type TechnicalResearch = {
-  inputTerm: string;
-  summary: TaskOutput<typeof evaluateSearchResults>["evaluationSummary"];
-  included: Array<
-  Awaited<ReturnType<typeof Exa.prototype.getContents>>["results"][number] & {
-    // custom types appended to exa's types:
-    category: (typeof domainCategories)[number]; // our custom domainCategories
-  }>;
-  excluded: Array<
-  Awaited<ReturnType<typeof Exa.prototype.searchAndContents<ReturnType<typeof composeSearchOptions>>>>["results"][number] & {
-    category: (typeof domainCategories)[number]; // our custom domainCategories
-  }>;
-  [key: string]: any;
-};
 
 export const entries = mysqlTable(
   "entries",
@@ -78,6 +61,8 @@ export const entriesRelations = relations(entries, ({ many, one }) => ({
     fields: [entries.inputTerm],
     references: [searchQueries.inputTerm],
   }),
+  technicalResearches: many(technicalResearch),
+  exaScrapedResults: many(exaScrapedResults),
 }));
 
 export const insertEntrySchema = createInsertSchema(entries).extend({}).omit({ id: true });

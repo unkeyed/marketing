@@ -84,8 +84,7 @@ We must first update summary generation, then swap in each consumer task. Steps 
          - Removed Firecrawl API and DB queries.  
          - Queried `entries.technicalResearch.included` for summaries.  
        - Test for acceptance:
-         1. Call `getOrCreateSummary({ url, connectTo })` and confirm it returns the correct object from `entries.technicalResearch.included`.  
-         2. Ensure no `db.query.firecrawlResponses` calls remain in this function.
+         1. Run `generateOutlineTask` and query the DB entry to verify each included item has a `summary` next to its `text` field.  
 
   - [ ] **Update generateOutlineTask to use Technical Research**  
        File: `apps/generator /src/trigger/glossary/generate-outline.ts` (lines 70–77)  

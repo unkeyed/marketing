@@ -2,6 +2,7 @@ import { db } from "@/lib/db-marketing/client";
 import {
   type SelectKeywords,
   entries,
+  exaScrapedResults,
   firecrawlResponses,
   insertSectionContentTypeSchema,
   insertSectionSchema,
@@ -12,15 +13,14 @@ import {
   sectionsToKeywords,
   selectKeywordsSchema,
 } from "@/lib/db-marketing/schemas";
-import type { Keyword } from "@/lib/db-marketing/schemas/keywords";
-import { getOrCreateSummary } from "@/lib/firecrawl";
 import { openai } from "@ai-sdk/openai";
-import { AbortTaskRunError, task } from "@trigger.dev/sdk/v3";
+import { AbortTaskRunError, task, TaskOutput } from "@trigger.dev/sdk/v3";
 import { generateObject } from "ai";
 import { and, eq, or } from "drizzle-orm";
 import { z } from "zod";
 import type { CacheStrategy } from "./_generate-glossary-entry";
 import { performEditorialEvalTask, performSEOEvalTask, performTechnicalEvalTask } from "./evals";
+import { tryCatch } from "@/lib/utils/try-catch";
 
 // TODO: this task is a bit flake-y still
 // - split up into smaller tasks,  and/or
@@ -29,15 +29,22 @@ import { performEditorialEvalTask, performSEOEvalTask, performTechnicalEvalTask 
 export const generateOutlineTask = task({
   id: "generate_outline",
   retry: {
-    maxAttempts: 5,
+    maxAttempts: 3,
   },
   run: async ({
     term,
     onCacheHit = "stale" as CacheStrategy,
   }: { term: string; onCacheHit?: CacheStrategy }) => {
-    const existing = await db.query.entries.findFirst({
+    console.debug("[DEBUG] About to check if entry exists at line 38");
+
+    const drizzleQuery = db.query.entries.findFirst({
       where: eq(entries.inputTerm, term),
       orderBy: (entries, { desc }) => [desc(entries.createdAt)],
+      columns: {
+        id: true,
+        inputTerm: true,
+        createdAt: true,
+      },
       with: {
         dynamicSections: {
           with: {
@@ -51,6 +58,18 @@ export const generateOutlineTask = task({
         },
       },
     });
+    console.debug(`[DEBUG] Check the drizzle query:\n
+      ${drizzleQuery.toSQL().sql}\n
+      ---------
+      params:
+      ${JSON.stringify(drizzleQuery.toSQL().params)}
+      `);
+    const { data: existing, error } = await tryCatch(drizzleQuery);
+
+    if (error) {
+      throw new AbortTaskRunError(`Database error: ${error}`);
+    }
+    console.debug(`[DEBUG] first read query performed successfully`);
 
     if (
       existing?.dynamicSections &&
@@ -60,42 +79,13 @@ export const generateOutlineTask = task({
       return existing;
     }
 
-    const entry = await db.query.entries.findFirst({
-      where: eq(entries.inputTerm, term),
-      orderBy: (entries, { desc }) => [desc(entries.createdAt)],
-    });
-    if (!entry) {
-      throw new AbortTaskRunError(`Entry not found for term: ${term}`);
-    }
-    // Fetch top-ranking pages' markdown content
-    const organicResults = await db.query.firecrawlResponses.findMany({
-      where: eq(firecrawlResponses.inputTerm, term),
-      with: {
-        serperOrganicResult: {
-          columns: { position: true },
-        },
+    const technicalResearchSummaries = await db.query.exaScrapedResults.findMany({
+      columns: {
+        url: true,
+        summary: true,
       },
+      where: eq(exaScrapedResults.inputTerm, term),
     });
-    if (organicResults.length === 0) {
-      throw new AbortTaskRunError(`No organic results found for term: ${term}`);
-    }
-    console.info(`Step 1/8 - ORGANIC RESULTS: ${organicResults?.length} results`);
-
-    // Summarize the markdown content to manage token limits
-    const summaries = await Promise.all(
-      organicResults?.map(async (result) =>
-        getOrCreateSummary({
-          url: result.sourceUrl,
-          connectTo: { term },
-          onCacheHit,
-        }),
-      ),
-    );
-
-    const topRankingContent = summaries
-      .map((r) => `${r?.sourceUrl}\n${r?.summary}`)
-      .join("=========\n\n");
-    console.info(`Step 3/8 - SUMMARIES: ${topRankingContent}`);
 
     const contentKeywords = await db.query.keywords.findMany({
       where: and(
@@ -103,12 +93,11 @@ export const generateOutlineTask = task({
         eq(keywords.inputTerm, term),
       ),
     });
-    console.info(`Step 3/8 - SUMMARIES: ${topRankingContent}`);
 
     // Step 4: Generate initial outline
     const initialOutline = await generateInitialOutline({
       term,
-      topRankingContent,
+      technicalResearchSummary: technicalResearchSummaries.map(s => `${s.url}\n${s.summary}`).join("\n\n"),
       contentKeywords,
     });
     console.info(
@@ -118,17 +107,20 @@ export const generateOutlineTask = task({
     // Step 5: Technical review by domain expert
     const technicalEval = await performTechnicalEvalTask.triggerAndWait({
       input: term,
-      content: topRankingContent,
+      content: technicalResearchSummaries.map(s => `${s.url}\n${s.summary}`).join("\n\n"),
       onCacheHit,
     });
     if (!technicalEval.ok) {
       throw new AbortTaskRunError("Technical evaluation failed");
     }
+    if (!technicalEval.output?.id) {
+      throw new AbortTaskRunError(`The technical evaluation task didn't return an eval id.`);
+    }
     console.info(`Step 5/8 - TECHNICAL EVALUATION RESULT: 
         ===
-        Ratings: ${JSON.stringify(technicalEval.output.ratings)}
+        Ratings: ${JSON.stringify(technicalEval?.output?.ratings)}
         ===
-        Recommendations: ${JSON.stringify(technicalEval.output.recommendations)}
+        Recommendations: ${JSON.stringify(technicalEval?.output?.recommendations)}
         `);
     const seoKeywords = await db.query.keywords.findMany({
       where: and(
@@ -140,7 +132,7 @@ export const generateOutlineTask = task({
     // Step 6: SEO review
     const seoEval = await performSEOEvalTask.triggerAndWait({
       input: term,
-      content: topRankingContent,
+      content: technicalResearchSummaries.map(result => `${result.url}\n${result.summary}`).join("\n\n"),
       onCacheHit,
     });
     if (!seoEval.ok) {
@@ -155,7 +147,7 @@ export const generateOutlineTask = task({
 
     const seoOptimizedOutline = await reviseSEOOutline({
       term,
-      outlineToRefine: technicalEval.output.revisedOutline,
+      outlineToRefine: initialOutline.object.outline,
       reviewReport: seoEval.output,
       seoKeywordsToAllocate: seoKeywords,
     });
@@ -168,7 +160,7 @@ export const generateOutlineTask = task({
     // Step 7: Editorial review
     const editorialEval = await performEditorialEvalTask.triggerAndWait({
       input: term,
-      content: seoOptimizedOutline.object.outline,
+      content: seoOptimizedOutline.object.outline.map(section => `${section.heading}\n${section.description}`).join("\n\n"),
       onCacheHit,
     });
     if (!editorialEval.ok) {
@@ -181,22 +173,34 @@ export const generateOutlineTask = task({
         Recommendations: ${JSON.stringify(editorialEval.output.recommendations)}
         `);
 
+
+    if (!editorialEval.output || !editorialEval.output.id) {
+      throw new AbortTaskRunError("Editorial evaluation output or outline is missing.");
+    }
+    const editorialOptimizedOutline = await reviseEditorialOutline({
+      term,
+      outlineToRefine: seoOptimizedOutline.object.outline,
+      reviewReport: editorialEval.output,
+    });
+
     // persist to db as a new entry by with their related entities
-    const sectionInsertionPayload = editorialEval.output.outline.map((section) =>
+    const sectionInsertionPayload = editorialOptimizedOutline.object.outline.map((section) =>
       insertSectionSchema.parse({
         ...section,
-        entryId: entry.id,
+        entryId: existing?.id,
       }),
     );
     const newSectionIds = await db.insert(sections).values(sectionInsertionPayload).$returningId();
+    console.debug("[DEBUG] Successfully inserted sections, got IDs:", newSectionIds);
 
     // associate the keywords with the sections
+    console.debug("[DEBUG] About to prepare keyword insertion payload at line 190");
     const keywordInsertionPayload = [];
-    for (let i = 0; i < editorialEval.output.outline.length; i++) {
+    for (let i = 0; i < editorialOptimizedOutline.object.outline?.length; i++) {
       // add the newly inserted section id to our outline
-      const section = { ...editorialEval.output.outline[i], id: newSectionIds[i].id };
-      for (let j = 0; j < section.keywords.length; j++) {
-        const keyword = section.keywords[j];
+      const section = { ...(editorialOptimizedOutline.object.outline[i] as unknown as object), id: newSectionIds[i].id };
+      for (let j = 0; j < (section as any).keywords.length; j++) {
+        const keyword = (section as any).keywords[j];
         const keywordId = seoKeywords.find(
           (seoKeyword) => keyword.keyword === seoKeyword.keyword,
         )?.id;
@@ -211,21 +215,26 @@ export const generateOutlineTask = task({
         keywordInsertionPayload.push(payload);
       }
     }
+    console.debug("[DEBUG] About to insert sectionsToKeywords at line 214", { keywordInsertionPayload });
     await db.insert(sectionsToKeywords).values(keywordInsertionPayload);
+    console.debug("[DEBUG] Successfully inserted sectionsToKeywords");
 
     // associate the content types with the sections
-    const contentTypesInsertionPayload = editorialEval.output.outline.flatMap((section, index) =>
-      section.contentTypes.map((contentType) =>
+    console.debug("[DEBUG] About to prepare content types insertion payload at line 217");
+    const contentTypesInsertionPayload = (editorialOptimizedOutline.object.outline).flatMap((section, index) =>
+      section.contentTypes.map((contentType: any) =>
         insertSectionContentTypeSchema.parse({
           ...contentType,
           sectionId: newSectionIds[index].id,
         }),
       ),
     );
+    console.debug("[DEBUG] About to insert sectionContentTypes at line 224", { contentTypesInsertionPayload });
     await db.insert(sectionContentTypes).values(contentTypesInsertionPayload);
+    console.debug("[DEBUG] Successfully inserted sectionContentTypes");
 
     const newEntry = await db.query.entries.findFirst({
-      where: eq(entries.id, entry.id),
+      where: eq(entries.id, existing?.id),
       orderBy: (entries, { desc }) => [desc(entries.createdAt)],
       with: {
         dynamicSections: {
@@ -267,11 +276,11 @@ const initialOutlineSchema = finalOutlineSchema.extend({
 
 async function generateInitialOutline({
   term,
-  topRankingContent,
+  technicalResearchSummary,
   contentKeywords,
 }: {
   term: string;
-  topRankingContent: string;
+  technicalResearchSummary: string;
   contentKeywords: Array<SelectKeywords>;
 }) {
   const initialOutlineSystem = `You are a **Technical SEO Content Writer** specializing in API development and computer science.
@@ -289,25 +298,26 @@ async function generateInitialOutline({
   - Include a short description under each heading that outlines the content to be included, explains its importance, and references sources.
   - Describe recommended content types for each section as per the schema definition called "type" inside the contentTypes array. These represent different type of content forms for SEO pages. Make a recommendation for what to use and keep track of your reasoning.
   - Ensure headers are under 70 characters, descriptive, and maintain clarity and readability.
+  - Cite the sources for every section in the form of the URL
   
   =====
   TOP RANKING PAGES CONTENT:
   =====
-  ${topRankingContent}
+  ${technicalResearchSummary}
   
   =====
   KEYWORDS USED IN HEADERS:
   =====
   FROM PAGE TITLES:
   ${contentKeywords
-    .filter((k) => k.source === "title")
-    .map((k) => `- ${k.keyword}`)
-    .join("\n")}
+      .filter((k) => k.source === "title")
+      .map((k) => `- ${k.keyword}`)
+      .join("\n")}
   FROM HEADERS:
   ${contentKeywords
-    .filter((k) => k.source === "headers")
-    .map((k) => `- ${k.keyword}`)
-    .join("\n")}
+      .filter((k) => k.source === "headers")
+      .map((k) => `- ${k.keyword}`)
+      .join("\n")}
   `;
 
   return await generateObject({
@@ -326,8 +336,8 @@ async function reviseSEOOutline({
 }: {
   term: string;
   outlineToRefine: z.infer<typeof initialOutlineSchema>["outline"];
-  reviewReport: Awaited<ReturnType<typeof performSEOEvalTask>>["object"];
-  seoKeywordsToAllocate: Array<Keyword>;
+  reviewReport: TaskOutput<typeof performSEOEvalTask>;
+  seoKeywordsToAllocate: Array<SelectKeywords>;
 }) {
   const seoRevisionSystem = `
    You are a **Senior SEO Strategist & Technical Content Specialist** with over 10 years of experience in optimizing content for API development and computer science domains.
@@ -392,3 +402,54 @@ async function reviseSEOOutline({
     schema: finalOutlineSchema,
   });
 }
+
+async function reviseEditorialOutline({
+  term,
+  outlineToRefine,
+  reviewReport,
+}: {
+  term: string;
+  outlineToRefine: z.infer<typeof initialOutlineSchema>["outline"];
+  reviewReport: TaskOutput<typeof performEditorialEvalTask>;
+}) {
+  const editorialRevisionSystem = `
+  You are a **Senior Editor & Content Strategist** with extensive experience in creating engaging and accurate technical content for API development and computer science audiences.
+
+  Task:
+  - Refine the provided outline based on the editorial review report and guidelines.
+  - Ensure the content flows logically, is engaging, and meets high editorial standards.
+
+  **Guidelines for Revised Outline:**
+  1. Clarity and Conciseness: Ensure each section heading and description is clear, concise, and easy to understand.
+  2. Accuracy: Verify that the information presented is factually correct and up-to-date.
+  3. Engagement: Make headers and descriptions compelling to maintain reader interest.
+  4. Tone and Style: Maintain a professional and technical tone suitable for API developers and computer scientists.
+  5. Completeness: Ensure the outline comprehensively covers the topic without being redundant.
+  6. Flow and Structure: Organize sections logically for a smooth reading experience.
+  7. Actionability: Where appropriate, ensure the content provides actionable insights or information.
+  8. Uniqueness: Each section should offer unique value and avoid repetition.
+
+  You have the ability to add, modify, or merge sections in the outline as needed to create the most effective and editorially sound structure.
+  Focus on the quality of the content, its organization, and its appeal to the target audience.
+  `;
+
+  const editorialRevisionPrompt = `
+  Review the following outline for the term "${term}":
+
+  Outline to refine:
+  ${JSON.stringify(outlineToRefine)}
+
+  Editorial Review Report:
+  ${JSON.stringify(reviewReport)}
+
+  Please refine the outline according to the guidelines and the review report to produce a polished, publish-ready structure.
+  `;
+
+  return await generateObject({
+    model: openai("gpt-4o-mini"),
+    system: editorialRevisionSystem,
+    prompt: editorialRevisionPrompt,
+    schema: finalOutlineSchema,
+  });
+}
+
