@@ -59,7 +59,8 @@ Keep the search query as short and as simple as possible, don't use quotes aroun
       set: {
         query: generatedQuery.object.query,
       },
-    }).$returningId();
+    })
+    .$returningId();
 
   if (!insertedQueryId) {
     throw new Error("Failed to insert or update search query");

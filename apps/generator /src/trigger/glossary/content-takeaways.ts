@@ -4,7 +4,7 @@ import { openai } from "@ai-sdk/openai";
 import { task } from "@trigger.dev/sdk/v3";
 import { generateObject } from "ai";
 import { eq } from "drizzle-orm";
-import { entries, exaScrapedResults, firecrawlResponses } from "../../lib/db-marketing/schemas";
+import { entries, exaScrapedResults } from "../../lib/db-marketing/schemas";
 import type { CacheStrategy } from "./_generate-glossary-entry";
 
 export const contentTakeawaysTask = task({
@@ -44,11 +44,14 @@ export const contentTakeawaysTask = task({
     });
 
     // group the scrpaedContent by its domainCategory
-    const groupedScrapedContent = scrapedContent.reduce((acc, content) => {
-      acc[content.domainCategory] = acc[content.domainCategory] || [];
-      acc[content.domainCategory].push(content);
-      return acc;
-    }, {} as Record<string, typeof scrapedContent>);
+    const groupedScrapedContent = scrapedContent.reduce(
+      (acc, content) => {
+        acc[content.domainCategory] = acc[content.domainCategory] || [];
+        acc[content.domainCategory].push(content);
+        return acc;
+      },
+      {} as Record<string, typeof scrapedContent>,
+    );
 
     const takeaways = await generateObject({
       model: openai("gpt-4"),
@@ -65,9 +68,11 @@ export const contentTakeawaysTask = task({
         ## Scraped Content summaries
         We have ${Object.keys(groupedScrapedContent).length} domain categories with URLs for each.
 
-        ${Object.entries(groupedScrapedContent).map(([domainCategory, contents]) => {
-          return `### Domain category: ${domainCategory}\n${contents.map((content) => `- ${content.url}: ${content.summary}`).join("\n\n")}`;
-        }).join("\n\n")}
+        ${Object.entries(groupedScrapedContent)
+          .map(([domainCategory, contents]) => {
+            return `### Domain category: ${domainCategory}\n${contents.map((content) => `- ${content.url}: ${content.summary}`).join("\n\n")}`;
+          })
+          .join("\n\n")}
         
         Create structured takeaways covering:
         1. TLDR (brief, clear definition)

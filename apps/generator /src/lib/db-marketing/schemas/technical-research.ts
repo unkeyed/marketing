@@ -1,13 +1,22 @@
-// import { domainCategories } from "@/trigger/glossary/research/technical/exa-domain-search";
-import { index, int, json, longtext, mysqlEnum, mysqlTable, unique, varchar } from "drizzle-orm/mysql-core";
-import { searchQueries } from "./searchQuery";
 import { relations } from "drizzle-orm";
-import { z } from "zod";
+// import { domainCategories } from "@/trigger/glossary/research/technical/exa-domain-search";
+import {
+  index,
+  int,
+  json,
+  longtext,
+  mysqlEnum,
+  mysqlTable,
+  unique,
+  varchar,
+} from "drizzle-orm/mysql-core";
 import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
+import { searchQueries } from "./searchQuery";
 
 import { entries } from "./entries";
 
-import { SearchResponse } from "exa-js";
+import type { SearchResponse } from "exa-js";
 export const domainCategories = [
   {
     name: "Official",
@@ -47,7 +56,9 @@ const evaluationSchema = z.object({
 export const technicalResearchSearchResultEvaluationSchema = z.object({
   url: z.string(),
   evaluation: evaluationSchema,
-  domainCategory: z.enum(domainCategories.map((c) => c.name) as [DomainCategory, ...DomainCategory[]]),
+  domainCategory: z.enum(
+    domainCategories.map((c) => c.name) as [DomainCategory, ...DomainCategory[]],
+  ),
 });
 
 // Add the metadata type
@@ -70,28 +81,40 @@ export const technicalResearch = mysqlTable(
   {
     id: int("id").primaryKey().autoincrement(),
     inputTerm: varchar("input_term", { length: 767 }).notNull(),
-    domainCategory: mysqlEnum("domain_category", domainCategories.map((c) => c.name) as [DomainCategory, ...DomainCategory[]]).notNull(),
-    hashedExaSearchResponseWithoutContent: varchar("hashed_exa_search_response_without_content", { length: 64 }).notNull(), // SHA-256 hash
-    exaSearchResponseWithoutContent: json("exa_search_response_without_content").$type<SearchResponse<{}>>().notNull(),
-    exaSearchResponseWithContent: json("exa_search_response_with_content").$type<SearchResponse<{ summary: true, text: true }> | null>().default(null),
+    domainCategory: mysqlEnum(
+      "domain_category",
+      domainCategories.map((c) => c.name) as [DomainCategory, ...DomainCategory[]],
+    ).notNull(),
+    hashedExaSearchResponseWithoutContent: varchar("hashed_exa_search_response_without_content", {
+      length: 64,
+    }).notNull(), // SHA-256 hash
+    exaSearchResponseWithoutContent: json("exa_search_response_without_content")
+      .$type<SearchResponse<{ [k: string]: never }>>()
+      .notNull(),
+    exaSearchResponseWithContent: json("exa_search_response_with_content")
+      .$type<SearchResponse<{ summary: true; text: true }> | null>()
+      .default(null),
     searchEvaluation: json("search_evaluation").$type<SearchEvaluation>().default(null),
-    exaScrapedContent: json("exa_scraped_content").$type<SearchResponse<{
-      summary: {
-        query: string;
-      };
-      text: {
-        includeHtmlTags: false;
-      }
-    }
-    > | null>().default(null),
+    exaScrapedContent: json("exa_scraped_content")
+      .$type<SearchResponse<{
+        summary: {
+          query: string;
+        };
+        text: {
+          includeHtmlTags: false;
+        };
+      }> | null>()
+      .default(null),
   },
   (table) => [
     index("input_term_idx").on(table.inputTerm),
-    unique("hashed_exa_search_response_without_content_idx").on(table.hashedExaSearchResponseWithoutContent),
-  ]
-)
+    unique("hashed_exa_search_response_without_content_idx").on(
+      table.hashedExaSearchResponseWithoutContent,
+    ),
+  ],
+);
 
-export const technicalResearchRelations = relations(technicalResearch, ({ one, many }) => ({
+export const technicalResearchRelations = relations(technicalResearch, ({ one }) => ({
   searchQuery: one(searchQueries, {
     fields: [technicalResearch.inputTerm],
     references: [searchQueries.inputTerm],
@@ -108,17 +131,21 @@ export const insertTechnicalResearchSchema = createInsertSchema(technicalResearc
 export type NewTechnicalResearch = z.infer<typeof insertTechnicalResearchSchema>;
 export type TechnicalResearch = typeof technicalResearch.$inferSelect;
 
-export const exaScrapedResults = mysqlTable("exa_scraped_results", {
-  id: int("id").primaryKey().autoincrement(),
-  inputTerm: varchar("input_term", { length: 767 }).notNull(),
-  url: varchar("url", { length: 767 }).notNull(),
-  summary: longtext("summary").notNull(),
-  text: longtext("text").notNull(),
-  domainCategory: mysqlEnum("domain_category", domainCategories.map((c) => c.name) as [DomainCategory, ...DomainCategory[]]).notNull(),
-}, (table) => [
-  index("input_term_idx").on(table.inputTerm),
-  unique("url_unique").on(table.url),
-]);
+export const exaScrapedResults = mysqlTable(
+  "exa_scraped_results",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    inputTerm: varchar("input_term", { length: 767 }).notNull(),
+    url: varchar("url", { length: 767 }).notNull(),
+    summary: longtext("summary").notNull(),
+    text: longtext("text").notNull(),
+    domainCategory: mysqlEnum(
+      "domain_category",
+      domainCategories.map((c) => c.name) as [DomainCategory, ...DomainCategory[]],
+    ).notNull(),
+  },
+  (table) => [index("input_term_idx").on(table.inputTerm), unique("url_unique").on(table.url)],
+);
 
 export const exaScrapedResultsRelations = relations(exaScrapedResults, ({ one }) => ({
   entry: one(entries, {

@@ -1,12 +1,10 @@
+import { db } from "@/lib/db-marketing/client";
+import { exaScrapedResults } from "@/lib/db-marketing/schemas";
 import { AbortTaskRunError, batch, task } from "@trigger.dev/sdk/v3";
-import Exa from "exa-js";
+import { eq } from "drizzle-orm";
+import type { CacheStrategy } from "../../_generate-glossary-entry";
 import { evaluateSearchResults } from "./evaluate-search-results";
 import { domainCategories, exaDomainSearchTask } from "./exa-domain-search";
-import { db } from "@/lib/db-marketing/client";
-import { and, eq } from "drizzle-orm";
-import { CacheStrategy } from "../../_generate-glossary-entry";
-import { composeScrapingContentBaseOptions } from "@/lib/exa";
-import { exaScrapedResults, technicalResearch } from "@/lib/db-marketing/schemas";
 import { scrapeSearchResults } from "./exa-scrape-results";
 
 export const technicalResearchTask = task({
@@ -26,17 +24,26 @@ export const technicalResearchTask = task({
       where: eq(exaScrapedResults.inputTerm, inputTerm),
     });
 
-    const missingDomainCategories = domainCategories.filter(domainCategory => !existingScrapedResults.some(scrapedResult => scrapedResult.domainCategory === domainCategory.name));
-  
+    const missingDomainCategories = domainCategories.filter(
+      (domainCategory) =>
+        !existingScrapedResults.some(
+          (scrapedResult) => scrapedResult.domainCategory === domainCategory.name,
+        ),
+    );
+
     if (missingDomainCategories.length === 0 && onCacheHit === "stale") {
-      console.info(`⏩︎ Cache hit for technical research for term "${inputTerm}" with ${existingScrapedResults.length} results, returning cached results`);
+      console.info(
+        `⏩︎ Cache hit for technical research for term "${inputTerm}" with ${existingScrapedResults.length} results, returning cached results`,
+      );
       return existingScrapedResults;
     }
 
     // we perform a search for each search category in parallel:
     let onCacheHitDevOrProd = onCacheHit;
     if (process.env.NODE_ENV === "development") {
-      console.info(`[DEVELOPMENT] Setting onCacheHit to "stale" for technical research for term "${inputTerm}" with ${domainCategories.length} categories`);
+      console.info(
+        `[DEVELOPMENT] Setting onCacheHit to "stale" for technical research for term "${inputTerm}" with ${domainCategories.length} categories`,
+      );
       onCacheHitDevOrProd = "stale";
     }
     const { runs } = await batch.triggerByTaskAndWait(
@@ -64,15 +71,17 @@ export const technicalResearchTask = task({
       throw new AbortTaskRunError("Failed to evaluate search results");
     }
 
-
     // Step 3: Scrape the content of the results
     const scrapedResults = await scrapeSearchResults.triggerAndWait({
-        inputTerm,
-        includedSearchResults: evaluationRun.output.flatMap((domainResearchEvaluation) => domainResearchEvaluation.searchEvaluation?.included.map((included) => ({
-          url: included.url,
-          domainCategory: domainResearchEvaluation.domainCategory,
-        })) ?? []),
-        onCacheHit,
+      inputTerm,
+      includedSearchResults: evaluationRun.output.flatMap(
+        (domainResearchEvaluation) =>
+          domainResearchEvaluation.searchEvaluation?.included.map((included) => ({
+            url: included.url,
+            domainCategory: domainResearchEvaluation.domainCategory,
+          })) ?? [],
+      ),
+      onCacheHit,
     });
     if (!scrapedResults.ok) {
       throw new AbortTaskRunError("Failed to scrape search results");

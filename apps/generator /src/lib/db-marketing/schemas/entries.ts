@@ -28,7 +28,6 @@ export const faqSchema = z.array(
 
 export type FAQ = z.infer<typeof faqSchema>;
 
-
 export const entries = mysqlTable(
   "entries",
   {

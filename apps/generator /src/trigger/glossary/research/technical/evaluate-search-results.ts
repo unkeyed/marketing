@@ -1,10 +1,14 @@
+import { db } from "@/lib/db-marketing/client";
+import {
+  type TechnicalResearch,
+  technicalResearch,
+  technicalResearchSearchResultEvaluationSchema,
+} from "@/lib/db-marketing/schemas/technical-research";
 import { google } from "@/lib/google";
 import { AbortTaskRunError, task } from "@trigger.dev/sdk/v3";
 import { generateObject } from "ai";
-import { domainCategories } from "./exa-domain-search";
-import { db } from "@/lib/db-marketing/client";
 import { and, eq } from "drizzle-orm";
-import { technicalResearch, technicalResearchSearchResultEvaluationSchema, type TechnicalResearch } from "@/lib/db-marketing/schemas/technical-research";
+import { domainCategories } from "./exa-domain-search";
 
 export const evaluateSearchResults = task({
   id: "evaluate-search-results",
@@ -17,16 +21,22 @@ export const evaluateSearchResults = task({
         domainCategory: true,
       },
     });
-    const missingDomainCategories = domainCategories.filter(searches => !existing.some(search => search.domainCategory === searches.name));
+    const missingDomainCategories = domainCategories.filter(
+      (searches) => !existing.some((search) => search.domainCategory === searches.name),
+    );
     if (missingDomainCategories.length > 0) {
-      console.warn(`Technical reserach incomplete`);
-      throw new AbortTaskRunError(`Technical research evaluation called but not all domain searches returned results: ${missingDomainCategories.map(c => c.name).join(", ")}`);
+      console.warn("Technical reserach incomplete");
+      throw new AbortTaskRunError(
+        `Technical research evaluation called but not all domain searches returned results: ${missingDomainCategories.map((c) => c.name).join(", ")}`,
+      );
     }
 
-    const searchResults = existing.flatMap(search => search.exaSearchResponseWithoutContent.results.map(result => ({
-      ...result,
-      domainCategory: search.domainCategory,
-    })));
+    const searchResults = existing.flatMap((search) =>
+      search.exaSearchResponseWithoutContent.results.map((result) => ({
+        ...result,
+        domainCategory: search.domainCategory,
+      })),
+    );
 
     const geminiResponse = await generateObject({
       model: google("gemini-2.0-flash-lite-preview-02-05") as any,
@@ -96,28 +106,38 @@ export const evaluateSearchResults = task({
 
     // upsert the technicalResearch.searchEvaluation for the given inputTerm, domainCategory:
     for (const domainCategory of domainCategories) {
-      const domainEvaluations = evaluations.filter(evaluation => evaluation.domainCategory === domainCategory.name);
+      const domainEvaluations = evaluations.filter(
+        (evaluation) => evaluation.domainCategory === domainCategory.name,
+      );
 
-      await db.update(technicalResearch)
+      await db
+        .update(technicalResearch)
         .set({
           searchEvaluation: {
             metadata: {
               evaluatedAt: new Date(),
               stats: {
                 included: domainEvaluations.filter(
-                  (evaluation) => evaluation.evaluation?.rating && evaluation.evaluation?.rating >= 7,
+                  (evaluation) =>
+                    evaluation.evaluation?.rating && evaluation.evaluation?.rating >= 7,
                 ).length,
                 excluded: domainEvaluations.filter(
-                  (evaluation) => evaluation.evaluation?.rating && evaluation.evaluation?.rating < 7,
+                  (evaluation) =>
+                    evaluation.evaluation?.rating && evaluation.evaluation?.rating < 7,
                 ).length,
               },
             },
             included: domainEvaluations.filter(
               (evaluation) => evaluation.evaluation?.rating && evaluation.evaluation?.rating >= 7,
             ),
-          }
+          },
         })
-        .where(and(eq(technicalResearch.inputTerm, inputTerm), eq(technicalResearch.domainCategory, domainCategory.name)));
+        .where(
+          and(
+            eq(technicalResearch.inputTerm, inputTerm),
+            eq(technicalResearch.domainCategory, domainCategory.name),
+          ),
+        );
     }
 
     const updatedEntries = await db.query.technicalResearch.findMany({
@@ -128,9 +148,13 @@ export const evaluateSearchResults = task({
       },
     });
     if (!updatedEntries.length) {
-      throw new AbortTaskRunError(`Technical research evaluation not found in DB for term "${inputTerm}". Run the _technical-research task first.`);
+      throw new AbortTaskRunError(
+        `Technical research evaluation not found in DB for term "${inputTerm}". Run the _technical-research task first.`,
+      );
     }
-    console.info(`✅︎ Evaluated search results for term "${inputTerm}" with stats: ${JSON.stringify(updatedEntries.map(entry => entry.searchEvaluation?.metadata.stats))}`);
+    console.info(
+      `✅︎ Evaluated search results for term "${inputTerm}" with stats: ${JSON.stringify(updatedEntries.map((entry) => entry.searchEvaluation?.metadata.stats))}`,
+    );
     return updatedEntries;
   },
 });

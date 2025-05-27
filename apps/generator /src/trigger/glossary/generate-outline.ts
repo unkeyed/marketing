@@ -3,7 +3,6 @@ import {
   type SelectKeywords,
   entries,
   exaScrapedResults,
-  firecrawlResponses,
   insertSectionContentTypeSchema,
   insertSectionSchema,
   insertSectionsToKeywordsSchema,
@@ -13,14 +12,14 @@ import {
   sectionsToKeywords,
   selectKeywordsSchema,
 } from "@/lib/db-marketing/schemas";
+import { tryCatch } from "@/lib/utils/try-catch";
 import { openai } from "@ai-sdk/openai";
-import { AbortTaskRunError, task, TaskOutput } from "@trigger.dev/sdk/v3";
+import { AbortTaskRunError, type TaskOutput, task } from "@trigger.dev/sdk/v3";
 import { generateObject } from "ai";
 import { and, eq, or } from "drizzle-orm";
 import { z } from "zod";
 import type { CacheStrategy } from "./_generate-glossary-entry";
 import { performEditorialEvalTask, performSEOEvalTask, performTechnicalEvalTask } from "./evals";
-import { tryCatch } from "@/lib/utils/try-catch";
 
 // TODO: this task is a bit flake-y still
 // - split up into smaller tasks,  and/or
@@ -69,7 +68,7 @@ export const generateOutlineTask = task({
     if (error) {
       throw new AbortTaskRunError(`Database error: ${error}`);
     }
-    console.debug(`[DEBUG] first read query performed successfully`);
+    console.debug("[DEBUG] first read query performed successfully");
 
     if (
       existing?.dynamicSections &&
@@ -97,7 +96,9 @@ export const generateOutlineTask = task({
     // Step 4: Generate initial outline
     const initialOutline = await generateInitialOutline({
       term,
-      technicalResearchSummary: technicalResearchSummaries.map(s => `${s.url}\n${s.summary}`).join("\n\n"),
+      technicalResearchSummary: technicalResearchSummaries
+        .map((s) => `${s.url}\n${s.summary}`)
+        .join("\n\n"),
       contentKeywords,
     });
     console.info(
@@ -107,7 +108,7 @@ export const generateOutlineTask = task({
     // Step 5: Technical review by domain expert
     const technicalEval = await performTechnicalEvalTask.triggerAndWait({
       input: term,
-      content: technicalResearchSummaries.map(s => `${s.url}\n${s.summary}`).join("\n\n"),
+      content: technicalResearchSummaries.map((s) => `${s.url}\n${s.summary}`).join("\n\n"),
       onCacheHit,
     });
     if (!technicalEval.ok) {
@@ -132,7 +133,9 @@ export const generateOutlineTask = task({
     // Step 6: SEO review
     const seoEval = await performSEOEvalTask.triggerAndWait({
       input: term,
-      content: technicalResearchSummaries.map(result => `${result.url}\n${result.summary}`).join("\n\n"),
+      content: technicalResearchSummaries
+        .map((result) => `${result.url}\n${result.summary}`)
+        .join("\n\n"),
       onCacheHit,
     });
     if (!seoEval.ok) {
@@ -160,7 +163,9 @@ export const generateOutlineTask = task({
     // Step 7: Editorial review
     const editorialEval = await performEditorialEvalTask.triggerAndWait({
       input: term,
-      content: seoOptimizedOutline.object.outline.map(section => `${section.heading}\n${section.description}`).join("\n\n"),
+      content: seoOptimizedOutline.object.outline
+        .map((section) => `${section.heading}\n${section.description}`)
+        .join("\n\n"),
       onCacheHit,
     });
     if (!editorialEval.ok) {
@@ -172,7 +177,6 @@ export const generateOutlineTask = task({
         ===
         Recommendations: ${JSON.stringify(editorialEval.output.recommendations)}
         `);
-
 
     if (!editorialEval.output || !editorialEval.output.id) {
       throw new AbortTaskRunError("Editorial evaluation output or outline is missing.");
@@ -198,7 +202,10 @@ export const generateOutlineTask = task({
     const keywordInsertionPayload = [];
     for (let i = 0; i < editorialOptimizedOutline.object.outline?.length; i++) {
       // add the newly inserted section id to our outline
-      const section = { ...(editorialOptimizedOutline.object.outline[i] as unknown as object), id: newSectionIds[i].id };
+      const section = {
+        ...(editorialOptimizedOutline.object.outline[i] as unknown as object),
+        id: newSectionIds[i].id,
+      };
       for (let j = 0; j < (section as any).keywords.length; j++) {
         const keyword = (section as any).keywords[j];
         const keywordId = seoKeywords.find(
@@ -215,21 +222,26 @@ export const generateOutlineTask = task({
         keywordInsertionPayload.push(payload);
       }
     }
-    console.debug("[DEBUG] About to insert sectionsToKeywords at line 214", { keywordInsertionPayload });
+    console.debug("[DEBUG] About to insert sectionsToKeywords at line 214", {
+      keywordInsertionPayload,
+    });
     await db.insert(sectionsToKeywords).values(keywordInsertionPayload);
     console.debug("[DEBUG] Successfully inserted sectionsToKeywords");
 
     // associate the content types with the sections
     console.debug("[DEBUG] About to prepare content types insertion payload at line 217");
-    const contentTypesInsertionPayload = (editorialOptimizedOutline.object.outline).flatMap((section, index) =>
-      section.contentTypes.map((contentType: any) =>
-        insertSectionContentTypeSchema.parse({
-          ...contentType,
-          sectionId: newSectionIds[index].id,
-        }),
-      ),
+    const contentTypesInsertionPayload = editorialOptimizedOutline.object.outline.flatMap(
+      (section, index) =>
+        section.contentTypes.map((contentType: any) =>
+          insertSectionContentTypeSchema.parse({
+            ...contentType,
+            sectionId: newSectionIds[index].id,
+          }),
+        ),
     );
-    console.debug("[DEBUG] About to insert sectionContentTypes at line 224", { contentTypesInsertionPayload });
+    console.debug("[DEBUG] About to insert sectionContentTypes at line 224", {
+      contentTypesInsertionPayload,
+    });
     await db.insert(sectionContentTypes).values(contentTypesInsertionPayload);
     console.debug("[DEBUG] Successfully inserted sectionContentTypes");
 
@@ -310,14 +322,14 @@ async function generateInitialOutline({
   =====
   FROM PAGE TITLES:
   ${contentKeywords
-      .filter((k) => k.source === "title")
-      .map((k) => `- ${k.keyword}`)
-      .join("\n")}
+    .filter((k) => k.source === "title")
+    .map((k) => `- ${k.keyword}`)
+    .join("\n")}
   FROM HEADERS:
   ${contentKeywords
-      .filter((k) => k.source === "headers")
-      .map((k) => `- ${k.keyword}`)
-      .join("\n")}
+    .filter((k) => k.source === "headers")
+    .map((k) => `- ${k.keyword}`)
+    .join("\n")}
   `;
 
   return await generateObject({
@@ -452,4 +464,3 @@ async function reviseEditorialOutline({
     schema: finalOutlineSchema,
   });
 }
-

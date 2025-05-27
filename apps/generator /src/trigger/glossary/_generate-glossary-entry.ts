@@ -9,8 +9,8 @@ import { draftSectionsTask } from "./draft-sections";
 import { generateFaqsTask } from "./generate-faqs";
 import { generateOutlineTask } from "./generate-outline";
 import { keywordResearchTask } from "./keyword-research";
-import { seoMetaTagsTask } from "./seo-meta-tags";
 import { technicalResearchTask } from "./research/technical/_technical-research";
+import { seoMetaTagsTask } from "./seo-meta-tags";
 
 export type CacheStrategy = "revalidate" | "stale";
 /**
@@ -97,7 +97,7 @@ export const generateGlossaryEntryTask = task({
     if (!technicalResearch.ok) {
       throw new AbortTaskRunError(`Technical research failed for term: ${term}`);
     }
-    
+
     console.info("✓ Technical research completed and persisted");
 
     // Step 2: Generate Outline

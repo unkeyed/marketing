@@ -1,22 +1,31 @@
 import { db } from "@/lib/db-marketing/client";
-import { DomainCategory, exaScrapedResults, ExaScrapedResults } from "@/lib/db-marketing/schemas/technical-research";
+import {
+  type DomainCategory,
+  type ExaScrapedResults,
+  exaScrapedResults,
+} from "@/lib/db-marketing/schemas/technical-research";
 import { composeScrapingContentBaseOptions } from "@/lib/exa";
 import { AbortTaskRunError, task } from "@trigger.dev/sdk/v3";
 
 import { eq, sql } from "drizzle-orm";
 import Exa from "exa-js";
-import { CacheStrategy } from "../../_generate-glossary-entry";
+import type { CacheStrategy } from "../../_generate-glossary-entry";
 
 export const scrapeSearchResults = task({
-    id: "scrape-search-results",
-    run: async (input: Pick<ExaScrapedResults, "inputTerm"> & { includedSearchResults: { url: string, domainCategory: DomainCategory }[], onCacheHit: CacheStrategy }) => {
-        const { inputTerm, includedSearchResults, onCacheHit } = input;
-        const existingResults = await db.query.exaScrapedResults.findMany({
-            where: eq(exaScrapedResults.inputTerm, inputTerm),
-        });
+  id: "scrape-search-results",
+  run: async (
+    input: Pick<ExaScrapedResults, "inputTerm"> & {
+      includedSearchResults: { url: string; domainCategory: DomainCategory }[];
+      onCacheHit: CacheStrategy;
+    },
+  ) => {
+    const { inputTerm, includedSearchResults, onCacheHit } = input;
+    const existingResults = await db.query.exaScrapedResults.findMany({
+      where: eq(exaScrapedResults.inputTerm, inputTerm),
+    });
 
-        const exa = new Exa(process.env.EXA_API_KEY || "");
-        const summaryQuery = `You are the **Chief Technology Officer (CTO)** of a leading API Development Tools Company with extensive experience in API development using programming languages such as Go, TypeScript, and Elixir and other backend languages. You have a PhD in computer science from MIT. Your expertise ensures that the content you summarize is technically accurate, relevant, and aligned with best practices in API development and computer science.
+    const exa = new Exa(process.env.EXA_API_KEY || "");
+    const summaryQuery = `You are the **Chief Technology Officer (CTO)** of a leading API Development Tools Company with extensive experience in API development using programming languages such as Go, TypeScript, and Elixir and other backend languages. You have a PhD in computer science from MIT. Your expertise ensures that the content you summarize is technically accurate, relevant, and aligned with best practices in API development and computer science.
 
     **Your Task:**
     Accurately and concisely summarize the content from the page for the term "${inputTerm}". Focus on technical details, including how the content is presented (e.g., text, images, tables). Ensure factual correctness and relevance to API development.
@@ -27,74 +36,83 @@ export const scrapeSearchResults = task({
     - Mention the types of content included, such as images, tables, code snippets, etc.
     - Cite the term the content is ranking for.`;
 
-        // First dedupe any URLs
-        const uniqueUrls = includedSearchResults.filter((result, index, self) =>
-            index === self.findIndex((r) => r.url === result.url)
-        );
+    // First dedupe any URLs
+    const uniqueUrls = includedSearchResults.filter(
+      (result, index, self) => index === self.findIndex((r) => r.url === result.url),
+    );
 
-        // Then find which ones are missing from our cache
-        const missingUrls = uniqueUrls.filter(({ url }) => !existingResults.some((result) => result.url === url));
+    // Then find which ones are missing from our cache
+    const missingUrls = uniqueUrls.filter(
+      ({ url }) => !existingResults.some((result) => result.url === url),
+    );
 
-        // Only return from cache if:
-        // 1. We're in "stale" mode AND
-        // 2. We have all URLs already cached
-        if (onCacheHit === "stale" && missingUrls.length === 0) {
-            console.info(`⏩︎ Cache hit for all results already scraped for term "${inputTerm}". Reason: onCacheHit is stale`);
-            return existingResults;
-        }
+    // Only return from cache if:
+    // 1. We're in "stale" mode AND
+    // 2. We have all URLs already cached
+    if (onCacheHit === "stale" && missingUrls.length === 0) {
+      console.info(
+        `⏩︎ Cache hit for all results already scraped for term "${inputTerm}". Reason: onCacheHit is stale`,
+      );
+      return existingResults;
+    }
 
-        // Otherwise, scrape everything (either missing URLs or revalidating all)
-        const urlsToScrape = onCacheHit === "revalidate" ? uniqueUrls : missingUrls;
-        const scrapingResults = await exa.getContents(
-            urlsToScrape.map(({ url }) => url),
-            composeScrapingContentBaseOptions({ summaryQuery })
-        );
+    // Otherwise, scrape everything (either missing URLs or revalidating all)
+    const urlsToScrape = onCacheHit === "revalidate" ? uniqueUrls : missingUrls;
+    const scrapingResults = await exa.getContents(
+      urlsToScrape.map(({ url }) => url),
+      composeScrapingContentBaseOptions({ summaryQuery }),
+    );
 
-        // log the costs for the exa responses:
-        const scrapingCosts = scrapingResults.costDollars;
-        console.info(`💰 Exa API costs for Content Scraping:
+    // log the costs for the exa responses:
+    const scrapingCosts = scrapingResults.costDollars;
+    console.info(`💰 Exa API costs for Content Scraping:
       Total: $${scrapingCosts?.total}
       Contents:
        - Text:  $${scrapingCosts?.contents?.text}
        - Summaries: $${scrapingCosts?.contents?.summary}
     `);
 
-        // Persist the scraping results
-        const newResults = scrapingResults.results.map((result) => ({
-            inputTerm,
-            url: result.url,
-            summary: result.summary,
-            text: result.text,
-            domainCategory: urlsToScrape.find(({ url }) => url === result.url)?.domainCategory,
-        }));
+    // Persist the scraping results
+    const newResults = scrapingResults.results.map((result) => ({
+      inputTerm,
+      url: result.url,
+      summary: result.summary,
+      text: result.text,
+      domainCategory: urlsToScrape.find(({ url }) => url === result.url)?.domainCategory,
+    }));
 
-        newResults.forEach(result => {
-            console.info(`URL: ${result.url}
+    newResults.forEach((result) => {
+      console.info(`URL: ${result.url}
     Summary length: ${result.summary?.length || 0}
     Text length: ${result.text?.length || 0}
     Total length: ${(result.summary?.length || 0) + (result.text?.length || 0)}`);
-        });
+    });
 
-        await db.insert(exaScrapedResults)
-            // @ts-expect-error we have to ensure domainCategory is not undefined
-            .values(newResults)
-            .onDuplicateKeyUpdate({
-                set: {
-                    summary: sql`VALUES(summary)`,
-                    text: sql`VALUES(text)`,
-                    domainCategory: sql`VALUES(domain_category)`,
-                    inputTerm: sql`VALUES(input_term)`,
-                }
-            })
-            .$returningId();
-        const scrapedUrls = await db.query.exaScrapedResults.findMany({
-            where: eq(exaScrapedResults.inputTerm, inputTerm),
-        });
-        const missingUrlsToScrape = urlsToScrape.filter(url => !scrapedUrls.some(scrapedUrl => scrapedUrl.url === url.url));
-        if (missingUrlsToScrape.length > 0) {
-            console.warn(`There's some integrity issue here, we might not have scraped all missing Urls properly.\nThere are ${missingUrlsToScrape.length} missing URLs.\nMissing URLs:\n${missingUrlsToScrape.map(r => r.url).join("\n")}`);
-            throw new AbortTaskRunError(`Failed to scrape all results for term "${inputTerm}".`);
-        }
-        return scrapedUrls;
-    },
+    await db
+      .insert(exaScrapedResults)
+      // @ts-expect-error we have to ensure domainCategory is not undefined
+      .values(newResults)
+      .onDuplicateKeyUpdate({
+        set: {
+          summary: sql`VALUES(summary)`,
+          text: sql`VALUES(text)`,
+          domainCategory: sql`VALUES(domain_category)`,
+          inputTerm: sql`VALUES(input_term)`,
+        },
+      })
+      .$returningId();
+    const scrapedUrls = await db.query.exaScrapedResults.findMany({
+      where: eq(exaScrapedResults.inputTerm, inputTerm),
+    });
+    const missingUrlsToScrape = urlsToScrape.filter(
+      (url) => !scrapedUrls.some((scrapedUrl) => scrapedUrl.url === url.url),
+    );
+    if (missingUrlsToScrape.length > 0) {
+      console.warn(
+        `There's some integrity issue here, we might not have scraped all missing Urls properly.\nThere are ${missingUrlsToScrape.length} missing URLs.\nMissing URLs:\n${missingUrlsToScrape.map((r) => r.url).join("\n")}`,
+      );
+      throw new AbortTaskRunError(`Failed to scrape all results for term "${inputTerm}".`);
+    }
+    return scrapedUrls;
+  },
 });

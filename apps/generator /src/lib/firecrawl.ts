@@ -1,13 +1,7 @@
 import { db } from "@/lib/db-marketing/client";
-import { entries, firecrawlResponses, serperOrganicResults } from "@/lib/db-marketing/schemas";
-import type { CacheStrategy } from "@/trigger/glossary/_generate-glossary-entry";
-import { openai } from "@ai-sdk/openai";
+import { firecrawlResponses } from "@/lib/db-marketing/schemas";
 import FirecrawlApp from "@mendable/firecrawl-js";
-import { AbortTaskRunError } from "@trigger.dev/sdk/v3";
-import { generateText } from "ai";
 import { eq } from "drizzle-orm";
-import { tryCatch } from "./utils/try-catch";
-import { composeScrapingContentBaseOptions, exa } from "./exa";
 
 const firecrawl = new FirecrawlApp({
   apiKey: process.env.FIRECRAWL_API_KEY!,
@@ -113,4 +107,3 @@ export async function getOrCreateFirecrawlResponse(args: {
     });
   }
 }
-

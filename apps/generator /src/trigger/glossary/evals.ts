@@ -78,30 +78,36 @@ Guidelines:
     }
     // update the existing eval if it exists
     if (existing?.id) {
-        await db.update(evals).set({
+      await db
+        .update(evals)
+        .set({
           ratings: JSON.stringify(result.object),
-        }).where(eq(evals.id, existing.id));
-        const ratingEval = await db.query.evals.findFirst({
-          where: eq(evals.id, existing.id),
-        });
-        if (!ratingEval?.id) {
-          throw new AbortTaskRunError(`There's a data integrity issue here, this shouldn't happen`);
-        }
-        return ratingEval;
+        })
+        .where(eq(evals.id, existing.id));
+      const ratingEval = await db.query.evals.findFirst({
+        where: eq(evals.id, existing.id),
+      });
+      if (!ratingEval?.id) {
+        throw new AbortTaskRunError(`There's a data integrity issue here, this shouldn't happen`);
+      }
+      return ratingEval;
     }
     // create a new eval if it doesn't exist
-    const [inserted] = await db.insert(evals).values({
-      entryId: entry.id,
-      type: options.type,
-      ratings: JSON.stringify(result.object),
-    }).$returningId();
+    const [inserted] = await db
+      .insert(evals)
+      .values({
+        entryId: entry.id,
+        type: options.type,
+        ratings: JSON.stringify(result.object),
+      })
+      .$returningId();
     if (!inserted.id) {
       throw new AbortTaskRunError(`There's a data integrity issue here, this shouldn't happen`);
     }
     const ratingEval = await db.query.evals.findFirst({
       where: eq(evals.id, inserted.id),
     });
-    if (!ratingEval?.id) {  
+    if (!ratingEval?.id) {
       throw new AbortTaskRunError(`There's a data integrity issue here, this shouldn't happen`);
     }
     return ratingEval;
@@ -127,10 +133,16 @@ export const getOrCreateRecommendationsTask = task({
       where: and(eq(evals.entryId, entry.id), eq(evals.type, options.type)),
     });
     if (!existing?.id) {
-      throw new AbortTaskRunError(`The recommendations task for performed for term '${input}' but the previous rating hasn't been performed yet`);
+      throw new AbortTaskRunError(
+        `The recommendations task for performed for term '${input}' but the previous rating hasn't been performed yet`,
+      );
     }
 
-    if (existing?.recommendations && existing.recommendations?.length > 0 && onCacheHit === "stale") {
+    if (
+      existing?.recommendations &&
+      existing.recommendations?.length > 0 &&
+      onCacheHit === "stale"
+    ) {
       return existing;
     }
 
@@ -161,15 +173,20 @@ Guidelines:
     });
 
     // persist the recommendations to our DB:
-    await db.update(evals).set({
-      recommendations: JSON.stringify(result.object.recommendations),
-    }).where(eq(evals.id, existing.id));
+    await db
+      .update(evals)
+      .set({
+        recommendations: JSON.stringify(result.object.recommendations),
+      })
+      .where(eq(evals.id, existing.id));
     const updated = await db.query.evals.findFirst({
       where: eq(evals.id, existing.id),
     });
 
     if (!updated?.id && !updated?.recommendations?.length) {
-      throw new AbortTaskRunError(`There's a  data integrity issue for eval with id ${existing.id}: Recommendations are missing`);
+      throw new AbortTaskRunError(
+        `There's a  data integrity issue for eval with id ${existing.id}: Recommendations are missing`,
+      );
     }
     return updated;
   },
@@ -194,7 +211,11 @@ export const performTechnicalEvalTask = task({
       where: and(eq(evals.entryId, entry.id), eq(evals.type, "technical")),
     });
 
-    if (existing?.recommendations && existing.recommendations?.length > 0 && onCacheHit === "stale") {
+    if (
+      existing?.recommendations &&
+      existing.recommendations?.length > 0 &&
+      onCacheHit === "stale"
+    ) {
       console.info(`Found existing technical evaluation for term: ${input}`);
       return existing;
     }
@@ -213,7 +234,9 @@ export const performTechnicalEvalTask = task({
       throw new AbortTaskRunError("Failed to perform technical ratings task");
     }
     if (!ratingsResult.output?.id) {
-      throw new AbortTaskRunError(`The ratings for technical task didn't return an eval id. This shouldn't happen.`);
+      throw new AbortTaskRunError(
+        `The ratings for technical task didn't return an eval id. This shouldn't happen.`,
+      );
     }
     console.info(`Generated technical ratings for term: ${input}`, ratingsResult.output);
 
@@ -232,16 +255,17 @@ export const performTechnicalEvalTask = task({
       recommendationsResult.output,
     );
 
-    
-    // return the new eval with the ratings and recommendations 
+    // return the new eval with the ratings and recommendations
     const newEval = await db.query.evals.findFirst({
       where: eq(evals.id, ratingsResult.output?.id),
     });
     if (!newEval?.id) {
-      throw new AbortTaskRunError(`There's a data integrity issue with the eval of type "technical" with id '${ratingsResult.output?.id}': The eval is missing`);
+      throw new AbortTaskRunError(
+        `There's a data integrity issue with the eval of type "technical" with id '${ratingsResult.output?.id}': The eval is missing`,
+      );
     }
-    
-    return newEval
+
+    return newEval;
   },
 });
 
@@ -264,9 +288,13 @@ export const performSEOEvalTask = task({
       where: and(eq(evals.entryId, entry.id), eq(evals.type, "seo")),
     });
 
-    if (existing?.recommendations && existing.recommendations?.length > 0 && onCacheHit === "stale") {
+    if (
+      existing?.recommendations &&
+      existing.recommendations?.length > 0 &&
+      onCacheHit === "stale"
+    ) {
       console.info(`⏩︎ Cache hit. Found existing SEO evaluation for term '${input}'.`);
-      return existing
+      return existing;
     }
 
     console.info(`Performing new SEO evaluation for term: ${input}`);
@@ -282,7 +310,9 @@ export const performSEOEvalTask = task({
       throw new AbortTaskRunError("Failed to get SEO ratings");
     }
     if (!ratingsResult.output.id) {
-      throw new AbortTaskRunError(`The ratings for SEO task didn't return an eval id. This shouldn't happen.`);
+      throw new AbortTaskRunError(
+        `The ratings for SEO task didn't return an eval id. This shouldn't happen.`,
+      );
     }
     console.info(`Generated SEO ratings for term: ${input}`, ratingsResult.output);
 
@@ -297,7 +327,9 @@ export const performSEOEvalTask = task({
       throw new AbortTaskRunError("Failed to get SEO recommendations");
     }
     if (!recommendationsResult.output?.id) {
-      throw new AbortTaskRunError(`The recommendations for SEO task didn't return an eval id. This shouldn't happen.`);
+      throw new AbortTaskRunError(
+        `The recommendations for SEO task didn't return an eval id. This shouldn't happen.`,
+      );
     }
     const newEval = await db.query.evals.findFirst({
       where: eq(evals.id, ratingsResult.output.id),
@@ -328,13 +360,16 @@ export const performEditorialEvalTask = task({
       where: and(eq(evals.entryId, entry.id), eq(evals.type, "editorial")),
     });
 
-    if (existing?.recommendations && existing.recommendations?.length > 0 && onCacheHit === "stale") {
+    if (
+      existing?.recommendations &&
+      existing.recommendations?.length > 0 &&
+      onCacheHit === "stale"
+    ) {
       console.info(`⏩︎ Cache hit. Found existing editorial evaluation for term: '${input}'.`);
       return existing;
     }
 
     console.info(`Performing new editorial evaluation for term: ${input}`);
-
 
     const ratingsResult = await getOrCreateRatingsTask.triggerAndWait({
       input,
@@ -349,7 +384,9 @@ export const performEditorialEvalTask = task({
       );
     }
     if (!ratingsResult.output?.id) {
-      throw new AbortTaskRunError(`The ratings for editorial task didn't return an eval id. This shouldn't happen.`);
+      throw new AbortTaskRunError(
+        `The ratings for editorial task didn't return an eval id. This shouldn't happen.`,
+      );
     }
     console.info(`Generated editorial ratings for term: ${input}`, ratingsResult.output);
 
@@ -361,21 +398,25 @@ export const performEditorialEvalTask = task({
     });
 
     if (!recommendationsResult.ok) {
-      throw new AbortTaskRunError(
-        "Failed to get editorial recommendations",
-      );
+      throw new AbortTaskRunError("Failed to get editorial recommendations");
     }
     if (!recommendationsResult.output?.id) {
-      throw new AbortTaskRunError(`The recommendations for editorial task didn't return an eval id. This shouldn't happen.`);
+      throw new AbortTaskRunError(
+        `The recommendations for editorial task didn't return an eval id. This shouldn't happen.`,
+      );
     }
-    console.info(`Generated editorial recommendations for term: ${input}`, recommendationsResult.output);
-
+    console.info(
+      `Generated editorial recommendations for term: ${input}`,
+      recommendationsResult.output,
+    );
 
     const newEval = await db.query.evals.findFirst({
       where: eq(evals.id, ratingsResult.output.id),
     });
     if (!newEval?.id) {
-      throw new AbortTaskRunError(`There's a data integrity issue with the eval of type "editorial" with id '${ratingsResult.output.id}': The eval id from the ratings task could not be found.`);
+      throw new AbortTaskRunError(
+        `There's a data integrity issue with the eval of type "editorial" with id '${ratingsResult.output.id}': The eval id from the ratings task could not be found.`,
+      );
     }
 
     return newEval;
