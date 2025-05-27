@@ -81,7 +81,7 @@ export async function getOrCreateFirecrawlResponse(args: {
       .onDuplicateKeyUpdate({
         set: {
           markdown: firecrawlResult.markdown ?? null,
-          updatedAtM: Date.now(),
+          updatedAt: Date.now(),
         },
       });
 
