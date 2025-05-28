@@ -44,7 +44,7 @@ export const Hero: React.FC = () => {
           priority
         />
       </div>
-      <SubHeroMainboard className="absolute hidden md:flex left-1/2 -translate-x-[calc(50%+85px)] -bottom-[224px]" />
+      <SubHeroMainboard className="absolute hidden md:flex left-1/2 -translate-x-[calc(50%+85px)] -bottom-[224px] -z-10" />
     </motion.div>
   );
 };

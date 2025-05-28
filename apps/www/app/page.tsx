@@ -12,14 +12,20 @@ import { OpenSource } from "@/components/open-source";
 import { RateLimitsBento } from "@/components/rate-limits-bento";
 import { Section, SectionTitle } from "@/components/section";
 import { FeatureGridChip } from "@/components/svg/feature-grid-chip";
-import { TopLeftShiningLight, TopRightShiningLight } from "@/components/svg/hero";
+import {
+  TopLeftShiningLight,
+  TopRightShiningLight,
+} from "@/components/svg/hero";
 import { OssLight } from "@/components/svg/oss-light";
 import { UsageBento } from "@/components/usage-bento";
 import { ChevronRight, LogIn } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import mainboard from "../images/mainboard.svg";
-import { DesktopLogoCloud, MobileLogoCloud } from "./(components)/logo-cloud-content";
+import {
+  DesktopLogoCloud,
+  MobileLogoCloud,
+} from "./(components)/logo-cloud-content";
 import { CodeExamples } from "./code-examples";
 
 export const metadata = {
@@ -81,9 +87,8 @@ export default async function Landing() {
             <SectionTitle
               className="mt-8 md:mt-16 lg:mt-32"
               title="Everything you need for your API"
-              text="Our platform simplifies the API-building process, allowing you to monetize, analyze, and protect endpoints."
+              text="Build, monetize, analyze, and protect your APIs; our platform makes it easy, providing everything you need."
               align="center"
-              label="Platform"
             />
             <AnalyticsBento />
             <div className="mt-6 grid md:grid-cols-[1fr_1fr] lg:grid-cols-[1fr_2fr] gap-6 z-50">
@@ -98,16 +103,23 @@ export default async function Landing() {
           <Section className="mt-16 md:mt-32">
             <SectionTitle
               title="Secure and scalable from day one"
-              text="We give you crucial security features out of the box, so that you can focus on rapidly iterating on your API."
+              text="Start secure. Our platform includes essential security features such as one-way hashed keys, audit logs, and rate limiting, enabling rapid API iteration and scaling."
               align="center"
-              label="Security"
             >
               <div className="flex mt-10 mb-10 space-x-6">
                 <Link href="https://app.unkey.com" className="group">
-                  <PrimaryButton shiny IconLeft={LogIn} label="Get Started" className="h-10" />
+                  <PrimaryButton
+                    shiny
+                    IconLeft={LogIn}
+                    label="Get Started"
+                    className="h-10"
+                  />
                 </Link>
                 <Link href="/docs">
-                  <SecondaryButton label="Visit the Docs" IconRight={ChevronRight} />
+                  <SecondaryButton
+                    label="Visit the Docs"
+                    IconRight={ChevronRight}
+                  />
                 </Link>
               </div>
             </SectionTitle>
@@ -139,16 +151,23 @@ export default async function Landing() {
               <SectionTitle
                 className="mt-8 md:mt-16 lg:mt-32 xl:mt-48"
                 title="Leveled-up API development"
-                text="With enhanced security, low latency, and better control, you can seamlessly integrate into your APIs and protect your data like never before."
-                label="Features"
+                text="You gain enhanced security, low latency, and better control, enabling seamless API integration and unparalleled data protection."
               >
                 <div className="flex mt-10 mb-10 space-x-6">
                   <Link href="https://app.unkey.com" className="group">
-                    <PrimaryButton shiny IconLeft={LogIn} label="Get Started" className="h-10" />
+                    <PrimaryButton
+                      shiny
+                      IconLeft={LogIn}
+                      label="Get Started"
+                      className="h-10"
+                    />
                   </Link>
 
                   <Link href="/docs">
-                    <SecondaryButton label="Visit the Docs" IconRight={ChevronRight} />
+                    <SecondaryButton
+                      label="Visit the Docs"
+                      IconRight={ChevronRight}
+                    />
                   </Link>
                 </div>
               </SectionTitle>
