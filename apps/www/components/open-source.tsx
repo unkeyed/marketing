@@ -36,11 +36,7 @@ export const OpenSource: React.FC = () => {
           >
             <div className="flex mt-10 space-x-6">
               <Link href="https://go.unkey.com/github" className="group">
-                <PrimaryButton
-                  IconLeft={Star}
-                  label="Star us on GitHub"
-                  shiny
-                />
+                <PrimaryButton IconLeft={Star} label="Star us on GitHub" shiny />
               </Link>
             </div>
           </SectionTitle>
@@ -52,11 +48,7 @@ export const OpenSource: React.FC = () => {
             viewport={{ once: true, amount: 0.5 }}
             transition={{ duration: 1, ease: "easeInOut" }}
           >
-            <ImageWithBlur
-              alt="Github logo"
-              src={GithubSvg}
-              className="mt-24"
-            />
+            <ImageWithBlur alt="Github logo" src={GithubSvg} className="mt-24" />
             <div className="absolute -z-50 top-[150px] left-[-50px] lg:w-[1000px] lg:h-[400px] lg:top-[400px] lg:left-[150px]">
               <OssChip className="flex" />
             </div>

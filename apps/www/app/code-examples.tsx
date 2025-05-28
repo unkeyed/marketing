@@ -516,14 +516,7 @@ const languagesList = {
 type Props = {
   className?: string;
 };
-type Language =
-  | "Typescript"
-  | "Python"
-  | "Rust"
-  | "Golang"
-  | "Curl"
-  | "Elixir"
-  | "Java";
+type Language = "Typescript" | "Python" | "Rust" | "Golang" | "Curl" | "Elixir" | "Java";
 type LanguagesList = {
   name: Language;
   Icon: React.FC<LangIconProps>;
@@ -611,17 +604,10 @@ export const CodeExamples: React.FC<Props> = ({ className }) => {
         <div className="mt-10">
           <div className="flex gap-6 pb-14">
             <Link key="get-started" href="https://app.unkey.com">
-              <PrimaryButton
-                shiny
-                label="Get Started"
-                IconRight={ChevronRight}
-              />
+              <PrimaryButton shiny label="Get Started" IconRight={ChevronRight} />
             </Link>
             <Link key="docs" href="/docs">
-              <SecondaryButton
-                label="Visit the docs"
-                IconRight={ChevronRight}
-              />
+              <SecondaryButton label="Visit the docs" IconRight={ChevronRight} />
             </Link>
           </div>
         </div>
