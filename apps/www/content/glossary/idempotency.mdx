@@ -65,6 +65,7 @@ When working with an **idempotent REST API**, consider the following key charact
 
 Here’s a practical example of an **idempotent REST API** call using TypeScript:
 
+```ts
 // Example of an idempotent GET request
 const fetchData = async (url: string) => {
   try {
@@ -84,7 +85,7 @@ const deleteData = async (url: string) => {
     console.error('Failed to delete data:', error);
   }
 };
-};
+
 ```
 
 ## Why PUT is Idempotent and POST is Not
@@ -97,7 +98,7 @@ To implement **idempotency in Node APIs**, you can use a unique key (like a UUID
 
 Here is an example in Express
 
-```typescript
+```ts
 import { Request, Response } from 'express';
 
 const idempotentPost = (req: Request, res: Response) => {
@@ -110,6 +111,7 @@ const checkForKeyAndProcess = (key: string, data: any) => {
   // Logic to check the key and process data
   return { status: 'Processed', data: data };
 };
+
 ```
 
 ## Real-World Applications of Idempotency
