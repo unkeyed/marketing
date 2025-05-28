@@ -6,12 +6,6 @@ export default defineConfig({
   out: "./drizzle",
   dialect: "mysql",
   dbCredentials: {
-    host: process.env.MARKETING_DATABASE_HOST!,
-    user: process.env.MARKETING_DATABASE_USERNAME!,
-    password: process.env.MARKETING_DATABASE_PASSWORD!,
-    database: process.env.MARKETING_DATABASE_NAME!,
-    ssl: {
-      rejectUnauthorized: true,
-    },
+    url: `mysql://${process.env.MARKETING_DATABASE_USERNAME}:${process.env.MARKETING_DATABASE_PASSWORD}@${process.env.MARKETING_DATABASE_HOST}/marketing`,
   },
 });
