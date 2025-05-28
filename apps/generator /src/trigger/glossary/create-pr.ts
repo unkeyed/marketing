@@ -3,7 +3,7 @@ import { entries } from "@/lib/db-marketing/schemas";
 import { tryCatch } from "@/lib/utils/try-catch";
 import { Octokit } from "@octokit/rest";
 import { AbortTaskRunError, task } from "@trigger.dev/sdk/v3";
-import { eq, or } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import GithubSlugger from "github-slugger";
 import yaml from "js-yaml"; // install @types/js-yaml?
 import type { CacheStrategy } from "./_generate-glossary-entry";
@@ -34,8 +34,16 @@ export const createPrTask = task({
       orderBy: (entries, { asc }) => [asc(entries.createdAt)],
     });
     if (existing?.githubPrUrl && onCacheHit === "stale") {
-      console.info(`✅ [createPrTask][term:${input}] Cache hit, returning PR: ${existing.githubPrUrl}`);
-      return { entry: { id: existing.id, inputTerm: existing.inputTerm, githubPrUrl: existing.githubPrUrl } };
+      console.info(
+        `✅ [createPrTask][term:${input}] Cache hit, returning PR: ${existing.githubPrUrl}`,
+      );
+      return {
+        entry: {
+          id: existing.id,
+          inputTerm: existing.inputTerm,
+          githubPrUrl: existing.githubPrUrl,
+        },
+      };
     }
 
     // 2. Prepare MDX file content
@@ -93,24 +101,27 @@ export const createPrTask = task({
     // 3. Check if file exists in main branch and if content is identical
     console.info(`🔍 [createPrTask][term:${input}] Check file in main branch`);
     const mainFileResult = await tryCatch(
-      octokit.repos.getContent({ owner, repo, path: filePath, ref: baseBranch })
+      octokit.repos.getContent({ owner, repo, path: filePath, ref: baseBranch }),
     );
     let fileExistsInMain = false;
     let fileIsIdenticalInMain = false;
-    let mainFileSha: string | undefined = undefined;
+    let _mainFileSha: string | undefined = undefined;
     if (mainFileResult.data && !mainFileResult.error) {
       const mainFile = mainFileResult.data.data;
       if (mainFile && typeof mainFile === "object" && "content" in mainFile) {
         fileExistsInMain = true;
         const mainFileContent = (mainFile.content as string).replace(/\n/g, "");
         fileIsIdenticalInMain = mainFileContent === contentBase64;
-        mainFileSha = (mainFile as any).sha;
+        _mainFileSha = (mainFile as any).sha;
       }
     }
     if (fileExistsInMain && fileIsIdenticalInMain) {
       console.info(`🟢 [createPrTask][term:${input}] File identical in main, early return`);
-      return { entry: { id: entry.id, inputTerm: entry.inputTerm, githubPrUrl: entry.githubPrUrl } };
-    } else if (fileExistsInMain) {
+      return {
+        entry: { id: entry.id, inputTerm: entry.inputTerm, githubPrUrl: entry.githubPrUrl },
+      };
+    }
+    if (fileExistsInMain) {
       console.info(`🟡 [createPrTask][term:${input}] File exists in main, content differs`);
     } else {
       console.info(`🟠 [createPrTask][term:${input}] File missing in main`);
@@ -118,18 +129,20 @@ export const createPrTask = task({
 
     // 4. List all branches and filter for relevant ones (reuse branches)
     console.info(`🌿 [createPrTask][term:${input}] List all branches`);
-    const branchListResult = await tryCatch(
-      octokit.repos.listBranches({ owner, repo })
-    );
+    const branchListResult = await tryCatch(octokit.repos.listBranches({ owner, repo }));
     if (branchListResult.error) {
-      console.error(`❌ [createPrTask][term:${input}] Failed to list branches: ${branchListResult.error}`);
+      console.error(
+        `❌ [createPrTask][term:${input}] Failed to list branches: ${branchListResult.error}`,
+      );
       throw new AbortTaskRunError(`Failed to list branches: ${branchListResult.error}`);
     }
     const allBranches = branchListResult.data?.data || [];
     const relevantBranches = allBranches
       .filter((b: any) => b.name.startsWith(branchPrefix))
       .map((b: any) => b.name);
-    console.info(`🌿 [createPrTask][term:${input}] Found ${relevantBranches.length} branches for slug '${slug}'`);
+    console.info(
+      `🌿 [createPrTask][term:${input}] Found ${relevantBranches.length} branches for slug '${slug}'`,
+    );
 
     // 5. For each relevant branch, check file content and PR status (only first branch)
     if (relevantBranches.length > 0) {
@@ -137,7 +150,7 @@ export const createPrTask = task({
       console.info(`🔄 [createPrTask][branch:${branch}] Start branch check`);
       // Get file content in this branch (if it exists)
       const fileResult = await tryCatch(
-        octokit.repos.getContent({ owner, repo, path: filePath, ref: branch })
+        octokit.repos.getContent({ owner, repo, path: filePath, ref: branch }),
       );
       let branchFileExists = false;
       let branchFileIsIdentical = false;
@@ -153,70 +166,143 @@ export const createPrTask = task({
       }
       // Check for open PRs from this branch
       const prsResult = await tryCatch(
-        octokit.rest.pulls.list({ owner, repo, head: `${owner}:${branch}`, base: baseBranch, state: "open" })
+        octokit.rest.pulls.list({
+          owner,
+          repo,
+          head: `${owner}:${branch}`,
+          base: baseBranch,
+          state: "open",
+        }),
       );
       const prs = prsResult.data?.data || [];
       const prExists = prs.length > 0;
       const openPr = prExists ? prs[0] : null;
       // Add branch existence to the caseKey for both logic and logging
       const branchExists = true;
-      const caseKey = `${branchExists ? 'branch-existant' : 'branch-inexistant'}:${branchFileIsIdentical ? 'fileDiff-unchanged' : branchFileExists ? 'fileDiff-changed' : 'fileDiff-unchanged'}:${prExists ? 'pr-existant' : 'pr-inexistant'}`;
+      const caseKey = `${branchExists ? "branch-existant" : "branch-inexistant"}:${branchFileIsIdentical ? "fileDiff-unchanged" : branchFileExists ? "fileDiff-changed" : "fileDiff-unchanged"}:${prExists ? "pr-existant" : "pr-inexistant"}`;
       // Branch summary log
-      console.info(`🔄 [createPrTask][branch:${branch}] file:${branchFileExists ? (branchFileIsIdentical ? 'unchanged' : 'changed') : 'missing'} pr:${prExists ? 'open' : 'none'}`);
+      console.info(
+        `🔄 [createPrTask][branch:${branch}] file:${branchFileExists ? (branchFileIsIdentical ? "unchanged" : "changed") : "missing"} pr:${prExists ? "open" : "none"}`,
+      );
       console.info(`⚡ [createPrTask][branch:${branch}] Case: ${caseKey}`);
       switch (caseKey) {
         case "branch-existant:fileDiff-unchanged:pr-existant":
           // Case 1: File exists, is identical, and PR exists
-          console.info(`✅ [createPrTask][branch:${branch}] File unchanged, PR exists: ${openPr?.html_url}`);
-          if (openPr && openPr.html_url) {
-            await db.update(entries).set({ githubPrUrl: openPr.html_url }).where(eq(entries.inputTerm, input));
+          console.info(
+            `✅ [createPrTask][branch:${branch}] File unchanged, PR exists: ${openPr?.html_url}`,
+          );
+          if (openPr?.html_url) {
+            await db
+              .update(entries)
+              .set({ githubPrUrl: openPr.html_url })
+              .where(eq(entries.inputTerm, input));
           }
-          return { entry: { id: entry.id, inputTerm: entry.inputTerm, githubPrUrl: openPr?.html_url } };
-        case "branch-existant:fileDiff-unchanged:pr-inexistant":
+          return {
+            entry: { id: entry.id, inputTerm: entry.inputTerm, githubPrUrl: openPr?.html_url },
+          };
+        case "branch-existant:fileDiff-unchanged:pr-inexistant": {
           // Case 2: File exists, is identical, but no PR
           console.info(`⚡ [createPrTask][branch:${branch}] File unchanged, creating PR`);
           const newPr1Result = await tryCatch(
-            octokit.pulls.create({ owner, repo, title: prTitle, body: prBody, head: branch, base: baseBranch })
+            octokit.pulls.create({
+              owner,
+              repo,
+              title: prTitle,
+              body: prBody,
+              head: branch,
+              base: baseBranch,
+            }),
           );
           if (!newPr1Result.data) {
             console.error(`❌ [createPrTask][branch:${branch}] Failed to create PR`);
             throw new AbortTaskRunError("Failed to create PR for existing branch");
           }
-          await db.update(entries).set({ githubPrUrl: newPr1Result.data.data.html_url }).where(eq(entries.inputTerm, input));
-          return { entry: { id: entry.id, inputTerm: entry.inputTerm, githubPrUrl: newPr1Result.data.data.html_url } };
-        case "branch-existant:fileDiff-changed:pr-existant":
+          await db
+            .update(entries)
+            .set({ githubPrUrl: newPr1Result.data.data.html_url })
+            .where(eq(entries.inputTerm, input));
+          return {
+            entry: {
+              id: entry.id,
+              inputTerm: entry.inputTerm,
+              githubPrUrl: newPr1Result.data.data.html_url,
+            },
+          };
+        }
+        case "branch-existant:fileDiff-changed:pr-existant": {
           // Case 3: File exists, is different, and PR exists
           console.info(`⚡ [createPrTask][branch:${branch}] File changed, updating file in PR`);
           const updateResult1 = await tryCatch(
-            octokit.repos.createOrUpdateFileContents({ owner, repo, path: filePath, message: commitMessage, content: contentBase64, branch, sha: branchFileSha })
+            octokit.repos.createOrUpdateFileContents({
+              owner,
+              repo,
+              path: filePath,
+              message: commitMessage,
+              content: contentBase64,
+              branch,
+              sha: branchFileSha,
+            }),
           );
           if (!updateResult1.data) {
             console.error(`❌ [createPrTask][branch:${branch}] Failed to update file`);
             throw new AbortTaskRunError("Failed to update file in existing branch");
           }
-          if (openPr && openPr.html_url) {
-            await db.update(entries).set({ githubPrUrl: openPr.html_url }).where(eq(entries.inputTerm, input));
+          if (openPr?.html_url) {
+            await db
+              .update(entries)
+              .set({ githubPrUrl: openPr.html_url })
+              .where(eq(entries.inputTerm, input));
           }
-          return { entry: { id: entry.id, inputTerm: entry.inputTerm, githubPrUrl: openPr?.html_url } };
-        case "branch-existant:fileDiff-changed:pr-inexistant":
+          return {
+            entry: { id: entry.id, inputTerm: entry.inputTerm, githubPrUrl: openPr?.html_url },
+          };
+        }
+        case "branch-existant:fileDiff-changed:pr-inexistant": {
           // Case 4: File exists, is different, and no PR
-          console.info(`⚡ [createPrTask][branch:${branch}] File changed, updating file and creating PR`);
+          console.info(
+            `⚡ [createPrTask][branch:${branch}] File changed, updating file and creating PR`,
+          );
           const updateResult2 = await tryCatch(
-            octokit.repos.createOrUpdateFileContents({ owner, repo, path: filePath, message: commitMessage, content: contentBase64, branch, sha: branchFileSha })
+            octokit.repos.createOrUpdateFileContents({
+              owner,
+              repo,
+              path: filePath,
+              message: commitMessage,
+              content: contentBase64,
+              branch,
+              sha: branchFileSha,
+            }),
           );
           if (!updateResult2.data) {
             console.error(`❌ [createPrTask][branch:${branch}] Failed to update file`);
             throw new AbortTaskRunError("Failed to update file in existing branch");
           }
           const newPr2Result = await tryCatch(
-            octokit.pulls.create({ owner, repo, title: prTitle, body: prBody, head: branch, base: baseBranch })
+            octokit.pulls.create({
+              owner,
+              repo,
+              title: prTitle,
+              body: prBody,
+              head: branch,
+              base: baseBranch,
+            }),
           );
           if (!newPr2Result.data) {
             console.error(`❌ [createPrTask][branch:${branch}] Failed to create PR`);
             throw new AbortTaskRunError("Failed to create PR for updated branch");
           }
-          await db.update(entries).set({ githubPrUrl: newPr2Result.data.data.html_url }).where(eq(entries.inputTerm, input));
-          return { entry: { id: entry.id, inputTerm: entry.inputTerm, githubPrUrl: newPr2Result.data.data.html_url } };
+          await db
+            .update(entries)
+            .set({ githubPrUrl: newPr2Result.data.data.html_url })
+            .where(eq(entries.inputTerm, input));
+          return {
+            entry: {
+              id: entry.id,
+              inputTerm: entry.inputTerm,
+              githubPrUrl: newPr2Result.data.data.html_url,
+            },
+          };
+        }
       }
     }
 
@@ -227,7 +313,7 @@ export const createPrTask = task({
     // Get the SHA of the latest commit on the base branch
     console.info(`🔍 [createPrTask][branch:${newBranchName}] Get SHA for base branch`);
     const refResult = await tryCatch(
-      octokit.git.getRef({ owner, repo, ref: `heads/${baseBranch}` })
+      octokit.git.getRef({ owner, repo, ref: `heads/${baseBranch}` }),
     );
     if (!refResult.data) {
       console.error(`❌ [createPrTask][branch:${newBranchName}] Failed to get ref for base branch`);
@@ -236,7 +322,12 @@ export const createPrTask = task({
     // Create new branch
     console.info(`🌿 [createPrTask][branch:${newBranchName}] Creating branch`);
     const createBranchResult = await tryCatch(
-      octokit.git.createRef({ owner, repo, ref: `refs/heads/${newBranchName}`, sha: refResult.data.data.object.sha })
+      octokit.git.createRef({
+        owner,
+        repo,
+        ref: `refs/heads/${newBranchName}`,
+        sha: refResult.data.data.object.sha,
+      }),
     );
     if (!createBranchResult.data) {
       console.error(`❌ [createPrTask][branch:${newBranchName}] Failed to create branch`);
@@ -245,7 +336,14 @@ export const createPrTask = task({
     // Create file in the new branch
     console.info(`📄 [createPrTask][branch:${newBranchName}] Creating file`);
     const createFileResult = await tryCatch(
-      octokit.repos.createOrUpdateFileContents({ owner, repo, path: filePath, message: commitMessage, content: contentBase64, branch: newBranchName })
+      octokit.repos.createOrUpdateFileContents({
+        owner,
+        repo,
+        path: filePath,
+        message: commitMessage,
+        content: contentBase64,
+        branch: newBranchName,
+      }),
     );
     if (!createFileResult.data) {
       console.error(`❌ [createPrTask][branch:${newBranchName}] Failed to create file`);
@@ -254,14 +352,30 @@ export const createPrTask = task({
     // Create PR
     console.info(`⚡ [createPrTask][branch:${newBranchName}] Creating PR`);
     const createPrResult = await tryCatch(
-      octokit.pulls.create({ owner, repo, title: prTitle, body: prBody, head: newBranchName, base: baseBranch })
+      octokit.pulls.create({
+        owner,
+        repo,
+        title: prTitle,
+        body: prBody,
+        head: newBranchName,
+        base: baseBranch,
+      }),
     );
     if (!createPrResult.data) {
       console.error(`❌ [createPrTask][branch:${newBranchName}] Failed to create PR`);
       throw new AbortTaskRunError(`Failed to create PR from branch ${newBranchName}`);
     }
-    await db.update(entries).set({ githubPrUrl: createPrResult.data.data.html_url }).where(eq(entries.inputTerm, input));
+    await db
+      .update(entries)
+      .set({ githubPrUrl: createPrResult.data.data.html_url })
+      .where(eq(entries.inputTerm, input));
     console.info(`✅ [createPrTask][term:${input}] Done, PR: ${createPrResult.data.data.html_url}`);
-    return { entry: { id: entry.id, inputTerm: entry.inputTerm, githubPrUrl: createPrResult.data.data.html_url } };
+    return {
+      entry: {
+        id: entry.id,
+        inputTerm: entry.inputTerm,
+        githubPrUrl: createPrResult.data.data.html_url,
+      },
+    };
   },
 });
