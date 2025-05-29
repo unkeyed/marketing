@@ -14,8 +14,9 @@ export const formOpts = formOptions({
 export const vcAcceleratorOptions = [
   "Arc",
   "Essence",
-  "Seedcamp",
+  "Homebrew",
   "Preston Werner Ventures",
+  "Seedcamp",
   "Sunflower Capital",
   "Techstars",
   "Uncork",

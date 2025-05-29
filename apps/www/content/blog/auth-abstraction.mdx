@@ -1,0 +1,213 @@
+---
+date: 2025-05-09
+title: "No Signup Required"
+image: "/images/blog-images/auth-abstraction/auth-infrastructure-not-product.png"
+description: "Building an auth abstraction layer for frictionless local development"
+author: meg
+tags: ["engineering"]
+---
+
+
+Let's be honest – authentication can be a real pain, especially when you're just trying to contribute to an open-source project. At Unkey, we felt this pain firsthand. We're all about making developers' lives easier (it's literally our product!), so it felt pretty hypocritical to make contributors jump through authentication hoops just to run our project locally.
+
+The problem was clear: we needed robust authentication in production while eliminating the barrier of third-party service signups for contributors. This friction directly contradicted our "developer first" philosophy and was turning away potential contributors.
+
+So we rolled up our sleeves and built a flexible auth abstraction layer – one that plays nicely with WorkOS in production, but also offers a simple "authless mode" for local development. No more third-party signups, no more configuration headaches. Now, contributors can focus on what matters: the code itself.
+
+## The Contributor Friction Problem
+
+When we first built Unkey, authentication wasn't just a feature – it was tightly woven throughout our codebase. Our previous auth provider's SDK functions were deeply embedded in our application code, creating a messy dependency that new contributors had to navigate.
+
+This tight coupling created several real problems:
+
+1. **Core feature entanglement** – Our user management, team management, and settings features were so tightly coupled to the auth provider's implementation that contributors couldn't work on these critical areas without first understanding the auth provider's internals
+2. **Feature configuration maze** – While the environment variables were straightforward, enabling the right features (like organizations) in the auth provider's dashboard was confusing and error-prone
+3. **Support burden** – Our core developers spent countless hours in Discord troubleshooting auth setup issues instead of building features
+
+The feedback from our Discord community was brutally honest. One frustrated contributor summed it up perfectly: "so [auth provider] just made me suffer 2 hours straight." Another pointed out a specific configuration issue: "also less to get wrong when setting up. since [auth provider] doesn't enable workspaces by default, its easy to get wrong."
+
+The worst part was that it was almost always the same issues: obscure settings in our previous auth provider's dashboard that were easily overlooked. Contributors were rightfully annoyed with how much time they wasted configuring third-party environment variables and tweaking settings in some external dashboard, completely separate from Unkey itself.
+
+It was something that shouldn't have been our problem, but we made it our problem – and we needed to fix it.
+
+## Our Authentication Requirements
+
+When we set out to rebuild our authentication approach, we had to balance several competing needs. This wasn't just about making local development easier—we needed a solution that would work across our entire ecosystem while staying true to our developer-first philosophy.
+
+Here's what we were looking for:
+
+**Production Requirements:**
+
+- **Rock-solid security** – No compromises on protecting user data and access control
+- **Enterprise-ready features** – Support for SSO, SAML, and other enterprise authentication methods
+- **Multi-tenancy support** – Organizations and teams are core to Unkey, so our auth solution needed to handle this complexity
+- **Scalability** – As Unkey grows, our authentication needs to grow with it
+
+**Developer Experience Requirements:**
+
+- **Zero-config local setup** – Contributors should be able to clone and run without any third-party configuration
+- **Minimal implementation** – Keep local auth completely in-memory with a single user, single workspace environment
+- **Resilient development** – Local development should work offline and be unaffected by third-party outages or service degradation
+- **Consistent behavior** – Code shouldn't need to be written differently for local vs. production environments
+
+**Architectural Requirements:**
+
+- **Provider independence** – The ability to switch providers if needed without rewriting application code
+- **Clear separation of concerns** – Auth logic should be isolated from business logic
+- **Testability** – Auth should be easy to mock in tests
+- **Minimal lock-in** – Avoid deep coupling to vendor-specific features
+
+Looking at these requirements, it was obvious that they were all pointing to a solution with proper abstraction. We didn't need to compromise on security to get a great developer experience; we just needed to design our system to accommodate both scenarios.
+
+What we didn't anticipate was the bonus feature this approach unlocked for self-hosting: BYOAP - Bring Your Own Auth Provider. The abstraction layer provides a clear interface and type definitions that make it possible for anyone self-hosting Unkey (which you can! let's talk!) to use their own auth provider instead of ours. All you need to do is implement our auth provider interface, and you can seamlessly integrate with whatever authentication system you already have in place.
+
+## Designing the Auth Abstraction Layer
+
+The core of our solution is an authentication abstraction layer that sits between our application and any authentication provider.
+
+<Mermaid
+  chart="
+graph TD;
+A[Application];
+B[Auth Abstraction Layer \n Abstract Base Class];
+C[WorkOS \n Production];
+D[Local Auth Mode \n  Development]
+A --> B;
+B --> C;
+B --> D;"
+/>
+
+The key insight here is that our application never talks directly to any auth provider. Instead, it only communicates with our abstraction layer through a well-defined abstract base class.
+
+This abstract class defines all the core authentication methods our application needs.
+
+```ts
+/**
+* BaseAuthProvider
+*
+* Abstract class defining the interface for authentication providers.
+* Implementations of this class handle user authentication, session management,
+* organization/tenant management, and user management operations.
+*/
+export abstract class BaseAuthProvider {
+
+/**
+* Validates a session token and returns information about its validity.
+*
+* @param sessionToken - The session token to validate
+* @returns Information about the session including validity, user ID, and organization
+*/
+abstract validateSession(sessionToken: string): Promise<SessionValidationResult>;
+
+/**
+* Refreshes an existing session token and returns a new token.
+*
+* @param sessionToken - The session token to refresh
+* @returns A new session token and related session information
+* @throws Error if the session cannot be refreshed
+*/
+abstract refreshSession(sessionToken: string): Promise<SessionRefreshResult>;
+
+/**
+* Initiates an email-based sign-in process for the specified email.
+*
+* @param email - The email address to sign in with
+* @returns Result of the sign-in attempt
+*/
+abstract signInViaEmail(email: string): Promise<EmailAuthResult>;
+
+/**
+* Verifies an authentication code sent to a user's email.
+*
+* @param params - Parameters containing the email, verification code, and optional invitation token
+* @returns Result of the verification process, including redirect information on success
+*/
+abstract verifyAuthCode(params: { email: string; code: string; invitationToken?: string;}): Promise<VerificationResult>;
+
+// other login functions
+// other User Management functions
+// other Organization Management functions
+}
+```
+
+We then created concrete implementations by extending this abstract class:
+
+1. **WorkOSAuthProvider** - For production environments, interfacing with WorkOS
+2. **LocalAuthProvider** - For development, providing a simple in-memory implementation
+
+
+```typescript
+export class WorkOSAuthProvider extends BaseAuthProvider {
+  // Implementation for production...
+}
+
+export class LocalAuthProvider extends BaseAuthProvider {
+  // Simpler implementation for development...
+}
+```
+
+The application code can now be written against the abstract base class without caring which specific provider is being used. All the authentication-specific logic is encapsulated behind this abstraction, making our core application code cleaner and more focused.
+
+As an extra benefit, our self-hosting customers have options for handling their authentication needs:
+1. Use our WorkOS implementation
+2. Use our LocalAuth implementation behind a proxy
+3. Write their own implementation for their existing authentication
+
+## Challenges and Lessons Learned
+
+Building our auth abstraction layer came with its share of hurdles. Here are some of the key challenges we faced and what we learned along the way:
+
+### Challenges
+
+**NextJS Cookie Handling**
+One of the most frustrating aspects of our implementation was dealing with cookies in NextJS. Between server components, client components, and API routes, ensuring consistent cookie access and management required careful planning. We had to create specialized utilities to handle cookies uniformly across different contexts, which added complexity we hadn't initially anticipated.
+
+**Session Handling and Caching**
+Managing user sessions efficiently proved tricky, especially with NextJS's rendering model. We needed to carefully implement caching to prevent frequent re-fetching of user data, but doing so introduced challenges around invalidation and staleness. Getting this balance right took several iterations.
+
+**Preventing Duplicate Auth Calls**
+In a React Server Component world, preventing duplicate calls to our auth provider became essential for performance. Multiple components rendering on the same page could each trigger authentication checks, causing a cascade of unnecessary network requests. We had to implement request deduplication mechanisms to ensure that even if several components asked "who is the current user?" simultaneously, we'd only make a single external call.
+
+**Handling Auth in Middleware**
+Middleware presented a unique challenge since it runs before the application context is fully established. Our abstraction layer needed to work correctly in this limited environment, which required a separate authentication flow specifically for middleware. This meant carefully designing our interface to function with the constraints of the middleware execution context, where we had less access to the full application state.
+
+**De-coupling Product Features from Auth Provider Functionality**
+Our previous auth provider offered features we'd built product functionality around. Extracting these dependencies was like untangling a complex knot, and we found ourselves asking "did we do it this way because its essential to the product, or because that's how our auth provider did it?" In doing so, we discovered numerous places where we'd inadvertently tied core business logic to auth provider-specific concepts, and had to go back and define boundaries between our product and the auth implementation.
+
+**Environment-Specific Authentication Flows**
+Creating consistent authentication flows that worked in both production and development environments required careful consideration. We needed to ensure that redirects, callbacks, and session management worked identically regardless of which auth provider was active.
+
+**Type Safety Across the Boundary**
+Maintaining strong TypeScript types across the abstraction boundary proved challenging. We wanted to ensure that consumers of our auth abstraction got proper type hints and compile-time checks without exposing implementation details.
+
+### Lessons Learned
+
+**Start with the Interface, Not the Implementation**
+Our most valuable lesson was the importance of designing the interface before any implementation. By thinking deeply about what our application actually needed from authentication (rather than what any specific provider offered), we created a much cleaner abstraction.
+
+**Auth Is More Than Just Login/Logout**
+We initially underestimated how many product features touched authentication. From user preferences to team management to permission checks, auth tentacles reached throughout our codebase. A thorough audit early in the process would have saved us significant refactoring.
+
+**Abstract at the Right Level**
+Finding the right level of abstraction was crucial. Too low-level, and we'd just be recreating the provider's SDK. Too high-level, and we'd lose flexibility. The sweet spot was abstracting at the level of our application's actual auth needs.
+
+And most importantly, **Auth is infrastructure, not product**. By treating authentication as infrastructure that should fade into the background rather than a product feature, we created a much better experience for both our users and our contributors.
+
+## Conclusion
+
+When we started this journey, we were tackling what seemed like a straightforward contributor experience issue: "How do we make it easier to run Unkey locally without signing up for third-party services?" What we ended up building was much more powerful.
+
+Our auth abstraction layer has transformed how we think about authentication at Unkey. It's no longer this tightly-coupled, vendor-specific puzzle that developers need to solve before they can contribute. Instead, it's an invisible piece of infrastructure that "just works" in development and scales seamlessly to meet our production needs.
+
+The immediate impact has been dramatic. New contributors can clone the repository, run a single command, and immediately start working on the codebase. No more Discord messages asking for help with authentication configuration. No more "I spent two hours just trying to get started." Just smooth, frictionless development.
+
+But the long-term benefits go beyond developer experience. Our abstraction layer has given us:
+
+- **Provider independence** – We can switch auth providers if needed without rewriting our application
+- **Self-hosting flexibility** – Users can bring their own auth provider when self-hosting Unkey
+- **Simplified testing** – We can easily mock authentication in our test suite
+- **Cleaner codebase** – Authentication concerns are properly separated from business logic
+
+For a product built on the promise of exceptional developer experience, our authentication system now lives up to that standard.
+
+If there's one thing we've learned, it's that abstractions matter. By investing time in building the right abstraction, we've made our product better for both users and contributors. Sometimes the best feature is the one users never have to think about—in this case, no signup required.
