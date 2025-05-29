@@ -24,11 +24,11 @@ import { CodeExamples } from "./code-examples";
 
 export const metadata = {
   title: "Unkey",
-  description: "Modern APIs, Effortless Development",
-  keywords: ["unkey", "api", "api development", "api security"],
+  description: "The Developer Platform for Modern APIs",
+  keywords: ["Unkey", "API", "API development", "API security", "API development platform"],
   openGraph: {
     title: "Unkey",
-    description: "Modern APIs, Effortless Development",
+    description: "The Developer Platform for Modern APIs",
     url: "https://unkey.com/",
     siteName: "unkey.com",
     images: [
