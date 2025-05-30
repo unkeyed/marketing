@@ -3,6 +3,7 @@ import { TemplatesClient } from "./client";
 export const metadata = {
   title: "Templates | Unkey",
   description: "Jumpstart your API development with our pre-built solutions.",
+  keywords: ["unkey", "api", "api development", "api security"],
   openGraph: {
     title: "Templates | Unkey",
     description: "Jumpstart your API development with our pre-built solutions.",

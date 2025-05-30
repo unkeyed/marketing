@@ -14,9 +14,7 @@ const navigation = [
     title: "Company",
     links: [
       { title: "About", href: "/about" },
-      { title: "Blog", href: "/blog" },
-      { title: "Changelog", href: "/changelog" },
-      { title: "Templates", href: "/templates" },
+
       { title: "Roadmap", href: "/roadmap" },
       { title: "Careers", href: "/careers" },
       {
@@ -26,17 +24,8 @@ const navigation = [
       },
       {
         title: "Source Code",
-        href: "/github",
+        href: "https://go.unkey.com/github",
         external: true,
-      },
-      {
-        title: "Docs",
-        href: "/docs",
-        external: true,
-      },
-      {
-        title: "Glossary",
-        href: "/glossary",
       },
       {
         title: "Status Page",
@@ -46,11 +35,35 @@ const navigation = [
     ],
   },
   {
+    title: "Resources",
+    links: [
+      { title: "Blog", href: "/blog" },
+      { title: "Changelog", href: "/changelog" },
+      { title: "Templates", href: "/templates" },
+      {
+        title: "Docs",
+        href: "/docs",
+        external: true,
+      },
+      {
+        title: "Glossary",
+        href: "/glossary",
+      },
+    ],
+  },
+  {
     title: "Connect",
     links: [
-      { title: "X (Twitter)", href: "https://x.com/unkeydev", external: true },
-      { title: "Discord", href: "/discord", external: true },
-      { title: "GitHub", href: "/github", external: true },
+      {
+        title: "X (Twitter)",
+        href: "https://go.unkey.com/twitter",
+        external: true,
+      },
+      {
+        title: "Discord",
+        href: "https://go.unkey.com/discord",
+        external: true,
+      },
       { title: "OSS Friends", href: "/oss-friends" },
       {
         title: "Book a Call",
@@ -68,11 +81,11 @@ const navigation = [
   },
 ] satisfies Array<{ title: string; links: Array<NavLink> }>;
 
-const Column: React.FC<{ title: string; links: Array<NavLink>; className?: string }> = ({
-  title,
-  links,
-  className,
-}) => {
+const Column: React.FC<{
+  title: string;
+  links: Array<NavLink>;
+  className?: string;
+}> = ({ title, links, className }) => {
   return (
     <div className={cn("flex flex-col gap-8   text-left ", className)}>
       <span className="w-full text-sm font-medium tracking-wider text-white font-display">
@@ -100,7 +113,7 @@ export function Footer() {
   return (
     <div className="border-t border-white/20 blog-footer-radial-gradient">
       <footer className="container relative grid grid-cols-2 gap-8 pt-8 mx-auto overflow-hidden lg:gap-16 sm:grid-cols-3 xl:grid-cols-5 sm:pt-12 md:pt-16 lg:pt-24 xl:pt-32">
-        <div className="flex flex-col items-center col-span-2 sm:items-start sm:col-span-3 xl:col-span-2">
+        <div className="flex flex-col items-center col-span-2 sm:items-start sm:col-span-3 xl:col-span-1">
           <UnkeyLogo />
           <div className="mt-8 text-sm font-normal leading-6 text-white/60">
             Build better APIs faster.
