@@ -156,7 +156,7 @@ export const createPrTask = task({
     }
     const allBranches = branchListResult.data?.data || [];
     const relevantBranches = allBranches
-      .filter((b: any) => b.name.includes(branchPrefix))
+      .filter((b: any) => b.name.startsWith(branchPrefix))
       .map((b: any) => b.name);
     console.info(
       `🌿 [createPrTask][owner:${owner}][repo:${repo}][term:${input}] Found ${relevantBranches.length} branches including slug '${slug}'`,
