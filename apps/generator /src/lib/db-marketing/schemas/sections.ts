@@ -31,11 +31,8 @@ export const sectionsRelations = relations(sections, ({ one, many }) => ({
   sectionsToKeywords: many(sectionsToKeywords),
 }));
 
-export const insertSectionSchema = createInsertSchema(sections)
-  .extend({
-    citedSources: z.string().url(),
-  })
-  .omit({ id: true });
+
+export const insertSectionSchema = createInsertSchema(sections).omit({ id: true });
 export const selectSectionSchema = createSelectSchema(sections);
 export type InsertSection = z.infer<typeof insertSectionSchema>;
 export type SelectSection = typeof sections.$inferSelect;
