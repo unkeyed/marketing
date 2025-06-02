@@ -115,7 +115,7 @@ export const exaScrapedResults = mysqlTable(
       domainCategories.map((c) => c.name) as [DomainCategory, ...DomainCategory[]],
     ).notNull(),
   },
-  (table) => [index("input_term_idx").on(table.inputTerm), unique("url_unique").on(table.url)],
+  (table) => [index("input_term_idx").on(table.inputTerm), unique("input_term_url_unique").on(table.inputTerm, table.url)],
 );
 
 export const exaScrapedResultsRelations = relations(exaScrapedResults, ({ one }) => ({
