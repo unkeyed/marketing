@@ -119,7 +119,7 @@ export const technicalResearchRelations = relations(technicalResearch, ({ one })
     fields: [technicalResearch.inputTerm],
     references: [searchQueries.inputTerm],
   }),
-  entries: one(entries, {
+  entry: one(entries, {
     fields: [technicalResearch.inputTerm],
     references: [entries.inputTerm],
   }),
