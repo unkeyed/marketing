@@ -201,10 +201,8 @@ export const generateOutlineTask = task({
       }),
     );
     const newSectionIds = await db.insert(sections).values(sectionInsertionPayload).$returningId();
-    console.debug("[DEBUG] Successfully inserted sections, got IDs:", newSectionIds);
 
     // associate the keywords with the sections
-    console.debug("[DEBUG] About to prepare keyword insertion payload at line 190");
     const keywordInsertionPayload = [];
     for (let i = 0; i < editorialOptimizedOutline.object.outline?.length; i++) {
       // add the newly inserted section id to our outline
@@ -228,14 +226,10 @@ export const generateOutlineTask = task({
         keywordInsertionPayload.push(payload);
       }
     }
-    console.debug("[DEBUG] About to insert sectionsToKeywords at line 214", {
-      keywordInsertionPayload,
-    });
+
     await db.insert(sectionsToKeywords).values(keywordInsertionPayload);
-    console.debug("[DEBUG] Successfully inserted sectionsToKeywords");
 
     // associate the content types with the sections
-    console.debug("[DEBUG] About to prepare content types insertion payload at line 217");
     const contentTypesInsertionPayload = editorialOptimizedOutline.object.outline.flatMap(
       (section, index) =>
         section.contentTypes.map((contentType: any) =>
@@ -245,14 +239,10 @@ export const generateOutlineTask = task({
           }),
         ),
     );
-    console.debug("[DEBUG] About to insert sectionContentTypes at line 224", {
-      contentTypesInsertionPayload,
-    });
     await db.insert(sectionContentTypes).values(contentTypesInsertionPayload);
-    console.debug("[DEBUG] Successfully inserted sectionContentTypes");
 
     const newEntry = await db.query.entries.findFirst({
-      where: eq(entries.id, existing?.id),
+      where: eq(entries.id, existing.id),
       orderBy: (entries, { desc }) => [desc(entries.createdAt)],
       with: {
         dynamicSections: {
