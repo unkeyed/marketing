@@ -34,7 +34,6 @@ export const generateOutlineTask = task({
     term,
     onCacheHit = "stale" as CacheStrategy,
   }: { term: string; onCacheHit?: CacheStrategy }) => {
-    console.debug("[DEBUG] About to check if entry exists at line 38");
 
     const drizzleQuery = db.query.entries.findFirst({
       where: eq(entries.inputTerm, term),
@@ -57,18 +56,22 @@ export const generateOutlineTask = task({
         },
       },
     });
-    console.debug(`[DEBUG] Check the drizzle query:\n
-      ${drizzleQuery.toSQL().sql}\n
-      ---------
-      params:
-      ${JSON.stringify(drizzleQuery.toSQL().params)}
-      `);
+    if (process.env.NODE_ENV === 'development') {
+      console.debug(`[DEBUG] Check the drizzle query:\n
+        ${drizzleQuery.toSQL().sql}\n
+        ---------
+        params:
+        ${JSON.stringify(drizzleQuery.toSQL().params)}
+        `);
+    }
     const { data: existing, error } = await tryCatch(drizzleQuery);
 
     if (error) {
       throw new AbortTaskRunError(`Database error: ${error}`);
     }
-    console.debug("[DEBUG] first read query performed successfully");
+    if (process.env.NODE_ENV === 'development') {
+      console.debug("[DEBUG] first read query performed successfully");
+    }
 
     if (
       existing?.dynamicSections &&
