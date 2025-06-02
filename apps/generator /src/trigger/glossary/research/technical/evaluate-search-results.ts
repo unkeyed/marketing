@@ -8,7 +8,7 @@ import { google } from "@/lib/google";
 import { AbortTaskRunError, task } from "@trigger.dev/sdk/v3";
 import { generateObject } from "ai";
 import { and, eq } from "drizzle-orm";
-import { domainCategories } from "./exa-domain-search";
+import { domainCategories } from "@/lib/constants/domain-categories";
 
 export const evaluateSearchResults = task({
   id: "evaluate-search-results",
