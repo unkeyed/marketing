@@ -66,6 +66,9 @@ export const scrapeSearchResults = task({
       urlsToScrape.map(({ url }) => url),
       composeScrapingContentBaseOptions({ summaryQuery }),
     );
+    if (!scrapingResults.results.length) {
+      throw new AbortTaskRunError(`Failed to scrape all results for term "${inputTerm}".`);
+    }
 
     // log the costs for the exa responses:
     const scrapingCosts = scrapingResults.costDollars;
