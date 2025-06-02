@@ -34,7 +34,6 @@ export const generateOutlineTask = task({
     term,
     onCacheHit = "stale" as CacheStrategy,
   }: { term: string; onCacheHit?: CacheStrategy }) => {
-
     const drizzleQuery = db.query.entries.findFirst({
       where: eq(entries.inputTerm, term),
       orderBy: (entries, { desc }) => [desc(entries.createdAt)],
@@ -56,7 +55,7 @@ export const generateOutlineTask = task({
         },
       },
     });
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       console.debug(`[DEBUG] Check the drizzle query:\n
         ${drizzleQuery.toSQL().sql}\n
         ---------
@@ -69,7 +68,7 @@ export const generateOutlineTask = task({
     if (error) {
       throw new AbortTaskRunError(`Database error: ${error}`);
     }
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       console.debug("[DEBUG] first read query performed successfully");
     }
 
@@ -81,7 +80,9 @@ export const generateOutlineTask = task({
       return existing;
     }
     if (!existing?.id) {
-      throw new AbortTaskRunError(`GenerateOutlineTask: Called without an entry for term '${term}'`);
+      throw new AbortTaskRunError(
+        `GenerateOutlineTask: Called without an entry for term '${term}'`,
+      );
     }
 
     const technicalResearchSummaries = await db.query.exaScrapedResults.findMany({
@@ -319,14 +320,14 @@ async function generateInitialOutline({
   =====
   FROM PAGE TITLES:
   ${contentKeywords
-      .filter((k) => k.source === "title")
-      .map((k) => `- ${k.keyword}`)
-      .join("\n")}
+    .filter((k) => k.source === "title")
+    .map((k) => `- ${k.keyword}`)
+    .join("\n")}
   FROM HEADERS:
   ${contentKeywords
-      .filter((k) => k.source === "headers")
-      .map((k) => `- ${k.keyword}`)
-      .join("\n")}
+    .filter((k) => k.source === "headers")
+    .map((k) => `- ${k.keyword}`)
+    .join("\n")}
   `;
 
   return await generateObject({
@@ -339,7 +340,11 @@ async function generateInitialOutline({
       console.warn(`[DEBUG] Encountered error: ${res.error}`);
       return res.text;
     },
-    experimental_telemetry: { functionId: "generateInitialOutline", recordInputs: true, recordOutputs: true },
+    experimental_telemetry: {
+      functionId: "generateInitialOutline",
+      recordInputs: true,
+      recordOutputs: true,
+    },
   });
 }
 

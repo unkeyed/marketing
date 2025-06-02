@@ -1,5 +1,5 @@
+import { type DomainCategory, domainCategories } from "@/lib/constants/domain-categories";
 import { relations } from "drizzle-orm";
-import { domainCategories, type DomainCategory } from "@/lib/constants/domain-categories";
 import {
   index,
   int,
@@ -116,9 +116,7 @@ export const exaScrapedResults = mysqlTable(
       domainCategories.map((c) => c.name) as [DomainCategory, ...DomainCategory[]],
     ).notNull(),
   },
-  (table) => [
-    unique("hashed_input_term_url_unique").on(table.hashedInputTermUrl)
-  ],
+  (table) => [unique("hashed_input_term_url_unique").on(table.hashedInputTermUrl)],
 );
 
 export const exaScrapedResultsRelations = relations(exaScrapedResults, ({ one }) => ({

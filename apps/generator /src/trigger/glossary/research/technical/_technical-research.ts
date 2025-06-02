@@ -1,3 +1,4 @@
+import { domainCategories } from "@/lib/constants/domain-categories";
 import { db } from "@/lib/db-marketing/client";
 import { exaScrapedResults } from "@/lib/db-marketing/schemas";
 import { AbortTaskRunError, batch, task } from "@trigger.dev/sdk/v3";
@@ -6,7 +7,6 @@ import type { CacheStrategy } from "../../_generate-glossary-entry";
 import { evaluateSearchResults } from "./evaluate-search-results";
 import { exaDomainSearchTask } from "./exa-domain-search";
 import { scrapeSearchResults } from "./exa-scrape-results";
-import { domainCategories } from "@/lib/constants/domain-categories";
 
 export const technicalResearchTask = task({
   id: "technical_research",

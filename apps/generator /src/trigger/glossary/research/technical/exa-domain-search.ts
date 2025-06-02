@@ -6,11 +6,11 @@ import {
 import { AbortTaskRunError, task } from "@trigger.dev/sdk/v3";
 
 import { createHash } from "node:crypto";
+import { type DomainCategory, domainCategories } from "@/lib/constants/domain-categories";
 import { db } from "@/lib/db-marketing/client";
 import { composeSearchOptionsWithoutScraping, exa } from "@/lib/exa";
 import { and, eq, isNotNull } from "drizzle-orm";
 import type { CacheStrategy } from "../../_generate-glossary-entry";
-import { domainCategories, type DomainCategory } from "@/lib/constants/domain-categories";
 
 // Define the main search task
 export const exaDomainSearchTask = task({

@@ -1,5 +1,5 @@
+import type { DomainCategory } from "@/lib/constants/domain-categories";
 import { db } from "@/lib/db-marketing/client";
-import { type DomainCategory } from "@/lib/constants/domain-categories";
 import {
   type ExaScrapedResults,
   exaScrapedResults,
@@ -7,10 +7,10 @@ import {
 import { composeScrapingContentBaseOptions } from "@/lib/exa";
 import { AbortTaskRunError, task } from "@trigger.dev/sdk/v3";
 
+import { createHash } from "node:crypto";
 import { eq, sql } from "drizzle-orm";
 import Exa from "exa-js";
 import type { CacheStrategy } from "../../_generate-glossary-entry";
-import { createHash } from "node:crypto";
 
 export const scrapeSearchResults = task({
   id: "scrape-search-results",
@@ -45,9 +45,11 @@ export const scrapeSearchResults = task({
     // Then find which ones are missing from our cache using normalized URL comparison
     // (normalize by removing trailing slashes and converting to lowercase)
     const missingUrls = uniqueUrls.filter(
-      ({ url }) => !existingResults.some((result) => 
-        result.url.toLowerCase().replace(/\/$/, '') === url.toLowerCase().replace(/\/$/, '')
-      ),
+      ({ url }) =>
+        !existingResults.some(
+          (result) =>
+            result.url.toLowerCase().replace(/\/$/, "") === url.toLowerCase().replace(/\/$/, ""),
+        ),
     );
 
     // Only return from cache if:
@@ -85,14 +87,17 @@ export const scrapeSearchResults = task({
       url: result.url,
       summary: result.summary,
       text: result.text,
-      domainCategory: urlsToScrape.find(({ url }) => url === result.url)?.domainCategory as DomainCategory,
-      hashedInputTermUrl: createHash('sha256').update(`${inputTerm}-${result.url}`).digest('hex'),
+      domainCategory: urlsToScrape.find(({ url }) => url === result.url)
+        ?.domainCategory as DomainCategory,
+      hashedInputTermUrl: createHash("sha256").update(`${inputTerm}-${result.url}`).digest("hex"),
     }));
 
     // Filter out any results with undefined domainCategory (necessary as we're type casting above theorietcially)
-    const validResults = newResults.filter(result => result.domainCategory !== undefined);
+    const validResults = newResults.filter((result) => result.domainCategory !== undefined);
     if (validResults.length !== newResults.length) {
-      console.warn(`Warning: ${newResults.length - validResults.length} results had undefined domainCategory and were skipped`);
+      console.warn(
+        `Warning: ${newResults.length - validResults.length} results had undefined domainCategory and were skipped`,
+      );
     }
 
     newResults.forEach((result) => {
@@ -120,9 +125,12 @@ export const scrapeSearchResults = task({
     // Check for missing URLs using normalized URL comparison
     // (normalize by removing trailing slashes and converting to lowercase)
     const missingUrlsToScrape = urlsToScrape.filter(
-      (url) => !scrapedUrls.some((scrapedUrl) => 
-        scrapedUrl.url.toLowerCase().replace(/\/$/, '') === url.url.toLowerCase().replace(/\/$/, '')
-      ),
+      (url) =>
+        !scrapedUrls.some(
+          (scrapedUrl) =>
+            scrapedUrl.url.toLowerCase().replace(/\/$/, "") ===
+            url.url.toLowerCase().replace(/\/$/, ""),
+        ),
     );
     if (missingUrlsToScrape.length > 0) {
       console.warn(

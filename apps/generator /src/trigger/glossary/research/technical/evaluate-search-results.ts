@@ -1,3 +1,4 @@
+import { domainCategories } from "@/lib/constants/domain-categories";
 import { db } from "@/lib/db-marketing/client";
 import {
   type TechnicalResearch,
@@ -8,7 +9,6 @@ import { google } from "@/lib/google";
 import { AbortTaskRunError, task } from "@trigger.dev/sdk/v3";
 import { generateObject } from "ai";
 import { and, eq } from "drizzle-orm";
-import { domainCategories } from "@/lib/constants/domain-categories";
 
 export const evaluateSearchResults = task({
   id: "evaluate-search-results",
@@ -106,41 +106,41 @@ export const evaluateSearchResults = task({
 
     // upsert the technicalResearch.searchEvaluation for the given inputTerm, domainCategory:
     await db.transaction(async (tx) => {
-    for (const domainCategory of domainCategories) {
-      const domainEvaluations = evaluations.filter(
-        (evaluation) => evaluation.domainCategory === domainCategory.name,
-      );
-
-      await tx
-        .update(technicalResearch)
-        .set({
-          searchEvaluation: {
-            metadata: {
-              evaluatedAt: new Date(),
-              stats: {
-                included: domainEvaluations.filter(
-                  (evaluation) =>
-                    evaluation.evaluation?.rating && evaluation.evaluation?.rating >= 7,
-                ).length,
-                excluded: domainEvaluations.filter(
-                  (evaluation) =>
-                    evaluation.evaluation?.rating && evaluation.evaluation?.rating < 7,
-                ).length,
-              },
-            },
-            included: domainEvaluations.filter(
-              (evaluation) => evaluation.evaluation?.rating && evaluation.evaluation?.rating >= 7,
-            ),
-          },
-        })
-        .where(
-          and(
-            eq(technicalResearch.inputTerm, inputTerm),
-            eq(technicalResearch.domainCategory, domainCategory.name),
-          ),
+      for (const domainCategory of domainCategories) {
+        const domainEvaluations = evaluations.filter(
+          (evaluation) => evaluation.domainCategory === domainCategory.name,
         );
-    }
-  });
+
+        await tx
+          .update(technicalResearch)
+          .set({
+            searchEvaluation: {
+              metadata: {
+                evaluatedAt: new Date(),
+                stats: {
+                  included: domainEvaluations.filter(
+                    (evaluation) =>
+                      evaluation.evaluation?.rating && evaluation.evaluation?.rating >= 7,
+                  ).length,
+                  excluded: domainEvaluations.filter(
+                    (evaluation) =>
+                      evaluation.evaluation?.rating && evaluation.evaluation?.rating < 7,
+                  ).length,
+                },
+              },
+              included: domainEvaluations.filter(
+                (evaluation) => evaluation.evaluation?.rating && evaluation.evaluation?.rating >= 7,
+              ),
+            },
+          })
+          .where(
+            and(
+              eq(technicalResearch.inputTerm, inputTerm),
+              eq(technicalResearch.domainCategory, domainCategory.name),
+            ),
+          );
+      }
+    });
 
     const updatedEntries = await db.query.technicalResearch.findMany({
       where: eq(technicalResearch.inputTerm, inputTerm),

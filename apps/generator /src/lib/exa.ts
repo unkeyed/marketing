@@ -25,7 +25,11 @@ export const composeSearchOptionsWithoutScraping = (props: {
     numResults,
     type: "keyword",
     // we unpack the array in a new array because out domainCategories returns `readonly`
-    includeDomains: [...(domainCategories.find((c: { name: string; domains: readonly string[] }) => c.name === domain)?.domains || [])],
+    includeDomains: [
+      ...(domainCategories.find(
+        (c: { name: string; domains: readonly string[] }) => c.name === domain,
+      )?.domains || []),
+    ],
     ...filterEmptyResultsOnly,
   } satisfies RegularSearchOptions & {};
 };
