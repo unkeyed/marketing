@@ -108,6 +108,7 @@ export const exaScrapedResults = mysqlTable(
     id: int("id").primaryKey().autoincrement(),
     inputTerm: varchar("input_term", { length: 767 }).notNull(),
     url: varchar("url", { length: 767 }).notNull(),
+    hashedInputTermUrl: varchar("hashed_input_term_url", { length: 64 }).notNull(), // SHA-256 hash
     summary: longtext("summary").notNull(),
     text: longtext("text").notNull(),
     domainCategory: mysqlEnum(
@@ -115,7 +116,9 @@ export const exaScrapedResults = mysqlTable(
       domainCategories.map((c) => c.name) as [DomainCategory, ...DomainCategory[]],
     ).notNull(),
   },
-  (table) => [index("input_term_idx").on(table.inputTerm), unique("input_term_url_unique").on(table.inputTerm, table.url)],
+  (table) => [
+    unique("hashed_input_term_url_unique").on(table.hashedInputTermUrl)
+  ],
 );
 
 export const exaScrapedResultsRelations = relations(exaScrapedResults, ({ one }) => ({

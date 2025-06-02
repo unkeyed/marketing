@@ -105,12 +105,13 @@ export const evaluateSearchResults = task({
     }
 
     // upsert the technicalResearch.searchEvaluation for the given inputTerm, domainCategory:
+    await db.transaction(async (tx) => {
     for (const domainCategory of domainCategories) {
       const domainEvaluations = evaluations.filter(
         (evaluation) => evaluation.domainCategory === domainCategory.name,
       );
 
-      await db
+      await tx
         .update(technicalResearch)
         .set({
           searchEvaluation: {
@@ -139,6 +140,7 @@ export const evaluateSearchResults = task({
           ),
         );
     }
+  });
 
     const updatedEntries = await db.query.technicalResearch.findMany({
       where: eq(technicalResearch.inputTerm, inputTerm),

@@ -1,6 +1,6 @@
 import { db } from "@/lib/db-marketing/client";
+import { type DomainCategory } from "@/lib/constants/domain-categories";
 import {
-  type DomainCategory,
   type ExaScrapedResults,
   exaScrapedResults,
 } from "@/lib/db-marketing/schemas/technical-research";
@@ -10,6 +10,7 @@ import { AbortTaskRunError, task } from "@trigger.dev/sdk/v3";
 import { eq, sql } from "drizzle-orm";
 import Exa from "exa-js";
 import type { CacheStrategy } from "../../_generate-glossary-entry";
+import { createHash } from "node:crypto";
 
 export const scrapeSearchResults = task({
   id: "scrape-search-results",
@@ -41,9 +42,12 @@ export const scrapeSearchResults = task({
       (result, index, self) => index === self.findIndex((r) => r.url === result.url),
     );
 
-    // Then find which ones are missing from our cache
+    // Then find which ones are missing from our cache using normalized URL comparison
+    // (normalize by removing trailing slashes and converting to lowercase)
     const missingUrls = uniqueUrls.filter(
-      ({ url }) => !existingResults.some((result) => result.url === url),
+      ({ url }) => !existingResults.some((result) => 
+        result.url.toLowerCase().replace(/\/$/, '') === url.toLowerCase().replace(/\/$/, '')
+      ),
     );
 
     // Only return from cache if:
@@ -78,7 +82,8 @@ export const scrapeSearchResults = task({
       url: result.url,
       summary: result.summary,
       text: result.text,
-      domainCategory: urlsToScrape.find(({ url }) => url === result.url)?.domainCategory,
+      domainCategory: urlsToScrape.find(({ url }) => url === result.url)?.domainCategory as DomainCategory,
+      hashedInputTermUrl: createHash('sha256').update(`${inputTerm}-${result.url}`).digest('hex'),
     }));
 
     newResults.forEach((result) => {
@@ -90,7 +95,6 @@ export const scrapeSearchResults = task({
 
     await db
       .insert(exaScrapedResults)
-      // @ts-expect-error we have to ensure domainCategory is not undefined
       .values(newResults)
       .onDuplicateKeyUpdate({
         set: {
@@ -104,8 +108,12 @@ export const scrapeSearchResults = task({
     const scrapedUrls = await db.query.exaScrapedResults.findMany({
       where: eq(exaScrapedResults.inputTerm, inputTerm),
     });
+    // Check for missing URLs using normalized URL comparison
+    // (normalize by removing trailing slashes and converting to lowercase)
     const missingUrlsToScrape = urlsToScrape.filter(
-      (url) => !scrapedUrls.some((scrapedUrl) => scrapedUrl.url === url.url),
+      (url) => !scrapedUrls.some((scrapedUrl) => 
+        scrapedUrl.url.toLowerCase().replace(/\/$/, '') === url.url.toLowerCase().replace(/\/$/, '')
+      ),
     );
     if (missingUrlsToScrape.length > 0) {
       console.warn(

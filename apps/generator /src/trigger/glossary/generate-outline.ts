@@ -272,6 +272,7 @@ export const reviewSchema = z.object({
 const finalOutlineSchema = z.object({
   outline: z.array(
     insertSectionSchema.omit({ entryId: true }).extend({
+      citedSources: z.string().url(),
       contentTypes: z.array(insertSectionContentTypeSchema.omit({ sectionId: true })),
       keywords: z.array(selectKeywordsSchema.pick({ keyword: true })),
     }),
@@ -306,7 +307,7 @@ async function generateInitialOutline({
   - Include a short description under each heading that outlines the content to be included, explains its importance, and references sources.
   - Describe recommended content types for each section as per the schema definition called "type" inside the contentTypes array. These represent different type of content forms for SEO pages. Make a recommendation for what to use and keep track of your reasoning.
   - Ensure headers are under 70 characters, descriptive, and maintain clarity and readability.
-  - Cite the sources for every section in the form of the URL
+  - Cite the sources for every section in the form of the URL and collect them in the "citedSources" field.
   
   =====
   TOP RANKING PAGES CONTENT:
@@ -318,14 +319,14 @@ async function generateInitialOutline({
   =====
   FROM PAGE TITLES:
   ${contentKeywords
-    .filter((k) => k.source === "title")
-    .map((k) => `- ${k.keyword}`)
-    .join("\n")}
+      .filter((k) => k.source === "title")
+      .map((k) => `- ${k.keyword}`)
+      .join("\n")}
   FROM HEADERS:
   ${contentKeywords
-    .filter((k) => k.source === "headers")
-    .map((k) => `- ${k.keyword}`)
-    .join("\n")}
+      .filter((k) => k.source === "headers")
+      .map((k) => `- ${k.keyword}`)
+      .join("\n")}
   `;
 
   return await generateObject({
@@ -333,6 +334,12 @@ async function generateInitialOutline({
     system: initialOutlineSystem,
     prompt: initialOutlinePrompt,
     schema: initialOutlineSchema,
+    experimental_repairText: async (res) => {
+      console.debug(`[DEBUG] Repairing text: ${res.text}`);
+      console.warn(`[DEBUG] Encountered error: ${res.error}`);
+      return res.text;
+    },
+    experimental_telemetry: { functionId: "generateInitialOutline", recordInputs: true, recordOutputs: true },
   });
 }
 
