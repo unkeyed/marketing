@@ -80,6 +80,9 @@ export const generateOutlineTask = task({
     ) {
       return existing;
     }
+    if (!existing?.id) {
+      throw new AbortTaskRunError(`GenerateOutlineTask: Called without an entry for term '${term}'`);
+    }
 
     const technicalResearchSummaries = await db.query.exaScrapedResults.findMany({
       columns: {
