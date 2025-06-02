@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-// import { domainCategories } from "@/trigger/glossary/research/technical/exa-domain-search";
+import { domainCategories, type DomainCategory } from "@/lib/constants/domain-categories";
 import {
   index,
   int,
@@ -17,35 +17,6 @@ import { searchQueries } from "./searchQuery";
 import { entries } from "./entries";
 
 import type { SearchResponse } from "exa-js";
-export const domainCategories = [
-  {
-    name: "Official",
-    domains: ["tools.ietf.org", "datatracker.ietf.org", "rfc-editor.org", "w3.org", "iso.org"],
-    description: "Official standards and specifications sources",
-  },
-  {
-    name: "Community",
-    domains: [
-      "stackoverflow.com",
-      "github.com",
-      "wikipedia.org",
-      "news.ycombinator.com",
-      "stackexchange.com",
-    ],
-    description: "Community-driven platforms and forums",
-  },
-  {
-    name: "Neutral",
-    domains: ["owasp.org", "developer.mozilla.org"],
-    description: "Educational and vendor-neutral resources",
-  },
-  {
-    name: "Google",
-    domains: [], // Empty domains array to search without domain restrictions
-    description: "General search results without domain restrictions",
-  },
-] as const;
-export type DomainCategory = (typeof domainCategories)[number]["name"];
 
 // Evaluation schema for content quality and relevance
 const evaluationSchema = z.object({
