@@ -1,5 +1,5 @@
 import type { CacheStrategy } from "@/trigger/glossary/_generate-glossary-entry";
-import { domainCategories } from "@/trigger/glossary/research/technical/exa-domain-search";
+import { domainCategories } from "@/lib/constants/domain-categories";
 import { AbortTaskRunError } from "@trigger.dev/sdk/v3";
 import { eq } from "drizzle-orm";
 import Exa, { type ContentsOptions, type RegularSearchOptions } from "exa-js";
