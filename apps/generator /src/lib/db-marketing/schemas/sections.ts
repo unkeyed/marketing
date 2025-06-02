@@ -1,7 +1,7 @@
 import { relations } from "drizzle-orm";
 import { int, mysqlEnum, mysqlTable, primaryKey, text, timestamp } from "drizzle-orm/mysql-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { z } from "zod";
+import type { z } from "zod";
 import { entries } from "./entries";
 import { keywords } from "./keywords";
 
@@ -30,7 +30,6 @@ export const sectionsRelations = relations(sections, ({ one, many }) => ({
   contentTypes: many(sectionContentTypes),
   sectionsToKeywords: many(sectionsToKeywords),
 }));
-
 
 export const insertSectionSchema = createInsertSchema(sections).omit({ id: true });
 export const selectSectionSchema = createSelectSchema(sections);
