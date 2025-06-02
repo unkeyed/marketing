@@ -1,3 +1,4 @@
+import { Mermaid } from "@/components/mermaid";
 import { useMDXComponent } from "@content-collections/mdx/react";
 import { ImageZoom } from "fumadocs-ui/components/image-zoom";
 import type { ImageProps } from "next/image";
@@ -94,6 +95,7 @@ export function MDX({ code }: MDXProps) {
   return (
     <Component
       components={{
+        Mermaid,
         ...MdxComponents,
       }}
     />

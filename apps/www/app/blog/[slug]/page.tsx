@@ -32,10 +32,11 @@ export function generateMetadata({
   return {
     title: `${post.title} | Unkey`,
     description: post.description,
-
+    keywords: post.tags,
     openGraph: {
       title: `${post.title} | Unkey`,
       description: post.description,
+
       url: `https://unkey.com/${post._meta.path}`,
       siteName: "unkey.com",
       type: "article",
