@@ -89,6 +89,12 @@ export const scrapeSearchResults = task({
       hashedInputTermUrl: createHash('sha256').update(`${inputTerm}-${result.url}`).digest('hex'),
     }));
 
+    // Filter out any results with undefined domainCategory (necessary as we're type casting above theorietcially)
+    const validResults = newResults.filter(result => result.domainCategory !== undefined);
+    if (validResults.length !== newResults.length) {
+      console.warn(`Warning: ${newResults.length - validResults.length} results had undefined domainCategory and were skipped`);
+    }
+
     newResults.forEach((result) => {
       console.info(`URL: ${result.url}
     Summary length: ${result.summary?.length || 0}
