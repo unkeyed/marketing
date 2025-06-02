@@ -4,8 +4,9 @@ import { AbortTaskRunError, batch, task } from "@trigger.dev/sdk/v3";
 import { eq } from "drizzle-orm";
 import type { CacheStrategy } from "../../_generate-glossary-entry";
 import { evaluateSearchResults } from "./evaluate-search-results";
-import { domainCategories, exaDomainSearchTask } from "./exa-domain-search";
+import { exaDomainSearchTask } from "./exa-domain-search";
 import { scrapeSearchResults } from "./exa-scrape-results";
+import { domainCategories } from "@/lib/constants/domain-categories";
 
 export const technicalResearchTask = task({
   id: "technical_research",
