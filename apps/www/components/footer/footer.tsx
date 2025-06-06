@@ -18,11 +18,6 @@ const navigation = [
       { title: "Roadmap", href: "/roadmap" },
       { title: "Careers", href: "/careers" },
       {
-        title: "Analytics",
-        href: "https://us.posthog.com/shared/HwZNjaKOLtgtpj6djuSo3fgOqrQm0Q?whitelabel",
-        external: true,
-      },
-      {
         title: "Source Code",
         href: "https://go.unkey.com/github",
         external: true,
@@ -124,7 +119,12 @@ export function Footer() {
         </div>
 
         {navigation.map(({ title, links }) => (
-          <Column key={title} title={title} links={links} className="col-span-1 " />
+          <Column
+            key={title}
+            title={title}
+            links={links}
+            className="col-span-1 "
+          />
         ))}
       </footer>
       <div className="container mt-8 h-[100px]">
