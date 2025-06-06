@@ -119,12 +119,7 @@ export function Footer() {
         </div>
 
         {navigation.map(({ title, links }) => (
-          <Column
-            key={title}
-            title={title}
-            links={links}
-            className="col-span-1 "
-          />
+          <Column key={title} title={title} links={links} className="col-span-1 " />
         ))}
       </footer>
       <div className="container mt-8 h-[100px]">
