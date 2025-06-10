@@ -18,11 +18,6 @@ const navigation = [
       { title: "Roadmap", href: "/roadmap" },
       { title: "Careers", href: "/careers" },
       {
-        title: "Analytics",
-        href: "https://us.posthog.com/shared/HwZNjaKOLtgtpj6djuSo3fgOqrQm0Q?whitelabel",
-        external: true,
-      },
-      {
         title: "Source Code",
         href: "https://go.unkey.com/github",
         external: true,
