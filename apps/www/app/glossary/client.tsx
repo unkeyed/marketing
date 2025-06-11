@@ -100,20 +100,28 @@ export function GlossaryClient() {
           </h1>
           <div className="max-w-3xl text-xl text-white/60 mx-auto">
             <p className="mt-6 text-base about-founders-text-gradient ">
-              With clear definitions and helpful examples, Unkey's API Glossary is your go-to
-              resource for understanding the key concepts and terminology in API development.
+              With clear definitions and helpful examples, Unkey's API Glossary
+              is your go-to resource for understanding the key concepts and
+              terminology in API development.
             </p>
           </div>
         </div>
         <div className="flex justify-center gap-6">
-          <p className="mt-6 text-base about-founders-text-gradient ">Ready to protect your API?</p>
+          <p className="mt-6 text-base about-founders-text-gradient ">
+            Ready to protect your API?
+          </p>
           <Link href="https://app.unkey.com" className="group self-end">
-            <PrimaryButton shiny IconLeft={LogIn} label="Get started" className="h-8" />
+            <PrimaryButton
+              shiny
+              IconLeft={LogIn}
+              label="Get started"
+              className="h-8"
+            />
           </Link>
         </div>
       </Container>
-      <div className="container mx-auto mt-18 overflow-hidden text-white">
-        <div className="mb-24 grid grid-cols-1 gap-4 md:gap-8 pb-24 lg:grid-cols-[15rem_1fr] xl:grid-cols-[15rem_1fr_15rem]">
+      <div className="max-w-[1600px] mx-auto mt-18 overflow-hidden text-white px-4 sm:px-6 lg:px-8">
+        <div className="mb-24 grid grid-cols-1 gap-8 md:gap-12 lg:gap-16 pb-24 lg:grid-cols-[20rem_1fr]">
           {/* Left Sidebar */}
           <div>
             <h2 className="w-full mb-4 font-semibold text-left blog-heading-gradient">
@@ -121,15 +129,19 @@ export function GlossaryClient() {
             </h2>
             <FilterableCommand
               placeholder="Search"
-              className="rounded-lg mb-4 border-[.75px] border-white/20 lg:w-[232px]"
+              className="rounded-lg mb-4 border-[.75px] border-white/20 lg:w-[300px]"
               terms={allGlossaries}
             />
           </div>
-          <div className="col-span-2">
+          <div className="col-span-1">
             <div className="justify-between flex border-b border-white/10 pb-8 mb-8">
               {alphabet.map((letter) =>
                 groupedTerms[letter]?.length > 0 ? (
-                  <Link key={letter} href={`#${letter}`} className="rounded hover:underline">
+                  <Link
+                    key={letter}
+                    href={`#${letter}`}
+                    className="rounded hover:underline"
+                  >
                     {letter}
                   </Link>
                 ) : (
@@ -142,52 +154,64 @@ export function GlossaryClient() {
             {Object.entries(groupedTerms).map(
               ([letter, letterTerms]) =>
                 letterTerms.length > 0 && (
-                  <section key={letter} id={letter} className="mb-8 scroll-mt-32">
-                    <h2 className="text-2xl font-semibold mb-4 grid-cols-1">{letter}</h2>
+                  <section
+                    key={letter}
+                    id={letter}
+                    className="mb-8 scroll-mt-32"
+                  >
+                    <h2 className="text-2xl font-semibold mb-4 grid-cols-1">
+                      {letter}
+                    </h2>
                     <div className="grid grid-cols-1 gap-8 auto-rows-fr xl:grid-cols-3 md:grid-cols-2 grid-col-1">
-                      {letterTerms.map(({ slug, categories, takeaways, term }) => (
-                        <Link
-                          key={slug}
-                          href={`/glossary/${slug}`}
-                          className="flex flex-col items-start justify-between h-full overflow-hidden duration-200 border rounded-xl border-white/10 hover:border-white/20"
-                        >
-                          <div className="relative w-full h-full">
-                            <div className="p-4 rounded-md space-y-2 bg-gradient-to-br from-[rgb(22,22,22)] to-[rgb(0,0,0)] border-b border-white/10">
-                              <div className="p-4 rounded-md space-y-2 ">
-                                <h3 className="text-sm font-semibold flex items-center text-white">
-                                  <Zap className="mr-2 h-5 w-5" /> TL;DR
-                                </h3>
-                                <p className="text-sm text-white/80 ">{takeaways.tldr}</p>
+                      {letterTerms.map(
+                        ({ slug, categories, takeaways, term }) => (
+                          <Link
+                            key={slug}
+                            href={`/glossary/${slug}`}
+                            className="flex flex-col items-start justify-between h-full overflow-hidden duration-200 border rounded-xl border-white/10 hover:border-white/20"
+                          >
+                            <div className="relative w-full h-full">
+                              <div className="p-4 rounded-md space-y-2 bg-gradient-to-br from-[rgb(22,22,22)] to-[rgb(0,0,0)] border-b border-white/10">
+                                <div className="p-4 rounded-md space-y-2 ">
+                                  <h3 className="text-sm font-semibold flex items-center text-white">
+                                    <Zap className="mr-2 h-5 w-5" /> TL;DR
+                                  </h3>
+                                  <p className="text-sm text-white/80 ">
+                                    {takeaways.tldr}
+                                  </p>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          <div className="flex flex-col justify-start w-full h-full p-4">
-                            <div>
-                              <div className="flex flex-row justify-start w-full h-full gap-3">
-                                {categories.length > 0
-                                  ? categories.map((categorySlug) => (
-                                      <div
-                                        key={categorySlug}
-                                        className="px-2 py-1 text-xs rounded-md bg-[rgb(26,26,26)] text-white/60"
-                                      >
-                                        {categorySlug // unslugged
-                                          .replace(/-/g, " ")
-                                          .replace(/\b\w/g, (char) => char.toUpperCase())}
-                                      </div>
-                                    ))
-                                  : null}
+                            <div className="flex flex-col justify-start w-full h-full p-4">
+                              <div>
+                                <div className="flex flex-row justify-start w-full h-full gap-3">
+                                  {categories.length > 0
+                                    ? categories.map((categorySlug) => (
+                                        <div
+                                          key={categorySlug}
+                                          className="px-2 py-1 text-xs rounded-md bg-[rgb(26,26,26)] text-white/60"
+                                        >
+                                          {categorySlug // unslugged
+                                            .replace(/-/g, " ")
+                                            .replace(/\b\w/g, (char) =>
+                                              char.toUpperCase(),
+                                            )}
+                                        </div>
+                                      ))
+                                    : null}
+                                </div>
+                              </div>
+                              <div className="flex flex-col items-end content-end justify-end w-full h-full">
+                                <div className="w-full h-12 mt-6">
+                                  <h3 className="text-lg font-semibold leading-6 text-left text-white group-hover:text-gray-600 line-clamp-2">
+                                    {term}
+                                  </h3>
+                                </div>
                               </div>
                             </div>
-                            <div className="flex flex-col items-end content-end justify-end w-full h-full">
-                              <div className="w-full h-12 mt-6">
-                                <h3 className="text-lg font-semibold leading-6 text-left text-white group-hover:text-gray-600 line-clamp-2">
-                                  {term}
-                                </h3>
-                              </div>
-                            </div>
-                          </div>
-                        </Link>
-                      ))}
+                          </Link>
+                        ),
+                      )}
                     </div>
                   </section>
                 ),

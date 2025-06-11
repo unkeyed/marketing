@@ -1,6 +1,13 @@
 import type { Glossary } from "@/.content-collections/generated";
+import { Frame } from "@/components/frame";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   AlertTriangle,
   BookOpen,
@@ -41,28 +48,58 @@ export default function Takeaways(props: Pick<Glossary, "term" | "takeaways">) {
   return (
     <Card className="w-full bg-white/5 shadow-[0_0_10px_rgba(255,255,255,0.1)] rounded-xl overflow-hidden relative border-white/20">
       <div className="absolute left-0 top-0 bottom-0 w-1 bg-white/20" />
-      <CardHeader className="border-white/20">
-        <CardTitle className="text-2xl font-bold text-white">{props.term}: Key Takeaways</CardTitle>
+      <CardHeader className="border-white/20 pb-8">
+        <CardTitle className="text-2xl font-bold text-white">
+          {props.term}: Key Takeaways
+        </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-8 p-6">
-        <div className="bg-white/10 p-4 rounded-md">
-          <h3 className="text-lg font-semibold flex items-center mb-2 text-white">
-            <Zap className="mr-2 h-5 w-5" /> TL;DR
-          </h3>
-          <p className="text-sm text-white/80">{props.takeaways.tldr}</p>
+      <CardContent className="space-y-10 p-8">
+        {/* Enhanced TL;DR Section */}
+        <div className="mb-8">
+          <Frame size="md">
+            <div className="bg-gradient-to-br from-[rgb(22,22,22)] to-[rgb(8,8,8)] p-6 space-y-4">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30">
+                  <Zap className="h-5 w-5 text-yellow-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-white">TL;DR</h3>
+              </div>
+              <p className="text-base leading-relaxed text-white/90 font-medium">
+                {props.takeaways.tldr}
+              </p>
+            </div>
+          </Frame>
         </div>
-        <div className="grid gap-8 md:grid-cols-2">
+
+        {/* Grid Sections with Better Spacing */}
+        <div className="grid gap-8 lg:gap-10 md:grid-cols-2">
           <Section
             icon={<FileText className="h-5 w-5" />}
             title="Definition & Structure"
             content={
-              <div className="space-y-2">
+              <div className="space-y-4">
                 {props.takeaways.definitionAndStructure.map((item) => (
-                  <div key={item.key} className="flex justify-between text-sm">
-                    <span className="font-medium text-white/80">{item.key}</span>
-                    <code className="bg-white/10 px-1 py-0.5 rounded tracking-tight text-xs text-white/90">
-                      {item.value}
-                    </code>
+                  <div key={item.key} className="space-y-2">
+                    <span className="font-medium text-white/80 text-sm block">
+                      {item.key}
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {item.value.split(",").map((value, index) => {
+                        const trimmedValue = value.trim();
+                        return (
+                          <Badge
+                            key={index}
+                            variant="secondary"
+                            className="bg-white/10 text-white/90 px-3 py-1 text-xs font-mono border border-white/20 max-w-[140px]"
+                            title={trimmedValue}
+                          >
+                            <span className="truncate block min-w-0">
+                              {trimmedValue}
+                            </span>
+                          </Badge>
+                        );
+                      })}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -77,16 +114,25 @@ export default function Takeaways(props: Pick<Glossary, "term" | "takeaways">) {
             icon={<Code className="h-5 w-5" />}
             title="Usage in APIs"
             content={
-              <>
-                <div className="flex flex-wrap gap-1 mb-2">
-                  {props.takeaways.usageInAPIs.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="bg-white/10 text-white/80">
-                      {tag}
-                    </Badge>
-                  ))}
+              <div className="space-y-4">
+                <div className="flex flex-wrap gap-2">
+                  {props.takeaways.usageInAPIs.tags.map((tag) => {
+                    return (
+                      <Badge
+                        key={tag}
+                        variant="secondary"
+                        className="bg-white/10 text-white/90 px-3 py-1 text-xs border border-white/20 max-w-[140px]"
+                        title={tag}
+                      >
+                        <span className="truncate block min-w-0">{tag}</span>
+                      </Badge>
+                    );
+                  })}
                 </div>
-                <p className="text-sm text-white/60">{props.takeaways.usageInAPIs.description}</p>
-              </>
+                <p className="text-sm text-white/70 leading-relaxed">
+                  {props.takeaways.usageInAPIs.description}
+                </p>
+              </div>
             }
           />
           <Section
@@ -95,36 +141,44 @@ export default function Takeaways(props: Pick<Glossary, "term" | "takeaways">) {
             items={props.takeaways.bestPractices}
           />
         </div>
-        <Section
-          icon={<BookOpen className="h-5 w-5" />}
-          title="Recommended Reading"
-          content={
-            <ul className="space-y-2 text-sm">
-              {props.takeaways.recommendedReading.map((item) => (
-                <li key={item.title}>
-                  <a
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 flex items-center"
-                  >
-                    {item.title}
-                    <ExternalLink className="h-3 w-3 ml-1" />
-                  </a>
-                </li>
-              ))}
-            </ul>
-          }
-        />
+
+        {/* Recommended Reading Section */}
+        <div className="mt-8">
+          <Section
+            icon={<BookOpen className="h-5 w-5" />}
+            title="Recommended Reading"
+            content={
+              <ul className="space-y-3 text-sm">
+                {props.takeaways.recommendedReading.map((item) => (
+                  <li key={item.title}>
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-400 hover:text-blue-300 flex items-center gap-2 transition-colors"
+                    >
+                      <span>{item.title}</span>
+                      <ExternalLink className="h-3 w-3 shrink-0" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            }
+          />
+        </div>
       </CardContent>
-      <CardFooter className="border-t text-xs border-white/10">
-        <div className="grid grid-cols-[auto_1fr_auto] gap-4 items-center w-full mt-6">
-          <div className="flex items-center">
-            <Coffee className="size-5 text-white/80" />
-            <span className="font-semibold text-white ml-2">Did You Know?</span>
+      <CardFooter className="border-t border-white/10 pt-6">
+        <div className="grid grid-cols-[auto_1fr_auto] gap-6 items-center w-full">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30">
+              <Coffee className="h-4 w-4 text-purple-400" />
+            </div>
+            <span className="font-semibold text-white">Did You Know?</span>
           </div>
-          <span className="text-white/60">{props.takeaways.didYouKnow}</span>
-          <RefreshCcw className="h-4 w-4 text-white/60 cursor-pointer" />
+          <span className="text-white/70 text-sm leading-relaxed">
+            {props.takeaways.didYouKnow}
+          </span>
+          <RefreshCcw className="h-4 w-4 text-white/60 cursor-pointer hover:text-white/80 transition-colors" />
         </div>
       </CardFooter>
     </Card>
@@ -142,24 +196,54 @@ type SectionProps = {
 function Section(props: SectionProps) {
   const { icon, title } = props;
   return (
-    <div className="space-y-2">
-      <h3 className="text-lg font-semibold flex items-center text-white">
-        {icon}
-        <span className="ml-2">{title}</span>
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold flex items-center gap-3 text-white">
+        <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30">
+          {icon}
+        </div>
+        <span>{title}</span>
       </h3>
       {props.content ? (
-        props.content
+        <div className="ml-11">{props.content}</div>
       ) : (
-        <div>
+        <div className="ml-11 space-y-3">
           {props.items?.map((item) =>
             typeof item === "string" ? (
-              <li key={item} className="text-sm ml-4 text-white/60">
-                {item}
-              </li>
+              <div key={item} className="text-sm text-white/70 leading-relaxed">
+                • {item}
+              </div>
             ) : (
-              <div key={item.key} className="flex justify-between text-sm space-y-2">
-                <span className="font-medium text-white/80">{item.key}</span>
-                <span className="text-white/60">{item.value}</span>
+              <div key={item.key} className="space-y-2">
+                <span className="font-medium text-white/80 text-sm block">
+                  {item.key}
+                </span>
+                {item.value.includes(",") ? (
+                  <div className="flex flex-wrap gap-2">
+                    {item.value.split(",").map((value, index) => {
+                      const trimmedValue = value.trim();
+                      return (
+                        <Badge
+                          key={index}
+                          variant="secondary"
+                          className="bg-white/10 text-white/90 px-3 py-1 text-xs border border-white/20 max-w-[140px]"
+                          title={trimmedValue}
+                        >
+                          <span className="truncate block min-w-0">
+                            {trimmedValue}
+                          </span>
+                        </Badge>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <Badge
+                    variant="secondary"
+                    className="bg-white/10 text-white/90 px-3 py-1 text-xs border border-white/20 w-fit max-w-[140px]"
+                    title={item.value}
+                  >
+                    <span className="truncate block min-w-0">{item.value}</span>
+                  </Badge>
+                )}
               </div>
             ),
           )}

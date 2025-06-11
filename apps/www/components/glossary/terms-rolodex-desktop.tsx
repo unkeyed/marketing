@@ -11,7 +11,10 @@ import { useState } from "react";
 export default function TermsRolodexDesktop({
   className,
   terms,
-}: { className?: string; terms: Array<Pick<Glossary, "slug" | "title">> }) {
+}: {
+  className?: string;
+  terms: Array<Pick<Glossary, "slug" | "title">>;
+}) {
   const params = useParams();
   const currentSlug = params.slug;
   if (typeof currentSlug !== "string") {
@@ -72,14 +75,16 @@ export default function TermsRolodexDesktop({
               key={`${term.slug}-${index}`}
               href={`/glossary/${term.slug}`}
               className={cn(
-                "flex items-center px-2 h-10 rounded-md text-white/60 hover:text-white text-sm font-normal transition-opacity duration-300",
+                "flex items-center px-4 py-2 h-10 rounded-md text-white/60 hover:text-white text-sm font-normal transition-opacity duration-300",
                 {
                   "text-white underline":
-                    index === Math.floor(visibleTerms.length / 2) && currentSlug !== term.slug,
-                  "text-white font-semibold border-l border-white rounded-none":
+                    index === Math.floor(visibleTerms.length / 2) &&
+                    currentSlug !== term.slug,
+                  "text-white font-semibold border-l-2 border-white rounded-none bg-white/5 pl-3":
                     currentSlug === term.slug,
                   "opacity-25":
-                    visibleTerms.length > 2 && (index === 0 || index === visibleTerms.length - 1),
+                    visibleTerms.length > 2 &&
+                    (index === 0 || index === visibleTerms.length - 1),
                 },
               )}
             >
