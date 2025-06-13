@@ -19,8 +19,7 @@ export default function TermsStepperMobile({
   const slugIndex = sortedTerms.findIndex((term) => term.slug === slug);
   const startIndex = slugIndex !== -1 ? slugIndex : 0;
   const currentTerm = sortedTerms[startIndex];
-  const previousTerm =
-    sortedTerms[(startIndex - 1 + sortedTerms.length) % sortedTerms.length];
+  const previousTerm = sortedTerms[(startIndex - 1 + sortedTerms.length) % sortedTerms.length];
   const nextTerm = sortedTerms[(startIndex + 1) % sortedTerms.length];
 
   return (
@@ -36,9 +35,7 @@ export default function TermsStepperMobile({
           </Link>
 
           <div className="text-center py-3 px-2">
-            <p className="font-medium text-sm text-white truncate">
-              {currentTerm.title}
-            </p>
+            <p className="font-medium text-sm text-white truncate">{currentTerm.title}</p>
           </div>
 
           <Link
