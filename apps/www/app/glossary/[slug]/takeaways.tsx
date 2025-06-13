@@ -1,13 +1,7 @@
 import type { Glossary } from "@/.content-collections/generated";
 import { Frame } from "@/components/frame";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AlertTriangle,
   BookOpen,
@@ -47,9 +41,7 @@ export default function Takeaways(props: Pick<Glossary, "term" | "takeaways">) {
   return (
     <Card className="w-full bg-white/5 shadow-[0_0_10px_rgba(255,255,255,0.1)] rounded-xl overflow-hidden relative border-white/20">
       <CardHeader className="border-white/20 pb-8">
-        <CardTitle className="text-2xl font-bold text-white">
-          {props.term}: Key Takeaways
-        </CardTitle>
+        <CardTitle className="text-2xl font-bold text-white">{props.term}: Key Takeaways</CardTitle>
       </CardHeader>
       <CardContent className="space-y-10 p-8">
         {/* Enhanced TL;DR Section */}
@@ -78,9 +70,7 @@ export default function Takeaways(props: Pick<Glossary, "term" | "takeaways">) {
               <div className="space-y-4">
                 {props.takeaways.definitionAndStructure.map((item) => (
                   <div key={item.key} className="space-y-2">
-                    <span className="font-medium text-white/80 text-sm block">
-                      {item.key}
-                    </span>
+                    <span className="font-medium text-white/80 text-sm block">{item.key}</span>
                     <div className="flex flex-wrap gap-2">
                       {item.value.split(",").map((value, _index) => {
                         const trimmedValue = value.trim();
@@ -91,9 +81,7 @@ export default function Takeaways(props: Pick<Glossary, "term" | "takeaways">) {
                             className="bg-white/10 text-white/90 px-3 py-1 text-xs font-mono border border-white/20 max-w-[280px]"
                             title={trimmedValue}
                           >
-                            <span className="truncate block min-w-0">
-                              {trimmedValue}
-                            </span>
+                            <span className="truncate block min-w-0">{trimmedValue}</span>
                           </Badge>
                         );
                       })}
@@ -211,9 +199,7 @@ function Section(props: SectionProps) {
               </div>
             ) : (
               <div key={item.key} className="space-y-2">
-                <span className="font-medium text-white/80 text-sm block">
-                  {item.key}
-                </span>
+                <span className="font-medium text-white/80 text-sm block">{item.key}</span>
                 {item.value.includes(",") ? (
                   <div className="flex flex-wrap gap-2">
                     {item.value.split(",").map((value, _index) => {
@@ -225,9 +211,7 @@ function Section(props: SectionProps) {
                           className="bg-white/10 text-white/90 px-3 py-1 text-xs border border-white/20 max-w-[280px]"
                           title={trimmedValue}
                         >
-                          <span className="truncate block min-w-0">
-                            {trimmedValue}
-                          </span>
+                          <span className="truncate block min-w-0">{trimmedValue}</span>
                         </Badge>
                       );
                     })}
