@@ -65,10 +65,7 @@ const Highlights: React.FC<{ className: string }> = ({ className }) => {
       xmlns="http://www.w3.org/2000/svg"
     >
       <g opacity="0.3">
-        <g
-          style={{ mixBlendMode: "lighten" }}
-          filter="url(#filter0_f_2076_3208)"
-        >
+        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter0_f_2076_3208)">
           <ellipse
             cx="574.307"
             cy="568.208"
@@ -79,10 +76,7 @@ const Highlights: React.FC<{ className: string }> = ({ className }) => {
             fillOpacity="0.5"
           />
         </g>
-        <g
-          style={{ mixBlendMode: "color-dodge" }}
-          filter="url(#filter1_f_2076_3208)"
-        >
+        <g style={{ mixBlendMode: "color-dodge" }} filter="url(#filter1_f_2076_3208)">
           <ellipse
             cx="468.5"
             cy="589.25"
@@ -93,10 +87,7 @@ const Highlights: React.FC<{ className: string }> = ({ className }) => {
             fillOpacity="0.5"
           />
         </g>
-        <g
-          style={{ mixBlendMode: "lighten" }}
-          filter="url(#filter2_f_2076_3208)"
-        >
+        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter2_f_2076_3208)">
           <ellipse
             cx="365.16"
             cy="517.917"
@@ -107,10 +98,7 @@ const Highlights: React.FC<{ className: string }> = ({ className }) => {
             fillOpacity="0.5"
           />
         </g>
-        <g
-          style={{ mixBlendMode: "lighten" }}
-          filter="url(#filter3_f_2076_3208)"
-        >
+        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter3_f_2076_3208)">
           <ellipse
             cx="417.083"
             cy="711.695"
@@ -121,10 +109,7 @@ const Highlights: React.FC<{ className: string }> = ({ className }) => {
             fillOpacity="0.5"
           />
         </g>
-        <g
-          style={{ mixBlendMode: "lighten" }}
-          filter="url(#filter4_f_2076_3208)"
-        >
+        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter4_f_2076_3208)">
           <ellipse
             cx="471.75"
             cy="470.5"
@@ -135,10 +120,7 @@ const Highlights: React.FC<{ className: string }> = ({ className }) => {
             fillOpacity="0.5"
           />
         </g>
-        <g
-          style={{ mixBlendMode: "lighten" }}
-          filter="url(#filter5_f_2076_3208)"
-        >
+        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter5_f_2076_3208)">
           <ellipse
             cx="472"
             cy="695"
@@ -149,10 +131,7 @@ const Highlights: React.FC<{ className: string }> = ({ className }) => {
             fillOpacity="0.5"
           />
         </g>
-        <g
-          style={{ mixBlendMode: "lighten" }}
-          filter="url(#filter6_f_2076_3208)"
-        >
+        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter6_f_2076_3208)">
           <ellipse
             cx="472"
             cy="787"
@@ -163,10 +142,7 @@ const Highlights: React.FC<{ className: string }> = ({ className }) => {
             fillOpacity="0.5"
           />
         </g>
-        <g
-          style={{ mixBlendMode: "lighten" }}
-          filter="url(#filter7_f_2076_3208)"
-        >
+        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter7_f_2076_3208)">
           <ellipse
             cx="472"
             cy="779.75"
@@ -189,16 +165,8 @@ const Highlights: React.FC<{ className: string }> = ({ className }) => {
           colorInterpolationFilters="sRGB"
         >
           <feFlood floodOpacity="0" result="BackgroundImageFix" />
-          <feBlend
-            mode="normal"
-            in="SourceGraphic"
-            in2="BackgroundImageFix"
-            result="shape"
-          />
-          <feGaussianBlur
-            stdDeviation="44.5"
-            result="effect1_foregroundBlur_2076_3208"
-          />
+          <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+          <feGaussianBlur stdDeviation="44.5" result="effect1_foregroundBlur_2076_3208" />
         </filter>
         <filter
           id="filter1_f_2076_3208"
@@ -210,16 +178,8 @@ const Highlights: React.FC<{ className: string }> = ({ className }) => {
           colorInterpolationFilters="sRGB"
         >
           <feFlood floodOpacity="0" result="BackgroundImageFix" />
-          <feBlend
-            mode="normal"
-            in="SourceGraphic"
-            in2="BackgroundImageFix"
-            result="shape"
-          />
-          <feGaussianBlur
-            stdDeviation="44.5"
-            result="effect1_foregroundBlur_2076_3208"
-          />
+          <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+          <feGaussianBlur stdDeviation="44.5" result="effect1_foregroundBlur_2076_3208" />
         </filter>
         <filter
           id="filter2_f_2076_3208"
@@ -231,16 +191,8 @@ const Highlights: React.FC<{ className: string }> = ({ className }) => {
           colorInterpolationFilters="sRGB"
         >
           <feFlood floodOpacity="0" result="BackgroundImageFix" />
-          <feBlend
-            mode="normal"
-            in="SourceGraphic"
-            in2="BackgroundImageFix"
-            result="shape"
-          />
-          <feGaussianBlur
-            stdDeviation="44.5"
-            result="effect1_foregroundBlur_2076_3208"
-          />
+          <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+          <feGaussianBlur stdDeviation="44.5" result="effect1_foregroundBlur_2076_3208" />
         </filter>
         <filter
           id="filter3_f_2076_3208"
@@ -252,16 +204,8 @@ const Highlights: React.FC<{ className: string }> = ({ className }) => {
           colorInterpolationFilters="sRGB"
         >
           <feFlood floodOpacity="0" result="BackgroundImageFix" />
-          <feBlend
-            mode="normal"
-            in="SourceGraphic"
-            in2="BackgroundImageFix"
-            result="shape"
-          />
-          <feGaussianBlur
-            stdDeviation="44.5"
-            result="effect1_foregroundBlur_2076_3208"
-          />
+          <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+          <feGaussianBlur stdDeviation="44.5" result="effect1_foregroundBlur_2076_3208" />
         </filter>
         <filter
           id="filter4_f_2076_3208"
@@ -273,16 +217,8 @@ const Highlights: React.FC<{ className: string }> = ({ className }) => {
           colorInterpolationFilters="sRGB"
         >
           <feFlood floodOpacity="0" result="BackgroundImageFix" />
-          <feBlend
-            mode="normal"
-            in="SourceGraphic"
-            in2="BackgroundImageFix"
-            result="shape"
-          />
-          <feGaussianBlur
-            stdDeviation="44.5"
-            result="effect1_foregroundBlur_2076_3208"
-          />
+          <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+          <feGaussianBlur stdDeviation="44.5" result="effect1_foregroundBlur_2076_3208" />
         </filter>
         <filter
           id="filter5_f_2076_3208"
@@ -294,16 +230,8 @@ const Highlights: React.FC<{ className: string }> = ({ className }) => {
           colorInterpolationFilters="sRGB"
         >
           <feFlood floodOpacity="0" result="BackgroundImageFix" />
-          <feBlend
-            mode="normal"
-            in="SourceGraphic"
-            in2="BackgroundImageFix"
-            result="shape"
-          />
-          <feGaussianBlur
-            stdDeviation="75"
-            result="effect1_foregroundBlur_2076_3208"
-          />
+          <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+          <feGaussianBlur stdDeviation="75" result="effect1_foregroundBlur_2076_3208" />
         </filter>
         <filter
           id="filter6_f_2076_3208"
@@ -315,16 +243,8 @@ const Highlights: React.FC<{ className: string }> = ({ className }) => {
           colorInterpolationFilters="sRGB"
         >
           <feFlood floodOpacity="0" result="BackgroundImageFix" />
-          <feBlend
-            mode="normal"
-            in="SourceGraphic"
-            in2="BackgroundImageFix"
-            result="shape"
-          />
-          <feGaussianBlur
-            stdDeviation="75"
-            result="effect1_foregroundBlur_2076_3208"
-          />
+          <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+          <feGaussianBlur stdDeviation="75" result="effect1_foregroundBlur_2076_3208" />
         </filter>
         <filter
           id="filter7_f_2076_3208"
@@ -336,16 +256,8 @@ const Highlights: React.FC<{ className: string }> = ({ className }) => {
           colorInterpolationFilters="sRGB"
         >
           <feFlood floodOpacity="0" result="BackgroundImageFix" />
-          <feBlend
-            mode="normal"
-            in="SourceGraphic"
-            in2="BackgroundImageFix"
-            result="shape"
-          />
-          <feGaussianBlur
-            stdDeviation="75"
-            result="effect1_foregroundBlur_2076_3208"
-          />
+          <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+          <feGaussianBlur stdDeviation="75" result="effect1_foregroundBlur_2076_3208" />
         </filter>
         <linearGradient
           id="paint0_linear_2076_3208"
