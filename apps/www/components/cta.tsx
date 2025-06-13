@@ -1,3 +1,4 @@
+"use client";
 import { SectionTitle } from "@/components/section";
 import { track } from "@vercel/analytics/server";
 import { CalendarDays, ChevronRight } from "lucide-react";
