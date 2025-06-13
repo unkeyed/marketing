@@ -1,4 +1,5 @@
 import { SectionTitle } from "@/components/section";
+import { track } from "@vercel/analytics/server";
 import { CalendarDays, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
@@ -23,10 +24,23 @@ export const CTA: React.FC = () => {
               target="_blank"
               href="https://cal.com/team/unkey/user-interview?utm_source=banner&utm_campaign=oss"
             >
-              <SecondaryButton label="Chat with us" IconRight={CalendarDays} />
+              <SecondaryButton
+                onClick={async () => {
+                  await track("chat");
+                }}
+                label="Chat with us"
+                IconRight={CalendarDays}
+              />
             </Link>
             <Link href="https://app.unkey.com">
-              <PrimaryButton shiny label="Start Now" IconRight={ChevronRight} />
+              <PrimaryButton
+                onClick={async () => {
+                  await track("sign up", { location: "CTA" });
+                }}
+                shiny
+                label="Start Now"
+                IconRight={ChevronRight}
+              />
             </Link>
           </div>
         </SectionTitle>

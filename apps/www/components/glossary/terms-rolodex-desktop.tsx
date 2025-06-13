@@ -78,13 +78,11 @@ export default function TermsRolodexDesktop({
                 "flex items-center px-4 py-2 h-10 rounded-md text-white/60 hover:text-white text-sm font-normal transition-opacity duration-300",
                 {
                   "text-white underline":
-                    index === Math.floor(visibleTerms.length / 2) &&
-                    currentSlug !== term.slug,
+                    index === Math.floor(visibleTerms.length / 2) && currentSlug !== term.slug,
                   "text-white font-semibold border-l-2 border-white rounded-none bg-white/5 pl-3":
                     currentSlug === term.slug,
                   "opacity-25":
-                    visibleTerms.length > 2 &&
-                    (index === 0 || index === visibleTerms.length - 1),
+                    visibleTerms.length > 2 && (index === 0 || index === visibleTerms.length - 1),
                 },
               )}
             >

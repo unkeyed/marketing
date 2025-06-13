@@ -7,6 +7,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
+import { track } from "@vercel/analytics";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import Link from "next/link";
@@ -67,10 +68,21 @@ export function Navigation() {
               label="Create Account"
               IconRight={ChevronRight}
               className="h-8 text-sm"
+              onClick={async () => {
+                track("signup", { location: "navigation" });
+              }}
             />
           </Link>
           <Link href="https://app.unkey.com">
-            <PrimaryButton shiny label="Sign In" IconRight={ChevronRight} className="h-8" />
+            <PrimaryButton
+              shiny
+              label="Sign In"
+              IconRight={ChevronRight}
+              className="h-8"
+              onClick={async () => {
+                track("signin", { location: "navigation" });
+              }}
+            />
           </Link>
         </div>
       </div>
@@ -145,6 +157,9 @@ function MobileLinks({ className }: { className?: string }) {
                 label="Sign In"
                 IconRight={ChevronRight}
                 className="flex justify-center w-full text-center"
+                onClick={async () => {
+                  track("signin", { location: "navigation-mobile" });
+                }}
               />
             </Link>
             <button
