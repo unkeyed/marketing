@@ -14,13 +14,30 @@
   - ❌ `AbortTaskRunError: Keyword research failed for term: RESTful API`
 
 ## 2. Reproduction
-- [ ] Run MCP locally with input `{ "term": "RESTful API", "onCacheHit": "revalidate" }`
-- [ ] Observe logs and confirm failure at keyword research step
-- [ ] Run keyword research task in isolation with same input
-- [ ] Document exact error and stack trace
+- [x] Run MCP locally with input `{ "term": "RESTful API", "onCacheHit": "revalidate" }`
+  - MCP server started successfully using `pnpm -F generator dev:mcp`.
+- [x] Run keywordResearchTask regression test in isolation (via MCP CLI/code, not UI)
+  - Test triggered as `keyword_research_regression_test` using MCP.
+- [x] Observe logs and confirm failure at keyword research step
+  - Failure confirmed. The test failed as expected, reproducing the bug.
+- [x] Document exact error and stack trace
+  - **Error:** `TypeError: value.toISOString is not a function`
+  - **Stacktrace:**
+    ```
+    TypeError: value.toISOString is not a function
+        at MySqlTimestamp.mapToDriverValue (.../chunk-M4CJJIEQ.mjs:3017:18)
+        at .../chunk-M4CJJIEQ.mjs:904:73
+        at Array.map (<anonymous>)
+        at _SQL.buildQueryFromSourceParams (.../chunk-M4CJJIEQ.mjs:846:32)
+        ...
+    ```
+  - The error occurs during the processing of a URL (e.g., https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design) in the keyword research step.
+
+**Next step:** Begin static and dynamic debugging to identify the root cause of the `toISOString` error in the workflow.
 
 ## 3. Write Failing Test
-- [ ] Add regression test for `keywordResearchTask` with input `RESTful API`
+- [x] Add regression test for `keywordResearchTask` with input `RESTful API`
+  - Regression test added to `_keyword-research-test.ts`.
 - [ ] Confirm test fails as expected
 
 ## 4. Debugging
@@ -46,4 +63,6 @@
 ---
 
 ### Context Log
-- (Add notes, logs, and findings here as you progress) 
+- MCP server started successfully (v4-beta.21) using `pnpm -F generator dev:mcp`.
+- **Known Error:** Running `pnpm -F generator dev` will fail with a CLI version mismatch error because it uses the latest Trigger.dev CLI, not the v4 beta required for MCP. Always use `pnpm -F generator dev:mcp` for MCP testing as per the troubleshooting section of @testing-workflows.mdc.
+- Regression test for RESTful API input added to `_keyword-research-test.ts`. 
