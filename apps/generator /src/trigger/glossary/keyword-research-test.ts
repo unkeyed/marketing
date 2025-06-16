@@ -8,26 +8,15 @@ const regressionTestCases: TestCase<typeof keywordResearchTask>[] = [
       term: "RESTful API",
     },
     validate(result) {
-      // Expecting an error result for now (should be updated to expect success after fix)
-      const validation = errorResultSchema.safeParse(result);
-      if (!validation.success) {
-        console.info(
-          `Test '${this.name}' failed. Expected an error result, but got: ${JSON.stringify(result)}`,
+      if (!result.ok) {
+        console.warn(
+          `Test '${this.name}' failed. Expected a successful result, but got: ${JSON.stringify(result)}`,
         );
         return false;
       }
-      // Optionally, check for specific error message
-      const error = validation.data.error;
-      if (typeof error !== "object" || !error || !("message" in error)) {
+      if (!result.output || !Array.isArray(result.output.keywords) || result.output.keywords.length === 0) {
         console.warn(
-          `Test '${this.name}' failed. Expected error to have a message property, but got: ${JSON.stringify(error)}`,
-        );
-        return false;
-      }
-      const message = (error as { message: unknown }).message;
-      if (typeof message !== "string" || !message.includes("Keyword research failed")) {
-        console.warn(
-          `Test '${this.name}' failed. Expected error message to include 'Keyword research failed', but got: ${message}`,
+          `Test '${this.name}' failed. Expected non-empty keywords array, but got: ${JSON.stringify(result.output)}`,
         );
         return false;
       }
