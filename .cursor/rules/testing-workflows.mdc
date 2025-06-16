@@ -146,4 +146,19 @@ Error: Please update your CLI. Alternatively, use `--skip-update-check` at your 
 **Solution:**
 - Always use `pnpm -F generator dev:mcp` for MCP testing. This uses the correct CLI version compatible with MCP and avoids the version mismatch error.
 
+### Ping Timeout During MCP Runs
+
+**Error:**
+```
+○ Connection was lost: ping timeout
+○ Connection was restored
+```
+
+**Cause:**
+- The connection to the local Trigger.dev MCP server was lost, often due to a network hiccup or the MCP process being interrupted.
+
+**Solution:**
+- Restart the Trigger.dev MCP server. Ask the user to run `pnpm -F generator dev:mcp` again to restore the connection.
+- After restarting, re-run your workflow or test.
+
 
