@@ -8,7 +8,7 @@
     "init": "pnpm dlx trigger.dev@latest init",
     "dev": "pnpm dlx trigger.dev@latest dev",
     "dev:mcp": "pnpm dlx trigger.dev@v4-beta dev --mcp",
-    "trigger:deploy": "pnpm dlx trigger.dev@latest deploy --skip-update-check",
+    "trigger:deploy": "pnpm dlx trigger.dev@v4-beta deploy --skip-update-check",
     "db:push": "dotenv -e .env drizzle-kit push",
     "db:studio": "dotenv -e .env drizzle-kit studio --verbose",
     "db:generate": "dotenv -e .env drizzle-kit generate",
