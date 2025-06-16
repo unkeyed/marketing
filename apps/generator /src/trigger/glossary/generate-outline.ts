@@ -193,6 +193,11 @@ export const generateOutlineTask = task({
       outlineToRefine: seoOptimizedOutline.object.outline,
       reviewReport: editorialEval.output,
     });
+    console.info(
+      `Step 9/9 - EDITORIAL OPTIMIZED OUTLINE RESULT: ${JSON.stringify(
+        editorialOptimizedOutline.object.outline,
+      )}`,
+    );
 
     // persist to db as a new entry by with their related entities
     const sectionInsertionPayload = editorialOptimizedOutline.object.outline.map((section) =>
@@ -217,7 +222,7 @@ export const generateOutlineTask = task({
           (seoKeyword) => keyword.keyword === seoKeyword.keyword,
         )?.id;
         if (!keywordId) {
-          console.warn(`Keyword "${keyword.keyword}" not found in seo keywords`);
+          console.warn(`Keyword "${keyword.keyword}" not found in seo keywords for keyword ${keyword.keyword}`);
           continue;
         }
         const payload = insertSectionsToKeywordsSchema.parse({
@@ -432,6 +437,7 @@ async function reviseEditorialOutline({
   outlineToRefine: z.infer<typeof initialOutlineSchema>["outline"];
   reviewReport: TaskOutput<typeof performEditorialEvalTask>;
 }) {
+  console.info(`[DEBUG] Revising editorial outline for term "${term}"`);
   const editorialRevisionSystem = `
   You are a **Senior Editor & Content Strategist** with extensive experience in creating engaging and accurate technical content for API development and computer science audiences.
 
@@ -470,5 +476,10 @@ async function reviseEditorialOutline({
     system: editorialRevisionSystem,
     prompt: editorialRevisionPrompt,
     schema: finalOutlineSchema,
+    experimental_telemetry: {
+      functionId: "reviseEditorialOutline",
+      recordInputs: true,
+      recordOutputs: true,
+    },
   });
 }
