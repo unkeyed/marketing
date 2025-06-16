@@ -35,6 +35,7 @@ export async function getOrCreateFirecrawlResponse(args: {
           sourceUrl: args.url,
           error: firecrawlResult.error || "Unknown error occurred",
           success: false,
+          inputTerm: args.connectTo.term || "",
         })
         .onDuplicateKeyUpdate({
           set: {
