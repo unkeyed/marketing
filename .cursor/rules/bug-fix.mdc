@@ -19,7 +19,7 @@ Streamline bug fixing workflow from issue creation to pull request.
 2. Write failing test that demonstrates the bug
 3. Pinpoint the error
    - Add debug logs for every step to verify the latest log you can see to pinpoint the error
-   - use `[debug: ${branchName.slice(0,5)}]` for the debug logs, so that you can easily remove them afterwards
+   - use the format: `[debug: ${branchName.slice(0,5)}]` for the debug logs, so that you can easily remove them afterwards
 3. Implement the fix
    - formulate a hypthesis first
    - then apply your changes that addresses that fix
