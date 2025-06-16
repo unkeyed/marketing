@@ -121,4 +121,29 @@ export const keywordResearchTest = createTestRunner({
 - The test runner will handle progress tracking, result reporting, and cleanup as part of the workflow.
 - Don't use the file naming convention `*.test.ts` as that's not supported either, use `-test.ts` instead
 
+## Troubleshooting: Known Errors
+
+### CLI Version Mismatch When Running `pnpm -F generator dev`
+
+**Error:**
+```
+Error: Some of the installed @trigger.dev packages are newer than your CLI version
+
+Versions
+┌──────────────────┬──────────────────┬────────┐
+│ package          │ installed        │ CLI    │
+├──────────────────┼──────────────────┼────────┤
+│ @trigger.dev/sdk │ 4.0.0-v4-beta.21 │ 3.3.17 │
+└──────────────────┴──────────────────┴────────┘
+
+CLI update required!
+Error: Please update your CLI. Alternatively, use `--skip-update-check` at your own risk.
+```
+
+**Cause:**
+- This happens when running `pnpm -F generator dev`, which uses the latest Trigger.dev CLI, not the v4 beta required for MCP.
+
+**Solution:**
+- Always use `pnpm -F generator dev:mcp` for MCP testing. This uses the correct CLI version compatible with MCP and avoids the version mismatch error.
+
 

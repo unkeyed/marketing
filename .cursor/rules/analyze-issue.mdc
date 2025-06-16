@@ -41,6 +41,14 @@ What won't be addressed in this implementation
 
 ## Process:
 1. Fetch issue details using `gh issue view <issue_number>`
+    - Usage:  `gh issue view {<number> | <url>} [flags]`
+    - Flags:
+        -c, --comments          View issue comments
+        -q, --jq expression     Filter JSON output using a jq expression
+            --json fields       Output JSON with the specified fields
+        -t, --template string   Format JSON output using a Go template; see "gh help formatting"
+        -w, --web               Open an issue in the browser
+    - Never use a flag that's not reported as the flags from the CLI
 2. Review related code and project structure
 3. Analyze requirements thoroughly
 4. Create detailed technical specification
