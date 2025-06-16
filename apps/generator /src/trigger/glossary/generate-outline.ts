@@ -222,7 +222,9 @@ export const generateOutlineTask = task({
           (seoKeyword) => keyword.keyword === seoKeyword.keyword,
         )?.id;
         if (!keywordId) {
-          console.warn(`Keyword "${keyword.keyword}" not found in seo keywords for keyword ${keyword.keyword}`);
+          console.warn(
+            `Keyword "${keyword.keyword}" not found in seo keywords for keyword ${keyword.keyword}`,
+          );
           continue;
         }
         const payload = insertSectionsToKeywordsSchema.parse({

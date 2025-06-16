@@ -1,4 +1,4 @@
-import { type TestCase, createTestRunner, errorResultSchema } from "@/lib/test";
+import { type TestCase, createTestRunner } from "@/lib/test";
 import { keywordResearchTask } from "./keyword-research";
 
 const regressionTestCases: TestCase<typeof keywordResearchTask>[] = [
@@ -14,7 +14,11 @@ const regressionTestCases: TestCase<typeof keywordResearchTask>[] = [
         );
         return false;
       }
-      if (!result.output || !Array.isArray(result.output.keywords) || result.output.keywords.length === 0) {
+      if (
+        !result.output ||
+        !Array.isArray(result.output.keywords) ||
+        result.output.keywords.length === 0
+      ) {
         console.warn(
           `Test '${this.name}' failed. Expected non-empty keywords array, but got: ${JSON.stringify(result.output)}`,
         );
@@ -32,4 +36,4 @@ export const keywordResearchRegressionTest = createTestRunner({
   testCases: regressionTestCases,
 });
 
-export default keywordResearchRegressionTest; 
+export default keywordResearchRegressionTest;
