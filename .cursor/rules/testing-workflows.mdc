@@ -1,0 +1,164 @@
+---
+description: Guidelines for testing `apps/generator ` workflows
+globs: 
+alwaysApply: false
+---
+## Your Task
+
+Test the "generate_glossary_entry" trigger.dev task located inside @_generate-glossary-entry.ts. Test it by using the Trigger.dev MCP locally. 
+Document the process, results, and troubleshooting in a structured, traceable way.
+
+**1. Static Analysis (First Step)**
+Analyze the workflow code (@_generate-glossary-entry.ts):
+
+- Map out workflow steps and all console.log, console.info, and console.error statements.
+- Identify the expected sequence of log messages and the structure of the final return value.
+- Add a section to this Progress Tracker summarizing the workflow steps and expected log messages/outputs.
+- Reference `apps/generator /readme.md` for additional workflow context if needed.
+
+
+**2. Progress Tracker (This Home File)**
+Create an .md file.
+This file is the Home for the task.
+Track:
+- Static analysis (expected workflow steps, logs, and outputs).
+- The input you plan to use for the workflow (e.g., generate_glossary_entry with a specific - inputTerm and tags).
+- The run_id received from the MCP when triggering the workflow.
+- The progress of polling, including which step/log message you are currently at, and any errors - or completion status.
+- The final output/result from the workflow (as returned by the MCP).
+- All references, documentation, and troubleshooting steps.
+- For every expected console log message from the static analysis that you can confirm in the trigger MCP logs or output, add a sub bullet point to the static analysis' log entry to mark it as successfull or erroneous with the markdown check mark and an appropriate emoji at the end of line.
+
+**3. MCP Call Log (.log file)**
+Create a .log file next to the progress tracker .md file you created.
+Progress to trace:
+- Every MCP call made (e.g., list-tasks, trigger-task, get-run, get-run-logs).
+- The input parameters and the full response for each call.
+- Timestamps for each call for traceability.
+
+**4. Execution, Polling, and Self-Healing**
+- Trigger the workflow using the MCP, record the input and run_id.
+- Poll the run logs using the MCP:
+  - Continue polling until the workflow finishes successfully or fails.
+  - For each log entry, compare it to the expected log messages from your static analysis to   - determine the current workflow step.
+  - If an error is encountered, record it and stop polling.
+  - If the workflow completes, record the final output.
+
+
+**Autonomy & Troubleshooting:**
+- **If you encounter an error from the tested trigger workflow (e.g., AbortTaskRun):**
+  - Gather all possible context from the files you have at your disposal, including the logs, your progress tracker, and the trigger MCP logs.
+  - Write a GitHub issue that an engineer can use to fix the task, including all necessary context (error details, logs, steps to reproduce, etc.).
+  - Use the GitHub MCP to post the GitHub issue automatically.
+  - Document the error and the GitHub issue link in the troubleshooting section of this rule.
+  - The GitHub issue should consist of a "Issue Summary" (A summary of the issue. This needs to be a clear detailed-rich summary), "Steps to Reproduce", "Expected behavior" & optionally a "Other information".
+    - The "Steps to Reproduce" should contain a section for reproduction for humans and agents. 
+      -> Agents use the local MCP testing setup explained inside .cursor/rules/testing-workflows.mdc
+      -> Humans should run the trigger.dev locally by running "pnpm -F generator dev", then copy the JSON input provided and head to the URL `https://cloud.trigger.dev/orgs/unkey-9e78/projects/billing-IzvK/env/dev/test/tasks/<taskname:generate_glossary_entry>`. Write the URL so that you replace the `taskname` with the appropriate task name to reproduce the error.
+  - If there's a faulty sub-task, ensure to *also* outline reproduction steps to test the isolated sub-task in question by providing the input as JSON and the URL as above with the updated taskname
+- **If you encounter an error from the setup:**
+  - Check the rules, errors, and troubleshooting guidelines in this file.
+  - If it is a known error, attempt to self-heal (e.g., restart services, fix configuration, etc.).
+    - If you successfully fix the error, document both the error and the fix in the troubleshooting section of this rule for future reference.
+  - If it is an unknown or unexpected error, escalate it to the user here and abort your task. Clearly communicate the error, what you tried, and why escalation is necessary.
+
+**Reference**
+- Use apps/generator /readme.md for additional context about the workflow, task structure, and expected behavior.
+
+## Custom Trigger.dev Test Runner (No Jest/Vitest/Mocha)
+
+- **Do NOT use vitest, jest, or mocha** for trigger workflow tests. These are not supported in this codebase for workflow testing.
+- Instead, use the custom test runner utilities exported from `apps/generator /src/lib/test/index.ts`.
+- Define test cases as objects and register them with a trigger task using the provided helpers.
+- This wraps each test in a trigger task run, so you can run the test files as regular trigger.dev workflows.
+- For agents: run tests via MCP (see above for MCP instructions).
+- For humans: use the Trigger.dev cloud testing pane (see referenced URL in this rule).
+- This approach enables autonomous, workflow-native test execution and progress tracking, and works around the lack of support for traditional test runners.
+
+## Example: Writing a Trigger.dev Workflow Test
+
+Suppose you want to test a task called `keywordResearchTask` in `keyword-research.ts`:
+
+1. **Import the test runner and your task:**
+
+```ts
+import { createTestRunner } from "@/lib/test";
+import { keywordResearchTask } from "./keyword-research";
+```
+
+2. **Define your test cases as objects:**
+
+```ts
+const testCases = [
+  {
+    name: "Fails for RESTful API",
+    input: { term: "RESTful API" },
+    validate: (result) => {
+      // Example: expect an error or specific output
+      return result && result.error && /Keyword research failed/.test(result.error.message);
+    },
+  },
+  // Add more test cases as needed
+];
+```
+
+3. **Register the test runner as a trigger task:**
+
+```ts
+export const keywordResearchTest = createTestRunner({
+  id: "keyword-research-test",
+  task: keywordResearchTask,
+  testCases,
+});
+```
+
+4. **Run the test as a workflow:**
+- For agents: trigger the test via MCP (see above for instructions)
+- For humans: use the Trigger.dev cloud testing pane and select the test task
+
+**Note:**
+- All test logic must be wrapped in this pattern—do not use describe/it/expect from jest/vitest/mocha.
+- The test runner will handle progress tracking, result reporting, and cleanup as part of the workflow.
+- Don't use the file naming convention `*.test.ts` as that's not supported either, use `-test.ts` instead
+
+## Troubleshooting: Known Errors
+
+### CLI Version Mismatch When Running `pnpm -F generator dev`
+
+**Error:**
+```
+Error: Some of the installed @trigger.dev packages are newer than your CLI version
+
+Versions
+┌──────────────────┬──────────────────┬────────┐
+│ package          │ installed        │ CLI    │
+├──────────────────┼──────────────────┼────────┤
+│ @trigger.dev/sdk │ 4.0.0-v4-beta.21 │ 3.3.17 │
+└──────────────────┴──────────────────┴────────┘
+
+CLI update required!
+Error: Please update your CLI. Alternatively, use `--skip-update-check` at your own risk.
+```
+
+**Cause:**
+- This happens when running `pnpm -F generator dev`, which uses the latest Trigger.dev CLI, not the v4 beta required for MCP.
+
+**Solution:**
+- Always use `pnpm -F generator dev:mcp` for MCP testing. This uses the correct CLI version compatible with MCP and avoids the version mismatch error.
+
+### Ping Timeout During MCP Runs
+
+**Error:**
+```
+○ Connection was lost: ping timeout
+○ Connection was restored
+```
+
+**Cause:**
+- The connection to the local Trigger.dev MCP server was lost, often due to a network hiccup or the MCP process being interrupted.
+
+**Solution:**
+- Restart the Trigger.dev MCP server. Ask the user to run `pnpm -F generator dev:mcp` again to restore the connection.
+- After restarting, re-run your workflow or test.
+
+
