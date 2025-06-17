@@ -1,7 +1,7 @@
 ---
 title: December 5th Changelog
-date: 2024-12-05,
-description: Python SDK, Identities, Ratelimit Overrides 
+date: 2024-12-05
+description: Python SDK, Identities, Ratelimit Overrides
 tags: ["product"]
 ---
 
@@ -56,15 +56,15 @@ if res.object is not None:
     pass
 ```
 
-I want to thank [Jonxslays](https://twitter.com/jonxslays) for his community SDK, which allowed developers to get started immediately and provided Unkey with the `unkey.py` name.  
+I want to thank [Jonxslays](https://twitter.com/jonxslays) for his community SDK, which allowed developers to get started immediately and provided Unkey with the `unkey.py` name.
 
-## Identities 
+## Identities
 
 Until today, you had the option to assign an owner to your keys, allowing you to filter keys by a specific owner. This was useful for fetching keys by user or organization via the API, but it didn't provide any additional functionality.
 
 With Identities, you can now group keys together and share metadata and rate limits across them.
 
-For example, we have a company named ACME Corp, which has the enterprise tier and access to our GPT-4o wrapper, with a per-day token limit. So first, we create the identity with the limits: 
+For example, we have a company named ACME Corp, which has the enterprise tier and access to our GPT-4o wrapper, with a per-day token limit. So first, we create the identity with the limits:
 
 ```curl
 curl --request POST \
@@ -138,9 +138,9 @@ The API will return details about the key:
 }
 ```
 
-## Ratelimit Overrides 
+## Ratelimit Overrides
 
-When we introduced standalone ratelimiting, we included a feature allowing custom overrides without needing to deploy user code. This feature was originally only available via the Unkey dashboard. This month, we introduced the ability to create, update, delete, and list overrides via our API; this unlocks the ability to integrate this into support tooling or back office tools. 
+When we introduced standalone ratelimiting, we included a feature allowing custom overrides without needing to deploy user code. This feature was originally only available via the Unkey dashboard. This month, we introduced the ability to create, update, delete, and list overrides via our API; this unlocks the ability to integrate this into support tooling or back office tools.
 
 ```curl
 curl --request POST \
@@ -156,9 +156,9 @@ curl --request POST \
 }'
 ```
 
-You can see how to implement them into your tooling in our [API reference](https://www.unkey.com/docs/api-reference/ratelimits/set-override). 
+You can see how to implement them into your tooling in our [API reference](https://www.unkey.com/docs/api-reference/ratelimits/set-override).
 
 ## Content
 
-- [Learn by building](https://www.unkey.com/blog/learn-by-building) - Michael Silva 
+- [Learn by building](https://www.unkey.com/blog/learn-by-building) - Michael Silva
 - [Improve Authentication UX](https://www.unkey.com/blog/improve-auth-experience) - James Perkins

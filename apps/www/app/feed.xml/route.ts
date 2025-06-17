@@ -4,8 +4,8 @@ import RSS from "rss";
 const feed = new RSS({
   title: "Unkey",
   description: "Open Source API Development platform",
-  site_url: "https://unkey.com",
-  feed_url: "https://unkey.com/feed.xml",
+  site_url: "https://www.unkey.com",
+  feed_url: "https://www.unkey.com/feed.xml",
   copyright: `${new Date().getFullYear()} Unkey`,
   language: "en",
   pubDate: new Date(),
@@ -20,8 +20,8 @@ export async function GET() {
     const author = authors[post.author];
     feed.item({
       title: post.title,
-      guid: `https://unkey.com/blog/${post.slug}`,
-      url: `https://unkey.com/blog/${post.slug}`,
+      guid: `https://www.unkey.com/blog/${post.slug}`,
+      url: `https://www.unkey.com/blog/${post.slug}`,
       date: post.date,
       description: post.description,
       author: author.name,

@@ -2,7 +2,7 @@ import { allChangelogs, allGlossaries, allPolicies, allPosts } from "content-col
 import type { Changelog, Glossary, Policy, Post } from "content-collections";
 import type { MetadataRoute } from "next";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://unkey.com";
+  const baseUrl = "https://www.unkey.com";
 
   const posts: MetadataRoute.Sitemap = allPosts.map((post: Post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
@@ -25,31 +25,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     {
-      url: "https://unkey.com",
+      url: "https://www.unkey.com",
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 1,
     },
     {
-      url: "https://unkey.com/about",
+      url: "https://www.unkey.com/about",
       lastModified: new Date(),
       changeFrequency: "yearly",
       priority: 0.6,
     },
     {
-      url: "https://unkey.com/blog",
+      url: "https://www.unkey.com/blog",
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 1,
     },
     {
-      url: "https://unkey.com/changelog",
+      url: "https://www.unkey.com/changelog",
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 1,
     },
     {
-      url: "https://unkey.com/glossary",
+      url: "https://www.unkey.com/glossary",
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 1,
