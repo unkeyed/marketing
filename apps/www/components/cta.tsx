@@ -1,4 +1,6 @@
+"use client";
 import { SectionTitle } from "@/components/section";
+import { track } from "@vercel/analytics/server";
 import { CalendarDays, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
@@ -21,11 +23,19 @@ export const CTA: React.FC = () => {
           <div className="flex flex-col items-center justify-center gap-6 mt-2 sm:mt-5 sm:flex-row">
             <Link
               target="_blank"
+              onClick={async () => {
+                await track("chat");
+              }}
               href="https://cal.com/team/unkey/user-interview?utm_source=banner&utm_campaign=oss"
             >
               <SecondaryButton label="Chat with us" IconRight={CalendarDays} />
             </Link>
-            <Link href="https://app.unkey.com">
+            <Link
+              onClick={async () => {
+                await track("sign up", { location: "CTA" });
+              }}
+              href="https://app.unkey.com"
+            >
               <PrimaryButton shiny label="Start Now" IconRight={ChevronRight} />
             </Link>
           </div>

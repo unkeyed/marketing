@@ -112,8 +112,8 @@ export function GlossaryClient() {
           </Link>
         </div>
       </Container>
-      <div className="container mx-auto mt-18 overflow-hidden text-white">
-        <div className="mb-24 grid grid-cols-1 gap-4 md:gap-8 pb-24 lg:grid-cols-[15rem_1fr] xl:grid-cols-[15rem_1fr_15rem]">
+      <div className="max-w-[1600px] mx-auto mt-18 overflow-hidden text-white px-4 sm:px-6 lg:px-8">
+        <div className="mb-24 grid grid-cols-1 gap-8 md:gap-12 lg:gap-16 pb-24 lg:grid-cols-[20rem_1fr]">
           {/* Left Sidebar */}
           <div>
             <h2 className="w-full mb-4 font-semibold text-left blog-heading-gradient">
@@ -121,11 +121,11 @@ export function GlossaryClient() {
             </h2>
             <FilterableCommand
               placeholder="Search"
-              className="rounded-lg mb-4 border-[.75px] border-white/20 lg:w-[232px]"
+              className="rounded-lg mb-4 border-[.75px] border-white/20 lg:w-[300px]"
               terms={allGlossaries}
             />
           </div>
-          <div className="col-span-2">
+          <div className="col-span-1">
             <div className="justify-between flex border-b border-white/10 pb-8 mb-8">
               {alphabet.map((letter) =>
                 groupedTerms[letter]?.length > 0 ? (

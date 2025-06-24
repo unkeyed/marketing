@@ -1,6 +1,6 @@
+import { Analytics } from "@vercel/analytics/next";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
-import { CSPostHogProvider } from "./providers";
 
 import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
@@ -18,13 +18,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={cn("dark", GeistSans.className)}>
-      <CSPostHogProvider>
-        <body className="w-full bg-black text-[#E2E2E2]">
-          {children}
-
-          <Toaster duration={7_000} />
-        </body>
-      </CSPostHogProvider>
+      <body className="w-full bg-black text-[#E2E2E2]">
+        {children}
+        <Analytics />
+        <Toaster duration={7_000} />
+      </body>
     </html>
   );
 }

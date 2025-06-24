@@ -4,7 +4,7 @@ import { openai } from "@ai-sdk/openai";
 import { task } from "@trigger.dev/sdk/v3";
 import { generateObject } from "ai";
 import { eq } from "drizzle-orm";
-import { entries, firecrawlResponses } from "../../lib/db-marketing/schemas";
+import { entries, exaScrapedResults } from "../../lib/db-marketing/schemas";
 import type { CacheStrategy } from "./_generate-glossary-entry";
 
 export const contentTakeawaysTask = task({
@@ -33,13 +33,25 @@ export const contentTakeawaysTask = task({
     }
 
     // Get scraped content for context
-    const scrapedContent = await db.query.firecrawlResponses.findMany({
-      where: eq(firecrawlResponses.inputTerm, term),
+    const scrapedContent = await db.query.exaScrapedResults.findMany({
+      where: eq(exaScrapedResults.inputTerm, term),
       columns: {
-        markdown: true,
+        text: true,
         summary: true,
+        url: true,
+        domainCategory: true,
       },
     });
+
+    // group the scrpaedContent by its domainCategory
+    const groupedScrapedContent = scrapedContent.reduce(
+      (acc, content) => {
+        acc[content.domainCategory] = acc[content.domainCategory] || [];
+        acc[content.domainCategory].push(content);
+        return acc;
+      },
+      {} as Record<string, typeof scrapedContent>,
+    );
 
     const takeaways = await generateObject({
       model: openai("gpt-4"),
@@ -53,8 +65,14 @@ export const contentTakeawaysTask = task({
       prompt: `
         Term: "${term}"
         
-        Scraped content summaries:
-        ${scrapedContent.map((content) => content.summary).join("\n\n")}
+        ## Scraped Content summaries
+        We have ${Object.keys(groupedScrapedContent).length} domain categories with URLs for each.
+
+        ${Object.entries(groupedScrapedContent)
+          .map(([domainCategory, contents]) => {
+            return `### Domain category: ${domainCategory}\n${contents.map((content) => `- ${content.url}: ${content.summary}`).join("\n\n")}`;
+          })
+          .join("\n\n")}
         
         Create structured takeaways covering:
         1. TLDR (brief, clear definition)
@@ -88,11 +106,20 @@ export const contentTakeawaysTask = task({
            
         4. Usage in APIs (max 3 concise sentences covering essential terms and main use cases)
         5. Best practices (only the 3 most important and widely-used practices)
-        6. Recommended reading (key resources)
+        6. Recommended reading
+           - Choose 1 key resources each from Domain Categories: "Official", "Community", "Neutral" and "Google"
+           - Choose the key resource that's most relevant to an API developer and at the same time the most authoritative and neutral one
+           - Do NOT include a URL from other API DevTooling vendors like kong, AWS, Cloudflare etc. If that means we don't provide a key resource for "Google", that's fine. 
+             - We don't want to name competitors.
+             - Omit the URL if you're in doubt if it's a API DevTooling vendor or not
         7. Interesting fact (did you know)
       `,
       schema: takeawaysSchema,
       temperature: 0.2,
+      experimental_telemetry: {
+        functionId: "content_takeaways",
+        isEnabled: true,
+      },
     });
 
     await db

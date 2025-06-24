@@ -178,14 +178,14 @@ const unkey = new Ratelimit({
 // elsewhere
 async function handler(request) {
   const identifier = request.getUserId() // or ip or anything else you want
-  
+
   const ratelimit = await unkey.limit(identifier)
   if (!ratelimit.success){
     return new Response("try again later", { status: 429 })
   }
-  
+
   // handle the request here
-  
+
 }`;
 
 const goVerifyKeyCodeBlock = `package main
@@ -555,7 +555,13 @@ export const CodeExamples: React.FC<Props> = ({ className }) => {
   const [language, setLanguage] = useState<Language>("Typescript");
   const [framework, setFramework] = useState<FrameworkName>("Typescript");
   const [languageHover, setLanguageHover] = useState("Typescript");
-  function getLanguage({ language, framework }: { language: Language; framework: FrameworkName }) {
+  function getLanguage({
+    language,
+    framework,
+  }: {
+    language: Language;
+    framework: FrameworkName;
+  }) {
     const frameworks = languagesList[language];
     const currentFramework = frameworks.find((f) => f.name === framework);
     return currentFramework?.editorLanguage || "tsx";
@@ -565,7 +571,13 @@ export const CodeExamples: React.FC<Props> = ({ className }) => {
     setFramework(languagesList[language].at(0)!.name);
   }, [language]);
 
-  function getCodeBlock({ language, framework }: { language: Language; framework: FrameworkName }) {
+  function getCodeBlock({
+    language,
+    framework,
+  }: {
+    language: Language;
+    framework: FrameworkName;
+  }) {
     const frameworks = languagesList[language];
     const currentFramework = frameworks.find((f) => f.name === framework);
     return currentFramework?.codeBlock || "";
@@ -574,9 +586,8 @@ export const CodeExamples: React.FC<Props> = ({ className }) => {
   return (
     <section className={className}>
       <SectionTitle
-        label="Code"
         title="Any language, any framework, always secure"
-        text="Add authentication to your APIs in a few lines of code. We provide SDKs for a range of languages and frameworks, and an intuitive REST API with public OpenAPI spec."
+        text="Simplify API security and access control with Unkey's developer-friendly platform. Our SDKs, intuitive REST API, and public OpenAPI spec make it easy to secure your APIs without complex configurations."
         align="center"
         className="relative"
       >

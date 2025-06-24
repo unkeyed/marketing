@@ -20,7 +20,7 @@ export async function getOrCreateSearchQuery({
     orderBy: (searchQueries, { asc }) => [asc(searchQueries.createdAt)],
   });
 
-  if (existing?.searchQuery && onCacheHit === "revalidate") {
+  if (existing?.searchQuery && onCacheHit === "stale") {
     return existing;
   }
 
@@ -55,6 +55,11 @@ Keep the search query as short and as simple as possible, don't use quotes aroun
   const [insertedQueryId] = await db
     .insert(searchQueries)
     .values(generatedQuery.object)
+    .onDuplicateKeyUpdate({
+      set: {
+        query: generatedQuery.object.query,
+      },
+    })
     .$returningId();
 
   if (!insertedQueryId) {

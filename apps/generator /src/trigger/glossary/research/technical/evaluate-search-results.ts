@@ -1,32 +1,46 @@
+import { domainCategories } from "@/lib/constants/domain-categories";
+import { db } from "@/lib/db-marketing/client";
+import {
+  type TechnicalResearch,
+  technicalResearch,
+  technicalResearchSearchResultEvaluationSchema,
+} from "@/lib/db-marketing/schemas/technical-research";
 import { google } from "@/lib/google";
-import { type TaskOutput, task } from "@trigger.dev/sdk/v3";
+import { AbortTaskRunError, task } from "@trigger.dev/sdk/v3";
 import { generateObject } from "ai";
-import { z } from "zod";
-import type { exaDomainSearchTask } from "./exa-domain-search";
-
-// Evaluation schema for content quality and relevance
-const evaluationSchema = z.object({
-  rating: z.number().min(1).max(10),
-  justification: z.string(),
-});
-
-type EvaluateSearchOptions = {
-  searchResults: TaskOutput<typeof exaDomainSearchTask>["results"];
-  inputTerm: string;
-};
+import { and, eq } from "drizzle-orm";
 
 export const evaluateSearchResults = task({
   id: "evaluate-search-results",
-  run: async ({ searchResults, inputTerm }: EvaluateSearchOptions) => {
-    // Set up the evaluation schema
-    const batchEvaluationSchema = z.object({
-      url: z.string(),
-      evaluation: evaluationSchema,
+  run: async ({ inputTerm }: Pick<TechnicalResearch, "inputTerm">) => {
+    const existing = await db.query.technicalResearch.findMany({
+      where: eq(technicalResearch.inputTerm, inputTerm),
+      columns: {
+        searchEvaluation: true,
+        exaSearchResponseWithoutContent: true,
+        domainCategory: true,
+      },
     });
+    const missingDomainCategories = domainCategories.filter(
+      (searches) => !existing.some((search) => search.domainCategory === searches.name),
+    );
+    if (missingDomainCategories.length > 0) {
+      console.warn("Technical reserach incomplete");
+      throw new AbortTaskRunError(
+        `Technical research evaluation called but not all domain searches returned results: ${missingDomainCategories.map((c) => c.name).join(", ")}`,
+      );
+    }
+
+    const searchResults = existing.flatMap((search) =>
+      search.exaSearchResponseWithoutContent.results.map((result) => ({
+        ...result,
+        domainCategory: search.domainCategory,
+      })),
+    );
 
     const geminiResponse = await generateObject({
       model: google("gemini-2.0-flash-lite-preview-02-05") as any,
-      schema: batchEvaluationSchema,
+      schema: technicalResearchSearchResultEvaluationSchema,
       output: "array",
       prompt: `
         Evaluate these search results for relevance to: "${inputTerm}"
@@ -39,10 +53,11 @@ export const evaluateSearchResults = task({
         
         GUIDANCE ON EVALUATING CONTENT:
         - Generally prioritize content from recent years (2020-present)
-        - Be cautious with older content (pre-2020)
-        - Only give high ratings (7+) to older content if it's truly foundational
-        - Consider the source quality
+        - Be cautious with older content (pre-2020), unless it's from a "Official", "Community" or "Neutral" category
+        - If the is from a "Official", "Community" or "Neutral" category assign a slightly higher rating compared to sources from "Google"
         - The ideal content is both highly relevant AND reasonably current
+        - Exclude implementation examples, e.g. if the inputTerm is "SDK" and there are GitHub results for examplatory SDKs, don't include them in the included results. 
+        - Include urls likely being objective and authoritative informational content about the term "${inputTerm}"
         
         Here are the results:
         
@@ -52,7 +67,7 @@ export const evaluateSearchResults = task({
         Title: ${r.title}
         URL: ${r.url}
         Published: ${r.publishedDate || "Unknown date"}
-        Summary: ${r.summary}
+        Research Category: ${r.domainCategory}
         `,
           )
           .join("\n\n")}
@@ -89,32 +104,59 @@ export const evaluateSearchResults = task({
       throw new Error("No evaluations returned from Gemini");
     }
 
-    // Return the original search results with evaluations attached
-    return {
-      costs: {
-        total:
-          geminiResponse.usage.promptTokens * (0.075 / 1000000) +
-          geminiResponse.usage.completionTokens * (0.3 / 1000000),
-        input: geminiResponse.usage.promptTokens * (0.075 / 1000000),
-        output: geminiResponse.usage.completionTokens * (0.3 / 1000000),
+    // upsert the technicalResearch.searchEvaluation for the given inputTerm, domainCategory:
+    await db.transaction(async (tx) => {
+      for (const domainCategory of domainCategories) {
+        const domainEvaluations = evaluations.filter(
+          (evaluation) => evaluation.domainCategory === domainCategory.name,
+        );
+
+        await tx
+          .update(technicalResearch)
+          .set({
+            searchEvaluation: {
+              metadata: {
+                evaluatedAt: new Date(),
+                stats: {
+                  included: domainEvaluations.filter(
+                    (evaluation) =>
+                      evaluation.evaluation?.rating && evaluation.evaluation?.rating >= 7,
+                  ).length,
+                  excluded: domainEvaluations.filter(
+                    (evaluation) =>
+                      evaluation.evaluation?.rating && evaluation.evaluation?.rating < 7,
+                  ).length,
+                },
+              },
+              included: domainEvaluations.filter(
+                (evaluation) => evaluation.evaluation?.rating && evaluation.evaluation?.rating >= 7,
+              ),
+            },
+          })
+          .where(
+            and(
+              eq(technicalResearch.inputTerm, inputTerm),
+              eq(technicalResearch.domainCategory, domainCategory.name),
+            ),
+          );
+      }
+    });
+
+    const updatedEntries = await db.query.technicalResearch.findMany({
+      where: eq(technicalResearch.inputTerm, inputTerm),
+      columns: {
+        searchEvaluation: true,
+        domainCategory: true,
       },
-      inputTerm,
-      evaluationSummary: {
-        totalEvaluated: evaluations.length,
-        totalIncluded: evaluations.filter(
-          (evaluation) => evaluation.evaluation?.rating && evaluation.evaluation?.rating >= 7,
-        ).length,
-        totalExcluded: evaluations.filter(
-          (evaluation) => evaluation.evaluation?.rating && evaluation.evaluation?.rating < 7,
-        ).length,
-      },
-      evaluations,
-      included: evaluations.filter(
-        (evaluation) => evaluation.evaluation?.rating && evaluation.evaluation?.rating >= 7,
-      ),
-      excluded: evaluations.filter(
-        (evaluation) => evaluation.evaluation?.rating && evaluation.evaluation?.rating < 7,
-      ),
-    };
+    });
+    if (!updatedEntries.length) {
+      throw new AbortTaskRunError(
+        `Technical research evaluation not found in DB for term "${inputTerm}". Run the _technical-research task first.`,
+      );
+    }
+    console.info(
+      `✅︎ Evaluated search results for term "${inputTerm}" with stats: ${JSON.stringify(updatedEntries.map((entry) => entry.searchEvaluation?.metadata.stats))}`,
+    );
+    return updatedEntries;
   },
 });

@@ -14,6 +14,7 @@ export const sections = mysqlTable("sections", {
   description: text("description").notNull(),
   order: int("order").notNull(),
   markdown: text("markdown"),
+  citedSources: text("cited_sources"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
@@ -30,7 +31,7 @@ export const sectionsRelations = relations(sections, ({ one, many }) => ({
   sectionsToKeywords: many(sectionsToKeywords),
 }));
 
-export const insertSectionSchema = createInsertSchema(sections).extend({}).omit({ id: true });
+export const insertSectionSchema = createInsertSchema(sections).omit({ id: true });
 export const selectSectionSchema = createSelectSchema(sections);
 export type InsertSection = z.infer<typeof insertSectionSchema>;
 export type SelectSection = typeof sections.$inferSelect;

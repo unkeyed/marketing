@@ -14,6 +14,8 @@ import { z } from "zod";
 import { searchQueries } from "./searchQuery";
 import { sections } from "./sections";
 import type { Takeaways } from "./takeaways-schema";
+import { exaScrapedResults, technicalResearch } from "./technical-research";
+import type { TechnicalResearch } from "./technical-research";
 
 export const entryStatus = ["ARCHIVED", "PUBLISHED"] as const;
 export type EntryStatus = (typeof entryStatus)[number];
@@ -40,6 +42,7 @@ export const entries = mysqlTable(
     status: mysqlEnum("status", entryStatus),
     takeaways: json("content_takeaways").$type<Takeaways>(),
     faq: json("content_faq").$type<FAQ>(),
+    technicalResearch: json("technical_research").$type<TechnicalResearch>(),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at")
       .notNull()
@@ -57,6 +60,8 @@ export const entriesRelations = relations(entries, ({ many, one }) => ({
     fields: [entries.inputTerm],
     references: [searchQueries.inputTerm],
   }),
+  technicalResearches: many(technicalResearch),
+  exaScrapedResults: many(exaScrapedResults),
 }));
 
 export const insertEntrySchema = createInsertSchema(entries).extend({}).omit({ id: true });

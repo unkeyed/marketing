@@ -33,13 +33,13 @@ export const serperSearchResponsesRelations = relations(serperSearchResponses, (
   serperRelatedSearches: many(serperRelatedSearches),
 }));
 
-export const insertSearchResponseSchema = createSelectSchema(serperSearchResponses)
+export const insertSerperSearchResponseSchema = createSelectSchema(serperSearchResponses)
   .extend({})
   .omit({
     id: true,
   });
 
-export type NewSearchResponseParams = z.infer<typeof insertSearchResponseSchema>;
+export type NewSerperSearchResponseParams = z.infer<typeof insertSerperSearchResponseSchema>;
 
 export const serperOrganicResults = mysqlTable(
   "serper_organic_results",
