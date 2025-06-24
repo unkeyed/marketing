@@ -73,10 +73,9 @@ To **enable CORS in a web API**, follow these steps:
 
 3. **Handle Preflight Requests**: For certain requests, browsers send a preflight request using the OPTIONS method. Respond with the appropriate CORS headers (`Access-Control-Allow-Methods`, `Access-Control-Allow-Headers`, `Access-Control-Max-Age`) to inform the browser that the actual request is safe to send.
 
-```typescript
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 
-const allowCors = (req: Request, res: Response) => {
+const allowCors = (req: Request, res: Response, next: NextFunction) => {
   res.header('Access-Control-Allow-Origin', 'https://example.com');
   res.header('Access-Control-Allow-Methods', 'GET, POST');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
@@ -85,6 +84,7 @@ const allowCors = (req: Request, res: Response) => {
     res.status(200).end();
     return;
   }
+  next();
 };
 ```
 
