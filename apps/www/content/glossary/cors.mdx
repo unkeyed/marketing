@@ -19,7 +19,7 @@ takeaways:
     - Understand and correctly implement the Access-Control-Allow-Origin header and related headers to manage CORS effectively.
   historicalContext:
     - key: Introduced
-      value: "2004"
+      value: "2014"
     - key: Origin
       value: Web Security (CORS)
     - key: Evolution
@@ -70,16 +70,28 @@ To **enable CORS in a web API**, follow these steps:
 
 2. **Configure HTTP Methods**: Specify which HTTP methods (GET, POST, etc.) are supported for CORS requests using the `Access-Control-Allow-Methods` header.
 
-3. **Handle Preflight Requests**: For certain requests, browsers send a preflight request using the OPTIONS method. Respond with the appropriate CORS headers (`Access-Control-Allow-Methods`, `Access-Control-Allow-Headers`, `Access-Control-Max-Age`) to inform the browser that the actual request is safe to send.
+> ⚠️ **Security Warning**: Never use `Access-Control-Allow-Origin: *` with credentials.
+This combination is forbidden by the CORS specification and can expose your API to attacks.
+
+3. **Handle Preflight Requests**: For "non-simple" requests (those with custom headers,
+   methods other than GET/POST/HEAD, or content-types other than application/x-www-form-urlencoded,
+   multipart/form-data, or text/plain), browsers send a preflight request using the OPTIONS method.
 
 ```typescript
 import { Request, Response, NextFunction } from 'express';
 
 const allowCors = (req: Request, res: Response, next: NextFunction) => {
-  res.header('Access-Control-Allow-Origin', 'https://example.com');
-  res.header('Access-Control-Allow-Methods', 'GET, POST');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  res.header('Access-Control-Max-Age', '3600');
+  const allowedOrigins = ['https://example.com', 'https://app.example.com'];
+  const origin = req.headers.origin;
+
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Max-Age', '86400'); // 24 hours
+
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
@@ -93,8 +105,6 @@ const allowCors = (req: Request, res: Response, next: NextFunction) => {
 In client-side JavaScript, handling CORS is primarily managed by the browser. However, you can control aspects of CORS in your requests:
 
 ```typescript
-import { fetch } from 'node-fetch';
-
 const fetchData = async () => {
   const response = await fetch('https://api.example.com/data', {
     method: 'GET',
