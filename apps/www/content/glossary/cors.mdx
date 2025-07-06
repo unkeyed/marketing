@@ -53,12 +53,11 @@ updatedAt: 2025-06-16T13:18:06.000Z
 slug: cors
 ---
 
-Cross-Origin Resource Sharing (CORS) is a vital security feature that governs how web applications from one origin (domain) can interact with resources from another origin. This glossary entry delves into the essentials of CORS, its mechanisms, implementation strategies, and how to handle CORS errors, particularly in environments like AWS API Gateway.
+CORS is a browser mechanism that relaxes the same-origin policy, governing how web applications from one origin (domain) can interact with resources from another origin. While its configuration affects security, CORS itself does not provide protection. This glossary entry delves into the essentials of CORS, its mechanisms, implementation strategies, and how to handle CORS errors, particularly in environments like AWS API Gateway.
 
 ## Understanding CORS in API Development
 
-CORS is crucial in **API development** as it facilitates secure cross-origin requests and data sharing between web applications and servers. Modern web applications often retrieve data from various sources that may not share the same origin. CORS allows server administrators to define who can access their resources and under what conditions, effectively preventing malicious interactions between sites.
-
+CORS is crucial in **API development** because it enables controlled cross-origin requests and data sharing between web applications and servers. Modern web applications often retrieve data from various sources that may not share the same origin. CORS allows server administrators to define who can access their resources and under what conditions, effectively preventing malicious interactions between sites.
 ## How CORS Works: The Mechanism Explained
 
 CORS operates through HTTP headers. When a browser initiates a cross-origin request, it sends an HTTP request to the target server with an `Origin` header. The server can then decide whether to allow or deny the request based on the specified origin. If permitted, the server responds with the `Access-Control-Allow-Origin` header, allowing the browser to grant access to the web application. If this header is absent or the origin is not allowed, the browser blocks access.
