@@ -30,10 +30,13 @@ research/keywords/
 
 ## Testing
 
-To run the tests:
+> **Note for agents:**
+> The following instructions are for humans. Agents should NOT use the cloud Test Pane or UI, and should instead use the MCP CLI and follow the troubleshooting section for agent-specific workflows. The MCP does not provide a UI; all agent test execution is via CLI or code, not a UI.
+
+To run the tests (for humans):
 
 ```bash
-pnpm -F generator dev
+pnpm -F generator dev:mcp
 ```
 
 Go into Trigger's [Test Pane](https://cloud.trigger.dev/orgs/unkey-9e78/projects/billing-IzvK/env/dev/test) and run the `research_keywords_test` test with an empty payload.
@@ -44,6 +47,9 @@ To test only a subtask, run:
 - `serper_search_test`
 - `serper_autosuggest_test`
 - `enrich_keywords_test`
+
+> **For agents:**
+> If you are an agent, refer to the troubleshooting section in @testing-workflows.mdc for the correct way to run and debug subtasks and workflow tests. Do not attempt to use the cloud Test Pane or expect a local UI.
 
 ## Logic Overview
 
