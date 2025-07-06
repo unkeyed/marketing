@@ -1,0 +1,137 @@
+---
+title: "CORS in APIs: Comprehensive Guide"
+description: Unlock the power of CORS in API development. Learn essentials and key takeaways from expert examples. Dive into CORS API Gateway. Start now.
+h1: "Understanding CORS: API Development Essentials"
+term: CORS
+categories: []
+takeaways:
+  tldr: CORS (Cross-Origin Resource Sharing) is a mechanism that allows many resources (e.g., fonts, JavaScript, etc.) on a web page to be requested from another domain outside the domain from which the resource originated.
+  didYouKnow: CORS relaxes security by allowing requests to be made across origins, but it does not provide any protection or security benefits. It's the server's responsibility to appropriately handle CORS and ensure that the application is secure.
+  usageInAPIs:
+    tags:
+      - Web Security
+      - HTTP Headers
+      - Cross-Domain
+    description: CORS is essential in API development, allowing web applications to make requests to APIs hosted on different domains. It uses HTTP headers to define trusted web origins and their properties, facilitating a header exchange between the browser and the server. Misconfiguration can introduce vulnerabilities, making understanding and implementing CORS correctly crucial for API security.
+  bestPractices:
+    - Always specify the exact origin or origins you trust, instead of using a wildcard ('*'), to prevent potential security vulnerabilities.
+    - Use preflight requests for more complex requests to ensure they are safe before they are sent.
+    - Understand and correctly implement the Access-Control-Allow-Origin header and related headers to manage CORS effectively.
+  historicalContext:
+    - key: Introduced
+      value: "2014"
+    - key: Origin
+      value: Web Security (CORS)
+    - key: Evolution
+      value: Standardized CORS
+  recommendedReading:
+    - url: https://www.w3.org/TR/2020/SPSD-cors-20200602/
+      title: Cross-Origin Resource Sharing (CORS)
+    - url: https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS
+      title: Cross-Origin Resource Sharing (CORS)
+    - url: https://en.wikipedia.org/wiki/Cross-origin_resource_sharing
+      title: Cross-origin resource sharing
+    - url: https://cloud.google.com/storage/docs/cross-origin
+      title: Cross-Origin Resource Sharing (CORS)
+  definitionAndStructure:
+    - key: Mechanism
+      value: HTTP Header Based
+    - key: Purpose
+      value: Cross-Domain Requests
+    - key: Key Headers
+      value: Access-Control-Allow-Origin
+faq:
+  - question: What is CORS in an API?
+    answer: Cross-Origin Resource Sharing (CORS) is a mechanism that allows many resources (e.g., fonts, JavaScript, etc.) on a web page to be requested from another domain outside the domain from which the resource originated. In the context of an API, CORS enables the API server to specify who can access its assets and how the resources can be accessed.
+  - question: What is CORS in API Connect?
+    answer: In IBM API Connect, Cross-Origin Resource Sharing (CORS) is a feature that allows API calls to be made from a browser-based code to a server on a different domain. By default, these cross-origin calls are blocked due to the same-origin security policy applied to the browser. However, with CORS enabled, API Connect can specify which domains are allowed to access its resources, thereby overcoming the same-origin policy restrictions.
+  - question: What is the difference between rest and CORS?
+    answer: REST (Representational State Transfer) and CORS (Cross-Origin Resource Sharing) are two different concepts. REST is an architectural style for designing networked applications. It uses a stateless, client-server communication model and leverages HTTP protocol methods like GET, POST, PUT, DELETE for data exchange. On the other hand, CORS is a browser mechanism that allows web applications to make cross-domain requests, overcoming the limitations of the same-origin policy. While REST is about how different systems communicate, CORS is about enabling secure cross-domain communication in web applications.
+  - question: How do I get around CORS for local development?
+    answer: To bypass CORS restrictions for local development, you can use a reverse proxy. A reverse proxy can route the requests from the frontend to the API server, making it appear as if the requests are coming from the same origin, thereby avoiding CORS restrictions. Tools like Nginx, Apache, or software like Node.js with http-proxy-middleware can be used to set up a reverse proxy. However, this should only be used for development purposes and not in a production environment as it could expose your application to security risks.
+updatedAt: 2025-06-16T13:18:06.000Z
+slug: cors
+---
+
+CORS is a browser mechanism that relaxes the same-origin policy, governing how web applications from one origin (domain) can interact with resources from another origin. While its configuration affects security, CORS itself does not provide protection. This glossary entry delves into the essentials of CORS, its mechanisms, implementation strategies, and how to handle CORS errors, particularly in environments like AWS API Gateway.
+
+## Understanding CORS in API Development
+
+CORS is crucial in **API development** because it enables controlled cross-origin requests and data sharing between web applications and servers. Modern web applications often retrieve data from various sources that may not share the same origin. CORS allows server administrators to define who can access their resources and under what conditions, effectively preventing malicious interactions between sites.
+## How CORS Works: The Mechanism Explained
+
+CORS operates through HTTP headers. When a browser initiates a cross-origin request, it sends an HTTP request to the target server with an `Origin` header. The server can then decide whether to allow or deny the request based on the specified origin. If permitted, the server responds with the `Access-Control-Allow-Origin` header, allowing the browser to grant access to the web application. If this header is absent or the origin is not allowed, the browser blocks access.
+
+## Enabling CORS in Web APIs: A Step-by-Step Guide
+
+To **enable CORS in a web API**, follow these steps:
+
+1. **Set Access-Control-Allow-Origin**: Identify which origin(s) can access your API. This can be a specific URL or `*` for all origins (not recommended for production).
+
+2. **Configure HTTP Methods**: Specify which HTTP methods (GET, POST, etc.) are supported for CORS requests using the `Access-Control-Allow-Methods` header.
+
+> ⚠️ **Security Warning**: Never use `Access-Control-Allow-Origin: *` with credentials.
+This combination is forbidden by the CORS specification and can expose your API to attacks.
+
+3. **Handle Preflight Requests**: For "non-simple" requests (those with custom headers,
+   methods other than GET/POST/HEAD, or content-types other than application/x-www-form-urlencoded,
+   multipart/form-data, or text/plain), browsers send a preflight request using the OPTIONS method.
+
+```typescript
+import { Request, Response, NextFunction } from 'express';
+
+const allowCors = (req: Request, res: Response, next: NextFunction) => {
+  const allowedOrigins = ['https://example.com', 'https://app.example.com'];
+  const origin = req.headers.origin;
+
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Max-Age', '86400'); // 24 hours
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+  next();
+};
+```
+
+## CORS in JavaScript: Implementation Examples
+
+In client-side JavaScript, handling CORS is primarily managed by the browser. However, you can control aspects of CORS in your requests:
+
+```typescript
+const fetchData = async () => {
+  const response = await fetch('https://api.example.com/data', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    mode: 'cors' // Ensures requests are made with CORS
+  });
+  const data = await response.json();
+  console.log(data);
+};
+
+fetchData();
+```
+
+## Handling CORS Errors in API Gateways
+
+CORS errors in **API gateways** occur when the necessary CORS headers are missing from responses from the backend server. To resolve these errors, ensure that your API gateway is configured to append the required CORS headers to responses, especially when the backend does not handle CORS.
+
+## AWS API Gateway and CORS: Best Practices
+
+When using **AWS API Gateway**, enable CORS by:
+
+1. **Using the AWS Management Console**: Navigate to your API's method response and integration response settings. Add the necessary CORS headers there.
+
+2. **Through a Lambda Function**: If using Lambda proxy integration, modify your Lambda function to return the necessary CORS headers.
+
+3. **Automate with SAM or CloudFormation**: Use AWS SAM (Serverless Application Model) or AWS CloudFormation to define your CORS settings in your infrastructure as code templates, ensuring consistency across environments.
+
+By understanding and implementing CORS effectively, you can ensure that your web applications are secure and functional, adhering to modern web standards. For more detailed examples and guidance, refer to resources on **CORS API development** and **npm CORS** packages.
