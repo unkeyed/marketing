@@ -40,7 +40,6 @@ export default function RootLayout({
     },
   };
 
-  
   return (
     <html lang="en" className={cn("dark", GeistSans.className)}>
       <body className="w-full bg-black text-[#E2E2E2]">
