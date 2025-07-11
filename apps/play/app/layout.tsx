@@ -23,8 +23,9 @@ export default function RootLayout({
       <body className="w-full bg-black text-[#E2E2E2]">
         <ConsentManagerProvider
           options={{
-            mode: "c15t",
-            backendURL: "/api/c15t",
+            ...(process.env.NEXT_PUBLIC_C15T_MODE
+              ? { mode: "c15t", backendURL: "/api/c15t" }
+              : { mode: "offline" }),
             react: {
               colorScheme: "dark",
             },

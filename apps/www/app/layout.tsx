@@ -50,8 +50,9 @@ export default function RootLayout({
       <body className="min-h-screen overflow-x-hidden antialiased bg-black text-pretty">
         <ConsentManagerProvider
           options={{
-            mode: "c15t",
-            backendURL: "/api/c15t",
+            ...(parsedEnv.NEXT_PUBLIC_C15T_MODE
+              ? { mode: "c15t", backendURL: "/api/c15t" }
+              : { mode: "offline" }),
             react: {
               colorScheme: "dark",
             },
