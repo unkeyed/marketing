@@ -14,10 +14,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { PrimaryButton, SecondaryButton } from "../button";
 import { DesktopNavLink, MobileNavLink } from "./link";
+import { useConsentManager } from "@c15t/nextjs";
 
 export function Navigation() {
   const [scrollPercent, setScrollPercent] = useState(0);
-
+  const { hasConsentFor } = useConsentManager();
   const containerVariants = {
     hidden: {
       opacity: 0,
@@ -69,7 +70,9 @@ export function Navigation() {
               IconRight={ChevronRight}
               className="h-8 text-sm"
               onClick={async () => {
-                track("signup", { location: "navigation" });
+                if (hasConsentFor("measurement")) {
+                  track("signup", { location: "navigation" });
+                }
               }}
             />
           </Link>
