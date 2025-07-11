@@ -7,6 +7,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
+import { useConsentManager } from "@c15t/nextjs";
 import { track } from "@vercel/analytics";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronRight } from "lucide-react";
@@ -14,7 +15,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { PrimaryButton, SecondaryButton } from "../button";
 import { DesktopNavLink, MobileNavLink } from "./link";
-import { useConsentManager } from "@c15t/nextjs";
 
 export function Navigation() {
   const [scrollPercent, setScrollPercent] = useState(0);
