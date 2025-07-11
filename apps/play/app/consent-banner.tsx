@@ -88,9 +88,8 @@ export function ConsentBanner() {
           },
           "widget.footer.save-button": {
             style: {
-              "--button-background-color-dark":
-                "linear-gradient(to right, rgb(255 255 255 / 0.8) , rgb(255 255 255 / 1))",
-              "--button-primary-dark": "##FFFFFF",
+             "--button-background-color-dark": "#FFFFFF",
+              "--button-primary-dark": "#000000",
               "--button-primary-hover-dark": "#FFF",
             },
           },
