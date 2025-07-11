@@ -90,7 +90,7 @@ export function ConsentBanner() {
             style: {
               "--button-background-color-dark":
                 "linear-gradient(to right, rgb(255 255 255 / 0.8) , rgb(255 255 255 / 1))",
-              "--button-primary-dark": "#000000",
+              "--button-primary-dark": "##FFFFFF",
               "--button-primary-hover-dark": "#FFF",
             },
           },
