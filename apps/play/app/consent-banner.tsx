@@ -88,7 +88,7 @@ export function ConsentBanner() {
           },
           "widget.footer.save-button": {
             style: {
-             "--button-background-color-dark": "#FFFFFF",
+              "--button-background-color-dark": "#FFFFFF",
               "--button-primary-hover-dark": "#FFF",
             },
           },
