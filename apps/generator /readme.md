@@ -182,190 +182,155 @@ The project uses:
 The workflow in Trigger.dev is organized in levels, which represent the nesting and dependencies between tasks:
 
 ```mermaid
+
 flowchart LR
-    %% Entry point as a note/label
+    %% Entry point sticky note
     ENTRY["`📌 **ENTRY POINT**
     **generate_glossary_entry**
     ━━━━━━━━━━━━━━━━━━━━
-    📥 Input: term, onCacheHit
-    🔧 Orchestrates workflow
-    📤 Returns: complete entry`"]
+    📥 term, onCacheHit
+    📤 complete entry`"]
 
-    %% Level 1: All steps horizontally aligned
-    subgraph WORKFLOW["Main Workflow Steps (Level 1)"]
+    %% Main Workflow as sticky notes
+    subgraph WORKFLOW["🗂️ Main Workflow Steps"]
         direction LR
         
         %% Step 1: Research Phase
-        subgraph S1["Step 1: Research Phase"]
-            direction TB
-            B["`**keyword_research**
-            📥 term, onCacheHit
-            🔧 Search query → Organic results
-            🔧 Scrape top 3 → Extract keywords
-            📤 keywords array (e.g., 76)`"]
-            
-            C["`**technical_research**
-            📥 inputTerm, onCacheHit
-            🔧 Orchestrates parallel searches
-            📤 scraped technical content`"]
-            
-            B --> C
-        end
-        
-        S1 --> DB1[("`**Database**
-        keywords
-        technicalResearch
-        exaScrapedResults`")]
+        S1["`📌 **Step 1: Research**
+        ━━━━━━━━━━━━━━━━
+        keyword_research
+        ⬇️
+        technical_research`"]
         
         %% Step 2: Content Structure
-        DB1 --> S2
-        subgraph S2["Step 2: Content Structure"]
-            D["`**generate_outline**
-            📥 term, onCacheHit
-            🔧 Creates sections structure
-            🔧 Technical + SEO evaluations
-            📤 dynamicSections array`"]
-        end
-        
-        S2 --> DB2[("`**Database**
-        sections
-        evaluations`")]
+        S2["`📌 **Step 2: Structure**
+        ━━━━━━━━━━━━━━━━
+        generate_outline`"]
         
         %% Step 3: Content Generation
-        DB2 --> S3
-        subgraph S3["Step 3: Content Generation"]
-            direction TB
-            E["`**draft_sections**
-            📥 term, onCacheHit
-            🔧 GPT-4 drafts ≤6 sections
-            🔧 Review + SEO optimize
-            📤 markdown content`"]
-            
-            F["`**content_takeaways**
-            📥 term, onCacheHit
-            🔧 Analyze scraped content
-            🔧 TLDR + best practices
-            📤 structured takeaways`"]
-            
-            E -.->|Parallel| F
-        end
-        
-        S3 --> DB3[("`**Database**
-        dynamicSectionsContent
-        contentTakeaways`")]
+        S3["`📌 **Step 3: Generate**
+        ━━━━━━━━━━━━━━━━
+        draft_sections
+        content_takeaways
+        ⚡ parallel`"]
         
         %% Step 4: SEO & Metadata
-        DB3 --> S4
-        subgraph S4["Step 4: SEO & Metadata"]
-            direction TB
-            G["`**seo_meta_tags**
-            📥 term, onCacheHit
-            🔧 Analyze top 10 rankings
-            🔧 Optimize title/desc/H1
-            📤 meta tags (char limits)`"]
-            
-            H["`**generate_faqs**
-            📥 term, onCacheHit
-            🔧 'People Also Ask' Qs
-            🔧 API-focused answers
-            📤 FAQ array`"]
-            
-            G --> H
-        end
-        
-        S4 --> DB4[("`**Database**
-        metaTitle/Description
-        faqs`")]
+        S4["`📌 **Step 4: SEO**
+        ━━━━━━━━━━━━━━━━
+        seo_meta_tags
+        generate_faqs`"]
         
         %% Step 5: Publishing
-        DB4 --> S5
-        subgraph S5["Step 5: Publishing"]
-            I["`**create_pr**
-            📥 input (term), onCacheHit
-            🔧 Create MDX + frontmatter
-            🔧 Handle branch/PR logic
-            📤 githubPrUrl`"]
-        end
+        S5["`📌 **Step 5: Publish**
+        ━━━━━━━━━━━━━━━━
+        create_pr`"]
         
-        S5 --> DB5[("`**Database**
-        githubPrUrl
-        status: completed`")]
+        S1 --> S2 --> S3 --> S4 --> S5
     end
 
-    %% Level 2: Sub-tasks grouped by parent
-    subgraph SUBTASKS["Level 2: Sub-tasks Details"]
+    %% Sub-steps for each main step
+    subgraph SUB1["keyword_research"]
+        direction LR
+        KR1[Search Query]
+        KR2[Organic Results]
+        KR3[Scrape Top 3]
+        KR4[Extract Keywords]
+        KR1 --> KR2 --> KR3 --> KR4
+    end
+    
+    subgraph SUB2["technical_research"]
+        direction LR
+        TR1[exa_domain_search ×4]
+        TR2[evaluate-search-results]
+        TR3[scrape-search-results]
+        TR1 --> TR2 --> TR3
+    end
+    
+    subgraph SUB3["generate_outline"]
+        GO1[Create Sections]
+        GO2[perform_technical_eval]
+        GO3[perform_seo_eval]
+        GO1 --> GO2
+        GO1 --> GO3
+    end
+    
+    subgraph SUB4["draft_sections"]
+        direction LR
+        DS1[GPT-4 Draft]
+        DS2[Review & Optimize]
+        DS1 --> DS2
+    end
+    
+    subgraph SUB5["content_takeaways"]
+        direction LR
+        CT1[Analyze Content]
+        CT2[Extract Insights]
+        CT1 --> CT2
+    end
+
+    %% Database Layer
+    subgraph DATABASE["💾 Database Layer"]
         direction LR
         
-        %% Technical Research Subtasks
-        subgraph TR_SUBS["technical_research Sub-tasks"]
-            direction TB
-            C1["`**exa_domain_search** ×4
-            🔧 Official sites (IETF, W3C)
-            🔧 Community (GitHub, SO)
-            🔧 Neutral (OWASP, MDN)
-            🔧 Google search`"]
-            
-            C2["`**evaluate-search-results**
-            🔧 AI filters relevance
-            📤 included/excluded`"]
-            
-            C3["`**scrape-search-results**
-            🔧 Full content fetch
-            📤 content + summaries`"]
-            
-            C1 --> C2 --> C3
-        end
+        DB_RESEARCH[("`**Research Data**
+        • keywords
+        • technicalResearch
+        • exaScrapedResults`")]
         
-        %% Outline Evaluations
-        subgraph GEN_SUBS["generate_outline Sub-tasks"]
-            direction TB
-            D1["`**perform_technical_eval**
-            🔧 Accuracy/completeness
-            📤 ratings + recommendations`"]
-            
-            D2["`**perform_seo_eval**
-            🔧 Keyword optimization
-            📤 SEO improvements`"]
-            
-            D1 -.->|Parallel| D2
-        end
+        DB_STRUCTURE[("`**Content Structure**
+        • sections
+        • evaluations`")]
+        
+        DB_CONTENT[("`**Generated Content**
+        • dynamicSectionsContent
+        • contentTakeaways`")]
+        
+        DB_META[("`**SEO & Metadata**
+        • metaTitle
+        • metaDescription
+        • faqs`")]
+        
+        DB_FINAL[("`**Final Output**
+        • githubPrUrl
+        • status: completed`")]
     end
-   
-    %% Connect entry to workflow
-    ENTRY -.->|"Starts"| S1
     
-    %% Connect sub-tasks to their parent tasks
-    C -.->|"Expands to"| TR_SUBS
-    D -.->|"Expands to"| GEN_SUBS
+    %% Connections
+    ENTRY --> S1
     
-    %% Connect sub-tasks back to parent workflow
-    C3 -.->|"Returns to"| C
-    D1 -.->|"Returns to"| D
-    D2 -.->|"Returns to"| D
+    %% Connect main steps to sub-steps
+    S1 -.->|expands| SUB1
+    S1 -.->|expands| SUB2
+    S2 -.->|expands| SUB3
+    S3 -.->|expands| SUB4
+    S3 -.->|expands| SUB5
     
-    %% Style the entry point
-    classDef entryPoint fill:#fff9c4,stroke:#f57c00,stroke-width:3px,color:#000
-    class ENTRY entryPoint
+    %% Workflow to Database connections
+    S1 -.->|"stores"| DB_RESEARCH
+    S2 -.->|"stores"| DB_STRUCTURE
+    S3 -.->|"stores"| DB_CONTENT
+    S4 -.->|"stores"| DB_META
+    S5 -.->|"stores"| DB_FINAL
     
-    %% Style the database nodes
+    %% Database feeds next steps
+    DB_RESEARCH -.->|"feeds"| S2
+    DB_STRUCTURE -.->|"feeds"| S3
+    DB_CONTENT -.->|"feeds"| S4
+    DB_META -.->|"feeds"| S5
+    
+    %% Styles
+    classDef stickyNote fill:#fff9c4,stroke:#f57c00,stroke-width:2px,color:#000
+    class ENTRY,S1,S2,S3,S4,S5 stickyNote
+    
     classDef database fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000
-    class DB1,DB2,DB3,DB4,DB5 database
+    class DB_RESEARCH,DB_STRUCTURE,DB_CONTENT,DB_META,DB_FINAL database
     
-    %% Style the main steps
-    classDef stepGroup fill:#f3e5f5,stroke:#4a148c,stroke-width:2px,color:#000
-    class S1,S2,S3,S4,S5 stepGroup
+    classDef container fill:#f5f5f5,stroke:#333,stroke-width:3px,color:#000
+    class WORKFLOW,DATABASE container
     
-    %% Style the main workflow container
-    classDef mainContainer fill:#f5f5f5,stroke:#333,stroke-width:3px,color:#000
-    class WORKFLOW mainContainer
-    
-    %% Style the subtasks container
-    classDef subtaskContainer fill:#fff3e0,stroke:#e65100,stroke-width:3px,color:#000
-    class SUBTASKS subtaskContainer
-    
-    %% Style individual subtask groups
-    classDef subtaskGroup fill:#ffebee,stroke:#c62828,stroke-width:2px,stroke-dasharray: 5 5,color:#000
-    class TR_SUBS,GEN_SUBS subtaskGroup
+    classDef substep fill:#e8f5e9,stroke:#2e7d32,stroke-width:1px,color:#000
+    class SUB1,SUB2,SUB3,SUB4,SUB5 substep
+
 ```
 ### Task Organization
 
