@@ -225,7 +225,14 @@ flowchart LR
         ━━━━━━━━━━━━━━━━
         create_pr`"]
         
-        S1 --> S2 --> S3 --> S4 --> S5
+        %% Step 6: Review
+        S6["`📌 **Step 6: Review**
+        ━━━━━━━━━━━━━━━━
+        PR Review
+        Manual QA
+        ✅ Merge`"]
+        
+        S1 --> S2 --> S3 --> S4 --> S5 --> S6
     end
 
     %% Sub-steps for each main step
@@ -267,6 +274,32 @@ flowchart LR
         CT2[Extract Insights]
         CT1 --> CT2
     end
+    
+    subgraph SUB6["seo_meta_tags"]
+        direction LR
+        SEO1[Fetch Keywords]
+        SEO2[Get Top 10 Pages]
+        SEO3[GPT-4 Craft Tags]
+        SEO4[Validate Lengths]
+        SEO1 --> SEO2 --> SEO3 --> SEO4
+    end
+    
+    subgraph SUB7["generate_faqs"]
+        direction LR
+        FAQ1[Get People Also Ask]
+        FAQ2[GPT-4 Generate Answers]
+        FAQ3[Store FAQs]
+        FAQ1 --> FAQ2 --> FAQ3
+    end
+    
+    subgraph SUB8["create_pr"]
+        direction LR
+        PR1[Check Existing PR]
+        PR2[Prepare MDX]
+        PR3[Branch Logic]
+        PR4[Create/Update PR]
+        PR1 --> PR2 --> PR3 --> PR4
+    end
 
     %% Database Layer
     subgraph DATABASE["💾 Database Layer"]
@@ -304,6 +337,9 @@ flowchart LR
     S2 -.->|expands| SUB3
     S3 -.->|expands| SUB4
     S3 -.->|expands| SUB5
+    S4 -.->|expands| SUB6
+    S4 -.->|expands| SUB7
+    S5 -.->|expands| SUB8
     
     %% Workflow to Database connections
     S1 -.->|"stores"| DB_RESEARCH
@@ -317,10 +353,11 @@ flowchart LR
     DB_STRUCTURE -.->|"feeds"| S3
     DB_CONTENT -.->|"feeds"| S4
     DB_META -.->|"feeds"| S5
+    DB_FINAL -.->|"feeds"| S6
     
     %% Styles
     classDef stickyNote fill:#fff9c4,stroke:#f57c00,stroke-width:2px,color:#000
-    class ENTRY,S1,S2,S3,S4,S5 stickyNote
+    class ENTRY,S1,S2,S3,S4,S5,S6 stickyNote
     
     classDef database fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000
     class DB_RESEARCH,DB_STRUCTURE,DB_CONTENT,DB_META,DB_FINAL database
@@ -329,7 +366,7 @@ flowchart LR
     class WORKFLOW,DATABASE container
     
     classDef substep fill:#e8f5e9,stroke:#2e7d32,stroke-width:1px,color:#000
-    class SUB1,SUB2,SUB3,SUB4,SUB5 substep
+    class SUB1,SUB2,SUB3,SUB4,SUB5,SUB6,SUB7,SUB8 substep
 
 ```
 ### Task Organization
