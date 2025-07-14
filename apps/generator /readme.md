@@ -2,23 +2,72 @@
 
 A Trigger.dev-based workflow for automatically generating marketing content, specifically focused on glossary entries. The system uses PlanetScale as its database with Drizzle ORM for data management.
 
-## Overview
+## Running the Glossary Generation Workflow
+
+### Production Environment
+
+The glossary generation workflow runs in Trigger.dev's production environment. To generate a new glossary entry:
+
+1. **Access the Trigger.dev Dashboard**
+   - URL: https://cloud.trigger.dev/orgs/unkey-9e78/projects/billing-IzvK/env/prod/test/tasks/generate_glossary_entry?tab=payload
+   - This is the production environment where actual glossary entries are generated
+
+2. **Provide the Payload**
+   ```json
+   {
+     "term": "Your Term Here",
+     "onCacheHit": "revalidate"
+   }
+   ```
+   - Replace "Your Term Here" with the actual term (e.g., "Facade Pattern", "Retry Pattern", etc.)
+   - The `onCacheHit` parameter controls cache behavior:
+     - `"revalidate"`: Forces fresh generation even if cached data exists
+     - `"stale"`: Uses cached data if available
+     - `"bypass"`: Bypasses the cache entirely
+
+3. **Run the Workflow**
+   - Click "Run test" button (see screenshot: `/Users/richardpoelderl/Library/Caches/com.raycast.macos/Clipboard/b9b6ada452bd35b5bac6409c49f12952fe905de69d6af8f5390fbaaf340f300a.png`)
+   - The workflow will start executing
+
+### Development vs Production
+
+- **Production (`prod`)**: Where actual glossary entries are generated
+- **Test Environment (`test`)**: Used for testing local WIP changes separately from production
+
+## Understanding the Workflow
 
 The main workflow (`_generate-glossary-entry.ts`) orchestrates the generation of glossary entries through a series of sequential and parallel tasks. The workflow is idempotent and can be safely restarted if aborted.
 
 ### Workflow Steps
 
-1. **Keyword Research**
-   - Analyzes and generates relevant keywords for the term
-   - Stores results in the database
+Based on the actual execution logs, here's the detailed workflow:
 
-2. **Technical Research**
-   - Performs technical analysis of the term
-   - Stores research results in the database
+1. **Keyword Research** (`keyword_research`)
+   - Performs search queries using the term
+   - Fetches organic search results (typically 10 results)
+   - Retrieves content from top 3 results using Firecrawl
+   - Extracts keywords from titles and headers
+   - Example output: 76 keywords for "Retry Pattern"
 
-3. **Outline Generation**
-   - Creates a structured outline for the content
-   - Defines dynamic sections for the entry
+2. **Technical Research** (`technical_research`)
+   - Runs multiple domain-specific searches in parallel:
+     - **Official**: Standards bodies (IETF, W3C, ISO)
+     - **Community**: Developer sites (StackOverflow, GitHub, Wikipedia)
+     - **Neutral**: General technical resources (OWASP, MDN)
+     - **Google**: General search results
+   - Each search includes API cost tracking (e.g., $0.0115 per search)
+   - Evaluates search results using AI to filter relevant content
+   - Scrapes selected results for detailed content
+
+3. **Outline Generation** (`generate_outline`)
+   - Creates structured content outline
+   - Performs technical evaluation (`perform_technical_eval`)
+     - Generates accuracy, completeness, and clarity ratings
+     - Creates technical recommendations
+   - Performs SEO evaluation (`perform_seo_eval`)
+     - Similar ratings for SEO aspects
+     - SEO-specific recommendations
+   - May retry on failure (with backoff delay)
 
 4. **Parallel Processing**
    - Drafts content sections
@@ -126,6 +175,204 @@ The project uses:
 - Tasks use caching by default but can be forced to revalidate
 - The system maintains a comprehensive audit trail of all operations
 
+## Workflow Visualization
+
+### Understanding the Task Hierarchy
+
+The workflow in Trigger.dev is organized in levels, which represent the nesting and dependencies between tasks:
+
+```mermaid
+graph LR
+    %% Main entry point
+    A["`**generate_glossary_entry**
+    📥 Input: term, onCacheHit
+    🔧 Orchestrates workflow
+    📤 Returns: complete entry`"]
+    
+    %% Step 1: Research Phase
+    A --> B
+    subgraph S1["Step 1: Research Phase"]
+        B["`**keyword_research**
+        📥 term, onCacheHit
+        🔧 Search query → Organic results
+        🔧 Scrape top 3 → Extract keywords
+        📤 keywords array (e.g., 76)`"]
+        
+        C["`**technical_research**
+        📥 inputTerm, onCacheHit
+        🔧 Orchestrates parallel searches
+        📤 scraped technical content`"]
+        
+        B -.->|Sequential| C
+        
+        %% Technical Research Subtasks (vertical)
+        C --> C1["`**exa_domain_search** ×4
+        🔧 Official sites (IETF, W3C)
+        🔧 Community (GitHub, SO)
+        🔧 Neutral (OWASP, MDN)
+        🔧 Google search`"]
+        
+        C1 --> C2["`**evaluate-search-results**
+        🔧 AI filters relevance
+        📤 included/excluded`"]
+        
+        C2 --> C3["`**scrape-search-results**
+        🔧 Full content fetch
+        📤 content + summaries`"]
+    end
+    
+    %% Database checkpoint
+    S1 --> DB1[("`**Database**
+    keywords
+    technicalResearch
+    exaScrapedResults`")]
+    
+    %% Step 2: Content Structure
+    DB1 --> D
+    subgraph S2["Step 2: Content Structure"]
+        D["`**generate_outline**
+        📥 term, onCacheHit
+        🔧 Creates sections structure
+        🔧 Technical + SEO evaluations
+        📤 dynamicSections array`"]
+        
+        D --> D1["`**perform_technical_eval**
+        🔧 Accuracy/completeness
+        📤 ratings + recommendations`"]
+        
+        D --> D2["`**perform_seo_eval**
+        🔧 Keyword optimization
+        📤 SEO improvements`"]
+    end
+    
+    %% Database checkpoint
+    S2 --> DB2[("`**Database**
+    sections
+    evaluations`")]
+    
+    %% Step 3: Content Generation
+    DB2 --> E
+    subgraph S3["Step 3: Content Generation"]
+        E["`**draft_sections**
+        📥 term, onCacheHit
+        🔧 GPT-4 drafts ≤6 sections
+        🔧 Review + SEO optimize
+        📤 markdown content`"]
+        
+        F["`**content_takeaways**
+        📥 term, onCacheHit
+        🔧 Analyze scraped content
+        🔧 TLDR + best practices
+        📤 structured takeaways`"]
+        
+        E -.->|Parallel| F
+    end
+    
+    %% Database checkpoint
+    S3 --> DB3[("`**Database**
+    dynamicSectionsContent
+    contentTakeaways`")]
+    
+    %% Step 4: SEO & Metadata
+    DB3 --> G
+    subgraph S4["Step 4: SEO & Metadata"]
+        G["`**seo_meta_tags**
+        📥 term, onCacheHit
+        🔧 Analyze top 10 rankings
+        🔧 Optimize title/desc/H1
+        📤 meta tags (char limits)`"]
+        
+        H["`**generate_faqs**
+        📥 term, onCacheHit
+        🔧 'People Also Ask' Qs
+        🔧 API-focused answers
+        📤 FAQ array`"]
+        
+        G -.->|Sequential| H
+    end
+    
+    %% Database checkpoint
+    S4 --> DB4[("`**Database**
+    metaTitle/Description
+    faqs`")]
+    
+    %% Step 5: Publishing
+    DB4 --> I
+    subgraph S5["Step 5: Publishing"]
+        I["`**create_pr**
+        📥 input (term), onCacheHit
+        🔧 Create MDX + frontmatter
+        🔧 Handle branch/PR logic
+        📤 githubPrUrl`"]
+    end
+    
+    %% Final database update
+    S5 --> DB5[("`**Database**
+    githubPrUrl
+    status: completed`")]
+    
+    %% Style the database nodes
+    classDef database fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    class DB1,DB2,DB3,DB4,DB5 database
+    
+    %% Style the steps
+    classDef stepGroup fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    class S1,S2,S3,S4,S5 stepGroup
+```
+
+### Task Organization
+
+Tasks can be:
+- **Sequential**: Running one after another (indicated by `triggerAndWait`)
+- **Parallel**: Running concurrently (using `batch.triggerByTaskAndWait`)
+- **Nested**: Sub-tasks that run within parent tasks
+
+### Monitoring Workflow Execution
+
+1. **Logs**: Available in both JSON format and visual representation in the Trigger.dev dashboard
+2. **Levels**: Indicate task hierarchy - higher levels are nested deeper
+3. **Status**: Each task shows its execution status (executing, completed, failed)
+4. **Duration**: Time taken for each task to complete
+5. **Cost Tracking**: API costs are logged for external service calls (Exa, AI generation)
+
+### Understanding Execution Logs
+
+The workflow logs provide detailed insights:
+
+#### Key Log Elements
+- **Run Information**:
+  - `id`: Unique identifier for the run
+  - `status`: Current state (e.g., "WAITING_TO_RESUME", "completed")
+  - `environment`: Shows if running in PRODUCTION or TEST
+
+- **Timeline Events**:
+  - **Dequeued**: Task picked up from queue
+  - **Launched**: Process created to run the task
+  - **Importing task file**: Task file loaded
+  - **Execution**: Actual task logic running
+
+- **Cost Tracking Examples**:
+  ```
+  💰 Exa API costs for the "Official" domain search:
+      Total: $0.0115 
+      Search: $0.0025 (@$0.0025/request)
+  
+  💸 Token usage: 7269 tokens
+      INPUT: $0.000334425
+      OUTPUT: $0.000843
+      TOTAL: $0.001177425
+  ```
+
+#### Error Handling
+- Tasks have retry logic with exponential backoff
+- Example: "Retry #2 delay" shows automatic retry after failure
+- Errors include full stack traces for debugging
+
+#### Performance Metrics
+- Each task logs duration in nanoseconds
+- Parallel tasks show concurrent execution
+- Store operations (upload/download) are tracked separately
+
 ## Testing
 
 ### Trigger.dev
@@ -176,3 +423,97 @@ Result:
   "...",
 ] 
 ```
+
+## Task Reference Guide
+
+### Core Tasks
+
+#### 1. generate_glossary_entry (Main Orchestrator)
+- **Purpose**: Orchestrates the entire glossary generation workflow
+- **Retry**: 0 attempts (relies on subtask retries)
+- **Cache Behavior**: Checks for complete entry before proceeding
+- **Error Handling**: Uses `AbortTaskRunError` for failed subtasks
+
+#### 2. keyword_research
+- **Purpose**: Discovers relevant keywords for the term
+- **Retry**: 3 attempts
+- **Key Operations**:
+  - Generates optimized search query
+  - Fetches organic search results via Serper API
+  - Scrapes top 3 results with Firecrawl
+  - Extracts keywords from titles and headers
+- **Cost**: ~$0.02-0.05 per run (Serper + Firecrawl)
+
+#### 3. technical_research
+- **Purpose**: Gathers authoritative technical content
+- **Parallel Execution**: 4 domain searches run concurrently
+- **Domain Categories**:
+  - Official (IETF, W3C, ISO)
+  - Community (StackOverflow, GitHub, Wikipedia)
+  - Neutral (OWASP, MDN)
+  - Google (general search)
+- **Cost**: ~$0.05-0.10 per run (Exa API + AI evaluation)
+
+#### 4. generate_outline
+- **Purpose**: Creates content structure with evaluations
+- **Retry**: 3 attempts (can be flaky)
+- **Evaluations**:
+  - Technical (accuracy, completeness, clarity)
+  - SEO (keyword optimization)
+  - Editorial (if applicable)
+- **Known Issues**: Memory-intensive, may need splitting
+
+#### 5. draft_sections & content_takeaways
+- **Purpose**: Generate main content and insights
+- **Execution**: Can run in parallel for efficiency
+- **Content Limits**: Up to 6 dynamic sections
+- **AI Model**: GPT-4-turbo for quality
+
+#### 6. seo_meta_tags
+- **Purpose**: Optimizes for search engines
+- **Character Limits**:
+  - Title: max 60 (target 45-50)
+  - Description: max 160 (target 140-145)
+  - H1: max 80 (target 45-50)
+
+#### 7. create_pr
+- **Purpose**: Creates GitHub pull request
+- **Retry**: 0 attempts
+- **Smart Features**:
+  - Detects identical files
+  - Updates existing PRs
+  - Handles branch conflicts
+
+## Tips for Engineers
+
+### Working with the Workflow
+
+1. **Cache Strategy**:
+   - Use `"stale"` for development to save on API costs
+   - Use `"revalidate"` for production to ensure fresh content
+   - Use `"bypass"` when debugging cache-related issues
+
+2. **Monitoring Best Practices**:
+   - Check the Trigger.dev dashboard for real-time execution status
+   - Look for failed tasks and retry patterns
+   - Monitor API costs to optimize usage
+
+3. **Debugging**:
+   - Each task has detailed logs with timestamps
+   - Check the "exception" events for error details
+   - Use task levels to understand execution flow
+
+4. **Performance Optimization**:
+   - Parallel tasks (using `batch`) significantly reduce total execution time
+   - The technical research phase runs 4 domain searches concurrently
+   - Content generation and takeaways run in parallel
+
+5. **Database Considerations**:
+   - All data is persisted to PlanetScale
+   - Check for existing entries before triggering new generations
+   - Use `db:studio` to inspect data directly
+
+6. **Task Dependencies**:
+   - `triggerAndWait` ensures dependent tasks complete before proceeding
+   - The workflow is designed to be resumable if interrupted
+   - Each task stores its output for subsequent tasks to use
