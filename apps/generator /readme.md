@@ -182,7 +182,7 @@ The project uses:
 The workflow in Trigger.dev is organized in levels, which represent the nesting and dependencies between tasks:
 
 ```mermaid
-graph LR
+flowchart LR
     %% Main entry point
     A["`**generate_glossary_entry**
     📥 Input: term, onCacheHit
@@ -190,8 +190,9 @@ graph LR
     📤 Returns: complete entry`"]
     
     %% Step 1: Research Phase
-    A --> B
+    A --> S1
     subgraph S1["Step 1: Research Phase"]
+        direction TB
         B["`**keyword_research**
         📥 term, onCacheHit
         🔧 Search query → Organic results
@@ -203,9 +204,9 @@ graph LR
         🔧 Orchestrates parallel searches
         📤 scraped technical content`"]
         
-        B -.->|Sequential| C
+        B --> C
         
-        %% Technical Research Subtasks (vertical)
+        %% Technical Research Subtasks (vertical under C)
         C --> C1["`**exa_domain_search** ×4
         🔧 Official sites (IETF, W3C)
         🔧 Community (GitHub, SO)
@@ -228,8 +229,9 @@ graph LR
     exaScrapedResults`")]
     
     %% Step 2: Content Structure
-    DB1 --> D
+    DB1 --> S2
     subgraph S2["Step 2: Content Structure"]
+        direction TB
         D["`**generate_outline**
         📥 term, onCacheHit
         🔧 Creates sections structure
@@ -251,8 +253,9 @@ graph LR
     evaluations`")]
     
     %% Step 3: Content Generation
-    DB2 --> E
+    DB2 --> S3
     subgraph S3["Step 3: Content Generation"]
+        direction TB
         E["`**draft_sections**
         📥 term, onCacheHit
         🔧 GPT-4 drafts ≤6 sections
@@ -274,8 +277,9 @@ graph LR
     contentTakeaways`")]
     
     %% Step 4: SEO & Metadata
-    DB3 --> G
+    DB3 --> S4
     subgraph S4["Step 4: SEO & Metadata"]
+        direction TB
         G["`**seo_meta_tags**
         📥 term, onCacheHit
         🔧 Analyze top 10 rankings
@@ -288,7 +292,7 @@ graph LR
         🔧 API-focused answers
         📤 FAQ array`"]
         
-        G -.->|Sequential| H
+        G --> H
     end
     
     %% Database checkpoint
@@ -297,8 +301,9 @@ graph LR
     faqs`")]
     
     %% Step 5: Publishing
-    DB4 --> I
+    DB4 --> S5
     subgraph S5["Step 5: Publishing"]
+        direction TB
         I["`**create_pr**
         📥 input (term), onCacheHit
         🔧 Create MDX + frontmatter
