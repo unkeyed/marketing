@@ -1,5 +1,10 @@
 # Marketing Generator
 
+> [!NOTE]
+> **Video Walkthrough**
+> Check this video walkthrough if you want a guided overview of the workflow
+> [Walkthrough](https://procurato.neetorecord.com/watch/56fc81bd8423c43c4bd1)
+
 A Trigger.dev-based workflow for automatically generating marketing content, specifically focused on glossary entries. The system uses PlanetScale as its database with Drizzle ORM for data management.
 
 ## Running the Glossary Generation Workflow
