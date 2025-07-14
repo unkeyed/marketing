@@ -31,7 +31,7 @@ The glossary generation workflow runs in Trigger.dev's production environment. T
      - `"bypass"`: Bypasses the cache entirely
 
 3. **Run the Workflow**
-   - Click "Run test" button (see screenshot: `/Users/richardpoelderl/Library/Caches/com.raycast.macos/Clipboard/b9b6ada452bd35b5bac6409c49f12952fe905de69d6af8f5390fbaaf340f300a.png`)
+   - Click "Run test" button in bottm right
    - The workflow will start executing
 
 ### Development vs Production
