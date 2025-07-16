@@ -81,6 +81,19 @@ export type Template = {
 };
 
 export const templates: Record<string, Template> = {
+
+  "fingerprint-ratelimit":{
+    title: "Using device fingerprinting to ratelimit",
+    description: "An example of device fingerprinting in combination with ratelimiting, great for waitlists",
+    authors: ["perkinsjr"],
+    repository: "https://github.com/perkinsjr/unkey-fingerprint",
+    image: "",
+    readmeUrl:
+      "https://raw.githubusercontent.com/perkinsjr/unkey-fingerprint/heads/main/README.md",
+
+    language: "Typescript",
+    framework: "Next.js",
+  },
   "vue-meteor": {
     title: "Secure Your Meteor App",
     description: "Protect your Vue 3 adn Vite-powered Meteor app",
