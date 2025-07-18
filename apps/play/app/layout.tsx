@@ -1,10 +1,12 @@
-import { Analytics } from "@vercel/analytics/next";
+import { ConsentManagerProvider } from "@c15t/nextjs";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
 
 import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import "./globals.css";
+import { ConsentBanner } from "./consent-banner";
+import { Tracking } from "./tracking";
 
 export const metadata: Metadata = {
   title: "Unkey Playground",
@@ -19,9 +21,21 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("dark", GeistSans.className)}>
       <body className="w-full bg-black text-[#E2E2E2]">
-        {children}
-        <Analytics />
-        <Toaster duration={7_000} />
+        <ConsentManagerProvider
+          options={{
+            ...(process.env.NEXT_PUBLIC_C15T_MODE
+              ? { mode: "c15t", backendURL: "/api/c15t" }
+              : { mode: "offline" }),
+            react: {
+              colorScheme: "dark",
+            },
+          }}
+        >
+          <ConsentBanner />
+          {children}
+          <Tracking />
+          <Toaster duration={7_000} />
+        </ConsentManagerProvider>
       </body>
     </html>
   );

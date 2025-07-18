@@ -7,6 +7,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
+import { useConsentManager } from "@c15t/nextjs";
 import { track } from "@vercel/analytics";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronRight } from "lucide-react";
@@ -17,7 +18,7 @@ import { DesktopNavLink, MobileNavLink } from "./link";
 
 export function Navigation() {
   const [scrollPercent, setScrollPercent] = useState(0);
-
+  const { hasConsentFor } = useConsentManager();
   const containerVariants = {
     hidden: {
       opacity: 0,
@@ -69,7 +70,9 @@ export function Navigation() {
               IconRight={ChevronRight}
               className="h-8 text-sm"
               onClick={async () => {
-                track("signup", { location: "navigation" });
+                if (hasConsentFor("measurement")) {
+                  track("signup", { location: "navigation" });
+                }
               }}
             />
           </Link>
