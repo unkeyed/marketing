@@ -5,8 +5,6 @@ const themeColors = {
   white: "#FFFFFF",
   black: "#000000",
   textLight: "#E2E2E2",
-  gradientBackground: "linear-gradient(to right, rgb(255 255 255 / 0.8) , rgb(255 255 255 / 1))",
-  borderRadius: "0.5rem",
 } as const;
 
 // Derived theme values
@@ -14,7 +12,6 @@ const themeConfig = {
   bgColor: themeColors.white,
   bgColorDark: themeColors.black,
   primaryColor: themeColors.white,
-  primaryColorHover: themeColors.white,
   textColor: themeColors.textLight,
   get focusRing() {
     return `${this.primaryColor} !important`;
@@ -25,40 +22,30 @@ const themeConfig = {
 } as const;
 
 export function ConsentBanner() {
-  const { bgColor, bgColorDark, primaryColor, primaryColorHover, focusRing, focusShadow } =
-    themeConfig;
+  const { bgColor, bgColorDark, primaryColor, focusRing, focusShadow } = themeConfig;
 
-  const baseTheme = {
-    style: {
-      "--button-focus-ring-dark": primaryColor,
-      "--button-focus-ring": primaryColor,
-      "--button-primary-dark": primaryColor,
-      "--button-primary": primaryColor,
-      "--button-shadow-primary-dark": `var(--button-shadow-dark), inset 0 0 0 1px ${primaryColor}`,
-      "--button-shadow-primary-focus-dark": focusShadow,
-      "--button-shadow-primary-focus": focusShadow,
-      "--button-shadow-primary": `var(--button-shadow), inset 0 0 0 1px ${primaryColor}`,
-      "--button-primary-hover-dark": primaryColorHover,
-      "--button-primary-hover": primaryColorHover,
-      "--button-border-radius": themeColors.borderRadius,
-    },
-  };
+  const mainButtonClassName =
+    "relative flex items-center px-4 gap-2 text-sm font-semibold text-black group-hover:bg-white/90 duration-1000 rounded-lg bg-gradient-to-r from-white/80 to-white h-10";
+  const secondaryButtonClassName =
+    "items-center gap-2 px-4 duration-500 text-white/70 hover:text-white h-10 flex";
 
   return (
     <>
       <CookieBanner
         theme={{
-          "banner.root": {
-            style: {
-              ...baseTheme.style,
-            },
+          "banner.footer.customize-button": {
+            className:
+              "items-center gap-2 px-4 duration-500 text-white/70 hover:text-white h-10 flex",
+            noStyle: true,
+          },
+          "banner.footer.reject-button": {
+            className: secondaryButtonClassName,
+            noStyle: true,
           },
           "banner.footer.accept-button": {
-            style: {
-              "--button-background-color-dark": "#FFFFFF",
-              "--button-primary-dark": "#000000",
-              "--button-primary-hover-dark": "#FFF",
-            },
+            className:
+              "relative flex items-center px-4 gap-2 text-sm font-semibold text-black group-hover:bg-white/90 duration-1000 rounded-lg bg-gradient-to-r from-white/80 to-white h-10",
+            noStyle: true,
           },
         }}
       />
@@ -66,7 +53,6 @@ export function ConsentBanner() {
         theme={{
           "dialog.root": {
             style: {
-              ...baseTheme.style,
               "--accordion-focus-ring-dark": focusRing,
               "--accordion-focus-ring": focusRing,
               "--accordion-focus-shadow-dark": focusShadow,
@@ -86,13 +72,17 @@ export function ConsentBanner() {
               "--widget-accordion-background-color": bgColor,
             },
           },
+          "widget.footer.accept-button": {
+            className: secondaryButtonClassName,
+            noStyle: true,
+          },
+          "widget.footer.reject-button": {
+            className: secondaryButtonClassName,
+            noStyle: true,
+          },
           "widget.footer.save-button": {
-            style: {
-              "--button-background-color-dark":
-                "linear-gradient(to right, rgb(255 255 255 / 0.8) , rgb(255 255 255 / 1))",
-              "--button-primary-dark": "#000000",
-              "--button-primary-hover-dark": "#FFF",
-            },
+            className: mainButtonClassName,
+            noStyle: true,
           },
         }}
       />
