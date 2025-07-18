@@ -42,8 +42,7 @@ export function ConsentBanner() {
             noStyle: true,
           },
           "banner.footer.accept-button": {
-            className:
-            mainButtonClassName,
+            className: mainButtonClassName,
             noStyle: true,
           },
         }}
