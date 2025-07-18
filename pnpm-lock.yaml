@@ -97,8 +97,8 @@ importers:
         specifier: ^1.2.8
         version: 1.2.8
       '@c15t/nextjs':
-        specifier: ^1.4.3
-        version: 1.4.3(@planetscale/database@1.19.0)(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(gel@2.1.0)(next@14.2.15(@opentelemetry/api@1.8.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))(ws@8.18.1)
+        specifier: ^1.4.4
+        version: 1.4.4(@planetscale/database@1.19.0)(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(gel@2.1.0)(next@14.2.15(@opentelemetry/api@1.8.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))(ws@8.18.1)
       '@hookform/resolvers':
         specifier: ^3.3.4
         version: 3.10.0(react-hook-form@7.55.0(react@18.3.1))
@@ -215,8 +215,8 @@ importers:
   apps/www:
     dependencies:
       '@c15t/nextjs':
-        specifier: ^1.4.3
-        version: 1.4.3(@planetscale/database@1.19.0)(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(gel@2.1.0)(next@14.2.26(@opentelemetry/api@1.8.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))(ws@8.18.1)
+        specifier: ^1.4.4
+        version: 1.4.4(@planetscale/database@1.19.0)(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(gel@2.1.0)(next@14.2.26(@opentelemetry/api@1.8.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))(ws@8.18.1)
       '@faker-js/faker':
         specifier: ^8.4.1
         version: 8.4.1
@@ -572,8 +572,8 @@ packages:
   '@c15t/backend@1.4.2':
     resolution: {integrity: sha512-Ki3HXTrGVPW5A0uFCuGyr/jDeFvJxhr9eOCykAuE1yOcXnATUEjqxwa6cH5jRXHz59mf7kLMHdRyjHarXxHqtA==}
 
-  '@c15t/nextjs@1.4.3':
-    resolution: {integrity: sha512-oZ2irMP7IrK1clI6y0uFmVOLSQHQzZniBrPhJxKJ25Ub4TTh27jhcdHeielN1ZEQTPY7T+WPIca9SDo18y8Plw==}
+  '@c15t/nextjs@1.4.4':
+    resolution: {integrity: sha512-BGzu7HRESslNjyK8MZTgvYVL4d1n6LKLJTUyse0X1wEUslaCGbGyJmG1ZnuiuZr3Yiw+27MiycGJ2aMKY2dtiA==}
     peerDependencies:
       next: ^15.0.0 || ^14.0.0
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
@@ -582,8 +582,8 @@ packages:
   '@c15t/node-sdk@1.4.2':
     resolution: {integrity: sha512-APQkUTjp2CJYxLH3Qfu0XcqNpw2ytzCaUjaim5PljMZ8Gv8ecI7LVQgq4H4xn9XddKfVvMIb2MoJIXX8D+a9Lg==}
 
-  '@c15t/react@1.4.3':
-    resolution: {integrity: sha512-XBaC7ut3hEUA0qfXDAxUKflp5Tg3ZNLeUSZSTmxNNAw9+h4H0hof2dWTpbrxEFaQdnDm1t/Pe1jBl/hsp9fnqg==}
+  '@c15t/react@1.4.4':
+    resolution: {integrity: sha512-IwANOzzKsZHTYfJRQGt1JbdZO/GvwaV+y/uQkvqQTzXCcfXClNQc/XneAySuVuXNRSsU5S1vgEJ1JR1g3Os5qQ==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
@@ -3020,8 +3020,8 @@ packages:
     resolution: {integrity: sha512-8SFQbg/0hQ9xy3UNTB0YEnsNBbWfhf7RtnzpL7TkBiTBRfrQ9Fxcnz7VJsleJpyp6rVLvXiuORqjlHi5q+PYuA==}
     engines: {node: '>=10.16.0'}
 
-  c15t@1.4.2:
-    resolution: {integrity: sha512-QyjgulVwjH7CLjB6VF59Vw0JWIL/SmdkruZstF27C+egIjY+hHWOD5uzAo6llhut6fZ0O/UPoaPBESRpR/H8zA==}
+  c15t@1.4.4:
+    resolution: {integrity: sha512-u7iwyjCuKePWX9EXv2CEQe3XYPAJeEyPGqyJfXlxt/Dd6fSqAKHUaX/Xf6QWi97AaIehp8QjcJw8Ka4kPds7eg==}
 
   call-bind-apply-helpers@1.0.2:
     resolution: {integrity: sha512-Sp1ablJ0ivDkSzjcaJdxEunN5/XvksFJ2sMBFfq6x0ryhQV/2b/KwFe21cMpmHtPOSij8K99/wSfoEuTObmuMQ==}
@@ -6350,9 +6350,9 @@ snapshots:
       - supports-color
       - ws
 
-  '@c15t/nextjs@1.4.3(@planetscale/database@1.19.0)(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(gel@2.1.0)(next@14.2.15(@opentelemetry/api@1.8.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))(ws@8.18.1)':
+  '@c15t/nextjs@1.4.4(@planetscale/database@1.19.0)(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(gel@2.1.0)(next@14.2.15(@opentelemetry/api@1.8.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))(ws@8.18.1)':
     dependencies:
-      '@c15t/react': 1.4.3(@planetscale/database@1.19.0)(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(gel@2.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))(ws@8.18.1)
+      '@c15t/react': 1.4.4(@planetscale/database@1.19.0)(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(gel@2.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))(ws@8.18.1)
       '@c15t/translations': 1.4.2
       next: 14.2.15(@opentelemetry/api@1.8.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
@@ -6398,9 +6398,9 @@ snapshots:
       - use-sync-external-store
       - ws
 
-  '@c15t/nextjs@1.4.3(@planetscale/database@1.19.0)(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(gel@2.1.0)(next@14.2.26(@opentelemetry/api@1.8.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))(ws@8.18.1)':
+  '@c15t/nextjs@1.4.4(@planetscale/database@1.19.0)(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(gel@2.1.0)(next@14.2.26(@opentelemetry/api@1.8.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))(ws@8.18.1)':
     dependencies:
-      '@c15t/react': 1.4.3(@planetscale/database@1.19.0)(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(gel@2.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))(ws@8.18.1)
+      '@c15t/react': 1.4.4(@planetscale/database@1.19.0)(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(gel@2.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))(ws@8.18.1)
       '@c15t/translations': 1.4.2
       next: 14.2.26(@opentelemetry/api@1.8.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
@@ -6492,13 +6492,13 @@ snapshots:
       - supports-color
       - ws
 
-  '@c15t/react@1.4.3(@planetscale/database@1.19.0)(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(gel@2.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))(ws@8.18.1)':
+  '@c15t/react@1.4.4(@planetscale/database@1.19.0)(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(gel@2.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))(ws@8.18.1)':
     dependencies:
       '@c15t/node-sdk': 1.4.2(@planetscale/database@1.19.0)(gel@2.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ws@8.18.1)
       '@radix-ui/react-accordion': 1.2.4(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-slot': 1.2.0(@types/react@18.3.20)(react@18.3.1)
       '@radix-ui/react-switch': 1.1.4(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      c15t: 1.4.2(@planetscale/database@1.19.0)(@types/react@18.3.20)(gel@2.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))(ws@8.18.1)
+      c15t: 1.4.4(@planetscale/database@1.19.0)(@types/react@18.3.20)(gel@2.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))(ws@8.18.1)
       clsx: 2.1.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -9008,7 +9008,7 @@ snapshots:
     dependencies:
       streamsearch: 1.1.0
 
-  c15t@1.4.2(@planetscale/database@1.19.0)(@types/react@18.3.20)(gel@2.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))(ws@8.18.1):
+  c15t@1.4.4(@planetscale/database@1.19.0)(@types/react@18.3.20)(gel@2.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))(ws@8.18.1):
     dependencies:
       '@c15t/backend': 1.4.2(@planetscale/database@1.19.0)(gel@2.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ws@8.18.1)
       '@c15t/translations': 1.4.2
