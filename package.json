@@ -13,6 +13,8 @@
     "playground:build": "turbo run build --filter=./apps/play",
     "generator:dev": "turbo run dev --filter=./apps/generator",
     "generator:build": "turbo run build --filter=./apps/generator",
+    "ratelimit:dev": "turbo run dev --filter=./apps/ratelimit",
+    "ratelimit:build": "turbo run build --filter=./apps/ratelimit",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types"
