@@ -256,7 +256,7 @@ export default function RatelimitPage() {
                 }}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue defaultValue={limit} />
+                  <SelectValue defaultValue={duration} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="10s">10s</SelectItem>
