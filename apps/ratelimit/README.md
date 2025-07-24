@@ -53,7 +53,7 @@ The comparison runs on Vercel Edge Runtime, which automatically routes requests 
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/unkeyed/marketing
    cd marketing/apps/ratelimit
    ```
 
@@ -63,7 +63,7 @@ The comparison runs on Vercel Edge Runtime, which automatically routes requests 
    ```
 
 3. **Set up environment variables**
-   Create a `.env.local` file:
+   Create a `.env` file:
    ```bash
    UPSTASH_REDIS_REST_URL=your_upstash_redis_url
    UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_token
