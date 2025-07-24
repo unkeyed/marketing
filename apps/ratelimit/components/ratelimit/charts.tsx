@@ -71,6 +71,15 @@ export interface TimeseriesLineChartProps {
   yAxisDomain?: [number, number];
 }
 
+const REGION_NAMES: Record<string, string> = {
+  bom1: "Mumbai, India",
+  fra1: "Frankfurt, Germany",
+  iad1: "Washington, DC",
+  kix1: "Osaka, Japan",
+  lhr1: "London, UK",
+  sfo1: "San Francisco, CA",
+};
+
 // Custom Tooltip Component
 const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (!active || !payload?.length) {
@@ -118,19 +127,10 @@ const CustomBarTooltip = ({ active, payload, label }: CustomBarTooltipProps) => 
     return null;
   }
 
-  const regionNames: Record<string, string> = {
-    bom1: "Mumbai, India",
-    fra1: "Frankfurt, Germany",
-    iad1: "Washington, DC",
-    kix1: "Osaka, Japan",
-    lhr1: "London, UK",
-    sfo1: "San Francisco, CA",
-  };
-
   return (
     <div className="rounded-lg shadow-lg border border-gray-200 bg-white dark:bg-gray-800 p-3">
       <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 font-medium">
-        {label ? regionNames[label] || label : "Unknown"}
+        {label ? REGION_NAMES[label] || label : "Unknown"}
       </p>
       {payload.map((item) => (
         <div key={item.dataKey} className="flex items-center gap-2 text-sm">
@@ -216,15 +216,8 @@ export const BarChart = ({
           <XAxis
             dataKey="name"
             tickFormatter={(value) => {
-              const regionNames: Record<string, string> = {
-                bom1: "Mumbai",
-                fra1: "Frankfurt",
-                iad1: "Washington",
-                kix1: "Osaka",
-                lhr1: "London",
-                sfo1: "San Francisco",
-              };
-              return regionNames[value] || value;
+              const shortName = REGION_NAMES[value]?.split(",")[0] || value;
+              return shortName;
             }}
             axisLine={false}
             tickLine={false}

@@ -123,7 +123,7 @@ export default function RatelimitPage() {
         results.forEach((result, index) => {
           if (result) {
             const region = REGIONS[index];
-            combinedData.unkey[region.code] = result.unkey || result.unkeySync;
+            combinedData.unkey[region.code] = result.unkey;
             combinedData.upstash[region.code] = result.upstash;
           }
         });
@@ -252,7 +252,7 @@ export default function RatelimitPage() {
               <Select
                 value={duration}
                 onValueChange={(d) => {
-                  setDuration(d as any);
+                  setDuration(d as "10s" | "60s" | "5m");
                 }}
               >
                 <SelectTrigger className="w-full">
