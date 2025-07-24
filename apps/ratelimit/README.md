@@ -133,7 +133,7 @@ Each region has its own API endpoint that tests both services:
 - `/sfo1` - San Francisco
 
 #### Request Format
-```typescript
+```typescript 
 POST /{region}
 Content-Type: application/json
 
