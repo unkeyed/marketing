@@ -44,9 +44,7 @@ export const POST = async (req: Request): Promise<Response> => {
 
   const t1 = performance.now();
   const [unkeyResponse, upstashResponse] = await Promise.all([
-    unkey
-      .limit(`${id}-unkey-bom1`)
-      .then((res) => ({ ...res, latency: performance.now() - t1 })),
+    unkey.limit(`${id}-unkey-bom1`).then((res) => ({ ...res, latency: performance.now() - t1 })),
     upstash
       .limit(`${id}-upstash-bom1`)
       .then((res) => ({ ...res, latency: performance.now() - t1 })),
