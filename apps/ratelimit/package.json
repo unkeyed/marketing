@@ -13,7 +13,7 @@
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-select": "^2.1.7",
     "@radix-ui/react-slot": "^1.1.0",
-    "@unkey/ratelimit": "^2.0.0",
+    "@unkey/ratelimit": "^2.1.0",
     "@upstash/ratelimit": "^2.0.5",
     "@upstash/redis": "^1.35.1",
     "class-variance-authority": "^0.7.0",

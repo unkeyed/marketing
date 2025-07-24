@@ -300,6 +300,24 @@ export default function RatelimitPage() {
                 </CardContent>
               </Card>
 
+              <Card className="w-full">
+                <CardHeader>
+                  <CardTitle>Why does latency go to 0 in Washington after being limited?</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-justify">
+                    Once ratelimited both Unkey and Upstash have 0 latency that is because we
+                    enabled ephemeralCache. This is important because Upstash charges per request,
+                    regardless if the user is being ratelimited. So this will reduce costs by
+                    avoiding round trips.
+                  </div>
+                  <div className="my-2">
+                    Unkey does not charge for ratelimited requests so for the most part this is a
+                    pointless feature to enable.
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Line Charts */}
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 {/* Unkey Chart */}

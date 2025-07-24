@@ -25,22 +25,19 @@ export default function ExplainerPage() {
           <h2 className="text-3xl font-bold mb-6">Overview</h2>
           <div className="prose prose-gray dark:prose-invert max-w-none text-lg leading-relaxed">
             <p className="mb-4">
-              This demo compares the latency performance of two ratelimit
-              services:
+              This demo compares the latency performance of two ratelimit services:
               <strong> Unkey</strong> and <strong>Upstash Redis</strong>
               (a popular Redis-based approach) across six global regions.
             </p>
             <p className="mb-4">
-              The comparison runs on Vercel Edge Runtime, which automatically
-              routes requests to the nearest edge location, providing a
-              realistic test of how each service performs from different
-              geographic locations.
+              The comparison runs on Vercel Edge Runtime, which automatically routes requests to the
+              nearest edge location, providing a realistic test of how each service performs from
+              different geographic locations.
             </p>
             <p>
-              <strong>Important:</strong> We used AWS region us-east-1 for
-              Upstash Redis. This is where Unkey is hosted however we are
-              globally distributed to ensure a fair performance comparison with
-              consistent infrastructure.
+              <strong>Important:</strong> We used AWS region us-east-1 for Upstash Redis. This is
+              where Unkey is hosted however we are globally distributed to ensure a fair performance
+              comparison with consistent infrastructure.
             </p>
           </div>
         </section>
@@ -55,29 +52,29 @@ export default function ExplainerPage() {
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-blue-500 rounded-full mt-3 mr-3 flex-shrink-0" />
               <span>
-                <strong>Test Configuration:</strong> Users can set the rate
-                limit (requests per window) and duration (10s, 60s, or 5m)
+                <strong>Test Configuration:</strong> Users can set the rate limit (requests per
+                window) and duration (10s, 60s, or 5m)
               </span>
             </li>
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-blue-500 rounded-full mt-3 mr-3 flex-shrink-0" />
               <span>
-                <strong>Parallel Testing:</strong> Simultaneously tests all 6
-                regions when you click "Test"
+                <strong>Parallel Testing:</strong> Simultaneously tests all 6 regions when you click
+                "Test"
               </span>
             </li>
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-blue-500 rounded-full mt-3 mr-3 flex-shrink-0" />
               <span>
-                <strong>Real-time Visualization:</strong> Displays latency data
-                in line charts and bar charts using Recharts
+                <strong>Real-time Visualization:</strong> Displays latency data in line charts and
+                bar charts using Recharts
               </span>
             </li>
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-blue-500 rounded-full mt-3 mr-3 flex-shrink-0" />
               <span>
-                <strong>Data Persistence:</strong> Uses browser localStorage to
-                maintain test history across sessions
+                <strong>Data Persistence:</strong> Uses browser localStorage to maintain test
+                history across sessions
               </span>
             </li>
           </ul>
@@ -86,52 +83,37 @@ export default function ExplainerPage() {
             Backend API Routes
           </h3>
           <p className="text-lg mb-4">
-            Each region has its own API endpoint that runs on Vercel's Edge
-            Runtime:
+            Each region has its own API endpoint that runs on Vercel's Edge Runtime:
           </p>
           <ul className="grid grid-cols-2 gap-2 mb-6">
             <li className="flex items-center space-x-2">
-              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">
-                /bom1
-              </code>
+              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">/bom1</code>
               <span>Mumbai, India</span>
             </li>
             <li className="flex items-center space-x-2">
-              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">
-                /fra1
-              </code>
+              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">/fra1</code>
               <span>Frankfurt, Germany</span>
             </li>
             <li className="flex items-center space-x-2">
-              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">
-                /iad1
-              </code>
+              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">/iad1</code>
               <span>Washington, DC</span>
             </li>
             <li className="flex items-center space-x-2">
-              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">
-                /kix1
-              </code>
+              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">/kix1</code>
               <span>Osaka, Japan</span>
             </li>
             <li className="flex items-center space-x-2">
-              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">
-                /lhr1
-              </code>
+              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">/lhr1</code>
               <span>London, UK</span>
             </li>
             <li className="flex items-center space-x-2">
-              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">
-                /sfo1
-              </code>
+              <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">/sfo1</code>
               <span>San Francisco, CA</span>
             </li>
           </ul>
           <p className="text-lg">
             Each endpoint is configured with{" "}
-            <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-              preferredRegion
-            </code>{" "}
+            <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">preferredRegion</code>{" "}
             to ensure the code runs in that specific geographic location.
           </p>
         </section>
@@ -143,24 +125,22 @@ export default function ExplainerPage() {
             1. User Identity
           </h3>
           <p className="text-lg mb-6">
-            Each user gets a unique identifier stored in a cookie. This ensures
-            consistent ratelimiting across test runs and prevents interference
-            between different users.
+            Each user gets a unique identifier stored in a cookie. This ensures consistent
+            ratelimiting across test runs and prevents interference between different users.
           </p>
 
           <h3 className="text-2xl font-semibold mb-4 text-green-600 dark:text-green-400">
             2. Parallel Execution
           </h3>
           <p className="text-lg mb-4">
-            When you click "Test", the frontend makes simultaneous POST requests
-            to all 6 regional endpoints. Each endpoint:
+            When you click "Test", the frontend makes simultaneous POST requests to all 6 regional
+            endpoints. Each endpoint:
           </p>
           <ul className="space-y-3 mb-6">
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-green-500 rounded-full mt-3 mr-3 flex-shrink-0" />
               <span className="text-lg">
-                Configures both Unkey and Upstash ratelimiters with your
-                specified settings
+                Configures both Unkey and Upstash ratelimiters with your specified settings
               </span>
             </li>
             <li className="flex items-start">
@@ -170,8 +150,8 @@ export default function ExplainerPage() {
                 <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
                   performance.now()
                 </code>{" "}
-                to measure precise timing at the lambda level, ensuring accurate
-                rate limiting metrics
+                to measure precise timing at the lambda level, ensuring accurate rate limiting
+                metrics
               </span>
             </li>
             <li className="flex items-start">
@@ -185,9 +165,7 @@ export default function ExplainerPage() {
             </li>
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-green-500 rounded-full mt-3 mr-3 flex-shrink-0" />
-              <span className="text-lg">
-                Returns the results including latency measurements
-              </span>
+              <span className="text-lg">Returns the results including latency measurements</span>
             </li>
           </ul>
 
@@ -195,27 +173,21 @@ export default function ExplainerPage() {
             3. Latency Measurement
           </h3>
           <p className="text-lg mb-4">
-            Latency is measured from the moment the ratelimit request starts
-            until the response is received. This includes:
+            Latency is measured from the moment the ratelimit request starts until the response is
+            received. This includes:
           </p>
           <ul className="space-y-3 mb-6">
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-green-500 rounded-full mt-3 mr-3 flex-shrink-0" />
-              <span className="text-lg">
-                Network round-trip time to the ratelimit service
-              </span>
+              <span className="text-lg">Network round-trip time to the ratelimit service</span>
             </li>
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-green-500 rounded-full mt-3 mr-3 flex-shrink-0" />
-              <span className="text-lg">
-                Processing time within the ratelimit service
-              </span>
+              <span className="text-lg">Processing time within the ratelimit service</span>
             </li>
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-green-500 rounded-full mt-3 mr-3 flex-shrink-0" />
-              <span className="text-lg">
-                Any connection establishment overhead
-              </span>
+              <span className="text-lg">Any connection establishment overhead</span>
             </li>
           </ul>
         </section>
@@ -244,15 +216,12 @@ const result = await unkey.limit(\`\${id}-unkey-\${region}\`);`}
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-purple-500 rounded-full mt-3 mr-3 flex-shrink-0" />
               <span className="text-lg">
-                Each user gets a unique key per region to prevent cross-region
-                interference
+                Each user gets a unique key per region to prevent cross-region interference
               </span>
             </li>
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-purple-500 rounded-full mt-3 mr-3 flex-shrink-0" />
-              <span className="text-lg">
-                Supports sliding window ratelimiting
-              </span>
+              <span className="text-lg">Supports sliding window ratelimiting</span>
             </li>
           </ul>
 
@@ -271,21 +240,16 @@ const result = await upstash.limit(\`\${id}-upstash-\${region}\`);`}
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-purple-500 rounded-full mt-3 mr-3 flex-shrink-0" />
               <span className="text-lg">
-                Uses Upstash global Redis compatible database with a primary in
-                us-east-1
+                Uses Upstash global Redis compatible database with a primary in us-east-1
               </span>
             </li>
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-purple-500 rounded-full mt-3 mr-3 flex-shrink-0" />
-              <span className="text-lg">
-                Implements sliding window algorithm
-              </span>
+              <span className="text-lg">Implements sliding window algorithm</span>
             </li>
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-purple-500 rounded-full mt-3 mr-3 flex-shrink-0" />
-              <span className="text-lg">
-                Separate keys per user and region for fair comparison
-              </span>
+              <span className="text-lg">Separate keys per user and region for fair comparison</span>
             </li>
           </ul>
 
@@ -324,22 +288,19 @@ const result = await upstash.limit(\`\${id}-upstash-\${region}\`);`}
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-orange-500 rounded-full mt-3 mr-3 flex-shrink-0" />
               <span className="text-lg">
-                <strong>Bar Chart:</strong> Compares latest latency across all
-                regions side-by-side
+                <strong>Bar Chart:</strong> Compares latest latency across all regions side-by-side
               </span>
             </li>
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-orange-500 rounded-full mt-3 mr-3 flex-shrink-0" />
               <span className="text-lg">
-                <strong>Line Charts:</strong> Show latency trends over time for
-                each service
+                <strong>Line Charts:</strong> Show latency trends over time for each service
               </span>
             </li>
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-orange-500 rounded-full mt-3 mr-3 flex-shrink-0" />
               <span className="text-lg">
-                <strong>Region Cards:</strong> Display detailed metrics for the
-                most recent test
+                <strong>Region Cards:</strong> Display detailed metrics for the most recent test
               </span>
             </li>
           </ul>
@@ -348,50 +309,32 @@ const result = await upstash.limit(\`\${id}-upstash-\${region}\`);`}
             Color Coding
           </h3>
           <p className="text-lg mb-4">
-            Each region has a consistent color across all visualizations, making
-            it easy to track performance patterns:
+            Each region has a consistent color across all visualizations, making it easy to track
+            performance patterns:
           </p>
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="flex items-center space-x-3">
-              <div
-                className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: "#7a2c65" }}
-              />
+              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: "#7a2c65" }} />
               <span className="text-lg">Mumbai: Purple</span>
             </div>
             <div className="flex items-center space-x-3">
-              <div
-                className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: "#3b9e9d" }}
-              />
+              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: "#3b9e9d" }} />
               <span className="text-lg">Frankfurt: Teal</span>
             </div>
             <div className="flex items-center space-x-3">
-              <div
-                className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: "#e27c9d" }}
-              />
+              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: "#e27c9d" }} />
               <span className="text-lg">Washington DC: Pink</span>
             </div>
             <div className="flex items-center space-x-3">
-              <div
-                className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: "#8a7141" }}
-              />
+              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: "#8a7141" }} />
               <span className="text-lg">Osaka: Brown</span>
             </div>
             <div className="flex items-center space-x-3">
-              <div
-                className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: "#309e25" }}
-              />
+              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: "#309e25" }} />
               <span className="text-lg">London: Green</span>
             </div>
             <div className="flex items-center space-x-3">
-              <div
-                className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: "#f1d632" }}
-              />
+              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: "#f1d632" }} />
               <span className="text-lg">San Francisco: Yellow</span>
             </div>
           </div>
@@ -403,9 +346,7 @@ const result = await upstash.limit(\`\${id}-upstash-\${region}\`);`}
           <h3 className="text-2xl font-semibold mb-4 text-red-600 dark:text-red-400">
             Real-World Performance
           </h3>
-          <p className="text-lg mb-4">
-            This demo provides realistic performance data because:
-          </p>
+          <p className="text-lg mb-4">This demo provides realistic performance data because:</p>
           <ul className="space-y-3 mb-8">
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-red-500 rounded-full mt-3 mr-3 flex-shrink-0" />
@@ -416,15 +357,13 @@ const result = await upstash.limit(\`\${id}-upstash-\${region}\`);`}
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-red-500 rounded-full mt-3 mr-3 flex-shrink-0" />
               <span className="text-lg">
-                Includes real network latency and geographic distribution
-                effects
+                Includes real network latency and geographic distribution effects
               </span>
             </li>
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-red-500 rounded-full mt-3 mr-3 flex-shrink-0" />
               <span className="text-lg">
-                Uses the same deployment architecture (Vercel Edge) many
-                applications use
+                Uses the same deployment architecture (Vercel Edge) many applications use
               </span>
             </li>
           </ul>
@@ -436,22 +375,22 @@ const result = await upstash.limit(\`\${id}-upstash-\${region}\`);`}
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-red-500 rounded-full mt-3 mr-3 flex-shrink-0" />
               <span className="text-lg">
-                <strong>Geographic Distribution:</strong> How close the
-                ratelimit service is to your users
+                <strong>Geographic Distribution:</strong> How close the ratelimit service is to your
+                users
               </span>
             </li>
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-red-500 rounded-full mt-3 mr-3 flex-shrink-0" />
               <span className="text-lg">
-                <strong>Network Optimization:</strong> How well the service
-                handles global connectivity
+                <strong>Network Optimization:</strong> How well the service handles global
+                connectivity
               </span>
             </li>
             <li className="flex items-start">
               <span className="inline-block w-2 h-2 bg-red-500 rounded-full mt-3 mr-3 flex-shrink-0" />
               <span className="text-lg">
-                <strong>Infrastructure Design:</strong> Whether the service is
-                built for edge computing
+                <strong>Infrastructure Design:</strong> Whether the service is built for edge
+                computing
               </span>
             </li>
           </ul>
@@ -460,22 +399,9 @@ const result = await upstash.limit(\`\${id}-upstash-\${region}\`);`}
             What the Results Show
           </h3>
           <p className="text-lg">
-            Typically, you'll observe that Unkey demonstrates consistently lower
-            latency across regions due to its edge-native architecture, while
-            traditional Redis-based solutions may show higher latency especially
-            from regions distant from the Redis instance.
-          </p>
-          <p className="text-lg">
-            You will see that in Washington, DC once ratelimited both Unkey and
-            Upstash have 0 latency that is because we enabled
-            **ephemeralCache**. The reason this is important is because Upstash
-            charges per request, regardless if the user is being ratelimited or
-            not. So this will reduce costs by avoiding unnecessary round trips.
-            You can read about [Upstash's
-            caching](https://upstash.com/docs/redis/sdks/ratelimit-ts/features#caching)
-            to learn more. Unkey does not charge for ratelimited requests so for
-            the most part this is a pointless feature to enable when using
-            Unkey.
+            Typically, you'll observe that Unkey demonstrates consistently lower latency across
+            regions due to its edge-native architecture, while traditional Redis-based solutions may
+            show higher latency especially from regions distant from the Redis instance.
           </p>
         </section>
 
@@ -490,8 +416,8 @@ const result = await upstash.limit(\`\${id}-upstash-\${region}\`);`}
             <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
               export const runtime = "edge"
             </code>{" "}
-            to ensure they run on Vercel's Edge Runtime rather than Node.js,
-            providing faster cold starts and better geographic distribution.
+            to ensure they run on Vercel's Edge Runtime rather than Node.js, providing faster cold
+            starts and better geographic distribution.
           </p>
 
           <h3 className="text-2xl font-semibold mb-4 text-indigo-600 dark:text-indigo-400">
@@ -502,45 +428,38 @@ const result = await upstash.limit(\`\${id}-upstash-\${region}\`);`}
             <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
               performance.now()
             </code>{" "}
-            for sub-millisecond timing precision, ensuring accurate latency
-            measurements even for very fast operations. This is run on the
-            Lambda to ensure consistent and accurate timing measurements.
+            for sub-millisecond timing precision, ensuring accurate latency measurements even for
+            very fast operations. This is run on the Lambda to ensure consistent and accurate timing
+            measurements.
           </p>
 
           <h3 className="text-2xl font-semibold mb-4 text-indigo-600 dark:text-indigo-400">
             Reset Functionality
           </h3>
           <p className="text-lg mb-6">
-            The "Reset" button clears the user cookie, effectively giving you a
-            fresh identity for testing. This is useful when you want to test
-            different scenarios without being affected by previous rate limit
-            state.
+            The "Reset" button clears the user cookie, effectively giving you a fresh identity for
+            testing. This is useful when you want to test different scenarios without being affected
+            by previous rate limit state.
           </p>
 
           <h3 className="text-2xl font-semibold mb-4 text-indigo-600 dark:text-indigo-400">
             Data Persistence
           </h3>
           <p className="text-lg mb-6">
-            Test results are stored in browser localStorage, so you can refresh
-            the page or come back later and still see your test history. Data is
-            scoped to the specific demo instance.
+            Test results are stored in browser localStorage, so you can refresh the page or come
+            back later and still see your test history. Data is scoped to the specific demo
+            instance.
           </p>
         </section>
 
         <div className="flex flex-col gap-2 md:gap-1 md:flex-row justify-center mt-12">
           <Link href="/">
-            <Button
-              size="lg"
-              className="w-full  px-8 py-3 text-lg cursor-pointer"
-            >
+            <Button size="lg" className="w-full  px-8 py-3 text-lg cursor-pointer">
               Try the Demo Yourself
             </Button>
           </Link>
           <a href="https://go.unkey.com/so-quick">
-            <Button
-              size="lg"
-              className="w-full px-8 py-3 text-lg cursor-pointer"
-            >
+            <Button size="lg" className="w-full px-8 py-3 text-lg cursor-pointer">
               Read the code
             </Button>
           </a>

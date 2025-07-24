@@ -227,8 +227,8 @@ importers:
         specifier: ^1.1.0
         version: 1.2.0(@types/react@19.1.8)(react@19.1.0)
       '@unkey/ratelimit':
-        specifier: ^2.0.0
-        version: 2.0.0(zod@4.0.5)
+        specifier: ^2.1.0
+        version: 2.1.0(zod@4.0.5)
       '@upstash/ratelimit':
         specifier: ^2.0.5
         version: 2.0.5(@upstash/redis@1.35.1)
@@ -3308,8 +3308,8 @@ packages:
   '@unkey/error@0.0.2':
     resolution: {integrity: sha512-E4/2PClLeZ/X9nGUqe36xy/tX2KFwBsOrqCMZbG3mscAUsHtnjSLzV8xa9TVQlfH4tXt2mfgAqxLqEwr1ayZDA==}
 
-  '@unkey/ratelimit@2.0.0':
-    resolution: {integrity: sha512-QwOBO7n7BngOZ8yknh4KyHVFweBYk9gVED33y7BpBZMLXnBeLnc2ttMXqTUH7b5rhyQkqnWrqHw4fbxLu8UnkQ==}
+  '@unkey/ratelimit@2.1.0':
+    resolution: {integrity: sha512-beBXluABoMI8QLEVQbC6XZmVcueenRQ7f0UWLmPHo/c99hCTZ3Xc0PG9HMC5Ki890sgJT+aJFpT1tx/pnzi9HA==}
 
   '@unkey/rbac@0.1.13':
     resolution: {integrity: sha512-BUuKQb7xoI2e+UtuDvr5U0ShZkG1gG8UxG5VzL6tonmoxGVC1vP0ZS5TKMLbhjYD6Dh5SDeak95qGDsQdaX7Ew==}
@@ -10279,7 +10279,7 @@ snapshots:
       zod: 3.24.2
       zod-error: 1.5.0
 
-  '@unkey/ratelimit@2.0.0(zod@4.0.5)':
+  '@unkey/ratelimit@2.1.0(zod@4.0.5)':
     dependencies:
       '@unkey/api': 2.0.0-alpha.7(zod@4.0.5)
     transitivePeerDependencies:

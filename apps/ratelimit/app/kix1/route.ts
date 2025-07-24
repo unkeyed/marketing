@@ -9,7 +9,6 @@ export const runtime = "edge";
 export const preferredRegion = ["kix1"];
 
 const UNKEY_RATELIMIT_COOKIE = "UNKEY_RATELIMIT";
-const cache = new Map();
 export const POST = async (req: Request): Promise<Response> => {
   const cookieStore = await cookies();
   const { limit, duration } = z
@@ -43,9 +42,7 @@ export const POST = async (req: Request): Promise<Response> => {
 
   const t1 = performance.now();
   const [unkeyResponse, upstashResponse] = await Promise.all([
-    unkey
-      .limit(`${id}-unkey-kix1`)
-      .then((res) => ({ ...res, latency: performance.now() - t1 })),
+    unkey.limit(`${id}-unkey-kix1`).then((res) => ({ ...res, latency: performance.now() - t1 })),
     upstash
       .limit(`${id}-upstash-kix1`)
       .then((res) => ({ ...res, latency: performance.now() - t1 })),

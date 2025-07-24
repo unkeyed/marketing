@@ -9,7 +9,8 @@ export const runtime = "edge";
 export const preferredRegion = ["iad1"];
 
 const UNKEY_RATELIMIT_COOKIE = "UNKEY_RATELIMIT";
-const cache = new Map();
+const upstashCache = new Map();
+const unkeyCache = new Map();
 export const POST = async (req: Request): Promise<Response> => {
   const cookieStore = await cookies();
   const { limit, duration } = z
@@ -24,12 +25,13 @@ export const POST = async (req: Request): Promise<Response> => {
     rootKey: env().RATELIMIT_DEMO_ROOT_KEY,
     limit,
     duration,
+    cache: unkeyCache,
   });
 
   const upstash = new UpstashRatelimit({
     redis: Redis.fromEnv(),
     limiter: UpstashRatelimit.slidingWindow(limit, duration),
-    ephemeralCache: cache,
+    ephemeralCache: upstashCache,
   });
 
   let id: string = crypto.randomUUID();
