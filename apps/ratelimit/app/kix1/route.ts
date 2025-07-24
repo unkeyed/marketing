@@ -29,7 +29,6 @@ export const POST = async (req: Request): Promise<Response> => {
   const upstash = new UpstashRatelimit({
     redis: Redis.fromEnv(),
     limiter: UpstashRatelimit.slidingWindow(limit, duration),
-    ephemeralCache: cache,
   });
 
   let id: string = crypto.randomUUID();

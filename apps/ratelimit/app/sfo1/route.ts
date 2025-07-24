@@ -30,7 +30,6 @@ export const POST = async (req: Request): Promise<Response> => {
   const upstash = new UpstashRatelimit({
     redis: Redis.fromEnv(),
     limiter: UpstashRatelimit.slidingWindow(limit, duration),
-    ephemeralCache: cache,
   });
 
   let id: string = crypto.randomUUID();
@@ -45,7 +44,9 @@ export const POST = async (req: Request): Promise<Response> => {
 
   const t1 = performance.now();
   const [unkeyResponse, upstashResponse] = await Promise.all([
-    unkey.limit(`${id}-unkey-sfo1`).then((res) => ({ ...res, latency: performance.now() - t1 })),
+    unkey
+      .limit(`${id}-unkey-sfo1`)
+      .then((res) => ({ ...res, latency: performance.now() - t1 })),
     upstash
       .limit(`${id}-upstash-sfo1`)
       .then((res) => ({ ...res, latency: performance.now() - t1 })),
