@@ -1,14 +1,10 @@
+import { insertSectionContentTypeSchema, insertSectionSchema } from "@/lib/db-marketing/schemas";
 import { openai } from "@ai-sdk/openai";
-import { task, type TaskOutput } from "@trigger.dev/sdk/v3";
+import { type TaskOutput, task } from "@trigger.dev/sdk/v3";
 import { generateObject } from "ai";
 import { z } from "zod";
 import type { CacheStrategy } from "../_generate-glossary-entry";
 import type { performTechnicalEvalTask } from "../evaluate/evals";
-import {
-  insertSectionContentTypeSchema,
-  insertSectionSchema,
-  selectKeywordsSchema,
-} from "@/lib/db-marketing/schemas";
 
 // Schema for the revised outline
 const technicalOutlineSchema = z.object({
@@ -77,22 +73,28 @@ You have the ability to add, modify, or merge sections in the outline as needed 
 `;
 
     // Parse ratings and recommendations if they are strings
-    const ratings = typeof reviewReport.ratings === 'string' ? JSON.parse(reviewReport.ratings) : reviewReport.ratings;
-    const recommendations = typeof reviewReport.recommendations === 'string' ? JSON.parse(reviewReport.recommendations) : reviewReport.recommendations;
+    const ratings =
+      typeof reviewReport.ratings === "string"
+        ? JSON.parse(reviewReport.ratings)
+        : reviewReport.ratings;
+    const recommendations =
+      typeof reviewReport.recommendations === "string"
+        ? JSON.parse(reviewReport.recommendations)
+        : reviewReport.recommendations;
 
     const technicalRevisionPrompt = `
 Review and refine the outline for the term "${term}".
 
 Current outline has ${outlineToRefine.length} sections:
-${outlineToRefine.map((s, i) => `${i + 1}. ${s.heading} - ${s.description.substring(0, 100)}...`).join('\n')}
+${outlineToRefine.map((s, i) => `${i + 1}. ${s.heading} - ${s.description.substring(0, 100)}...`).join("\n")}
 
 Technical Review Feedback:
-- Accuracy Rating: ${ratings?.accuracy || 'N/A'}/10
-- Completeness Rating: ${ratings?.completeness || 'N/A'}/10  
-- Clarity Rating: ${ratings?.clarity || 'N/A'}/10
+- Accuracy Rating: ${ratings?.accuracy || "N/A"}/10
+- Completeness Rating: ${ratings?.completeness || "N/A"}/10  
+- Clarity Rating: ${ratings?.clarity || "N/A"}/10
 
 Key Recommendations:
-${recommendations?.map((r: any) => `- ${r.type}: ${r.description}`).join('\n') || 'No specific recommendations'}
+${recommendations?.map((r: any) => `- ${r.type}: ${r.description}`).join("\n") || "No specific recommendations"}
 
 Technical Context Summary:
 ${technicalContext.substring(0, 1000)}...
@@ -130,25 +132,32 @@ Notes:
       schema: technicalOutlineSchema,
       experimental_repairText: async (res) => {
         console.warn(`[revise_technical_outline] Schema mismatch, attempting repair`);
-        
+
         try {
           // First check if JSON appears complete
           const trimmedText = res.text.trim();
           const lastChars = trimmedText.slice(-20);
-          const hasProperEnding = trimmedText.endsWith('}]}') || trimmedText.endsWith('}]\n}');
-          
+          const hasProperEnding = trimmedText.endsWith("}]}") || trimmedText.endsWith("}]\n}");
+
           if (!hasProperEnding) {
-            console.error('[revise_technical_outline] ❌ Response appears truncated');
-            console.error('Expected ending: }]} or }]\n}');
-            console.error('Actual ending:', lastChars);
-            console.error('Full length:', trimmedText.length, 'characters');
-            
+            console.error("[revise_technical_outline] ❌ Response appears truncated");
+            console.error("Expected ending: }]} or }]\n}");
+            console.error("Actual ending:", lastChars);
+            console.error("Full length:", trimmedText.length, "characters");
+
             // Check bracket balance as additional validation
             const openBrackets = (trimmedText.match(/[{\[]/g) || []).length;
             const closeBrackets = (trimmedText.match(/[}\]]/g) || []).length;
-            console.error('Bracket balance: { [ opened:', openBrackets, '} ] closed:', closeBrackets);
-            
-            throw new Error('Response was truncated. The outline is incomplete. Try reducing the number of sections or description length.');
+            console.error(
+              "Bracket balance: { [ opened:",
+              openBrackets,
+              "} ] closed:",
+              closeBrackets,
+            );
+
+            throw new Error(
+              "Response was truncated. The outline is incomplete. Try reducing the number of sections or description length.",
+            );
           }
 
           // Try to parse as JSON
@@ -156,21 +165,21 @@ Notes:
           try {
             parsed = JSON.parse(res.text);
           } catch (e) {
-            console.error('[revise_technical_outline] ❌ JSON parse failed despite proper ending');
-            console.error('Parse error:', e);
-            console.error('Raw text (last 200 chars):', res.text.slice(-200));
-            throw new Error('Invalid JSON format. Please try again.');
+            console.error("[revise_technical_outline] ❌ JSON parse failed despite proper ending");
+            console.error("Parse error:", e);
+            console.error("Raw text (last 200 chars):", res.text.slice(-200));
+            throw new Error("Invalid JSON format. Please try again.");
           }
 
           // First check what validation errors we have
           const initialParseResult = technicalOutlineSchema.safeParse(parsed);
           if (!initialParseResult.success) {
-            console.error('[revise_technical_outline] ❌ Initial Zod validation errors:');
+            console.error("[revise_technical_outline] ❌ Initial Zod validation errors:");
             initialParseResult.error.issues.forEach((issue, index) => {
-              console.error(`  ${index + 1}. Path: ${issue.path.join('.')}`);
+              console.error(`  ${index + 1}. Path: ${issue.path.join(".")}`);
               console.error(`     Error: ${issue.message}`);
               console.error(`     Type: ${issue.code}`);
-              if (issue.code === 'invalid_type') {
+              if (issue.code === "invalid_type") {
                 console.error(`     Expected: ${issue.expected}, Received: ${issue.received}`);
               }
             });
@@ -178,7 +187,7 @@ Notes:
 
           // Ensure it has an outline array
           if (!parsed.outline) {
-            console.log('[revise_technical_outline] 🔧 Adding missing outline wrapper');
+            console.log("[revise_technical_outline] 🔧 Adding missing outline wrapper");
             parsed = { outline: Array.isArray(parsed) ? parsed : [parsed] };
           }
 
@@ -187,46 +196,50 @@ Notes:
             console.log(`[revise_technical_outline] 🔧 Fixing ${parsed.outline.length} sections`);
             parsed.outline = parsed.outline.map((section: any, index: number) => {
               const fixes: string[] = [];
-              
+
               // Add missing required fields with defaults
               const fixed: any = { ...section };
-              
+
               if (!section.heading) {
                 fixed.heading = `Section ${index + 1}`;
-                fixes.push('heading');
+                fixes.push("heading");
               }
               if (!section.description) {
-                fixed.description = 'Description pending.';
-                fixes.push('description');
+                fixed.description = "Description pending.";
+                fixes.push("description");
               }
               if (!section.order) {
                 fixed.order = index + 1;
-                fixes.push('order');
+                fixes.push("order");
               }
               if (!section.citedSources) {
-                fixed.citedSources = 'https://www.w3.org/TR/trace-context/';
-                fixes.push('citedSources');
+                fixed.citedSources = "https://www.w3.org/TR/trace-context/";
+                fixes.push("citedSources");
               }
               if (!Array.isArray(section.contentTypes)) {
-                fixed.contentTypes = [{
-                  type: 'text',
-                  description: 'Default content type',
-                  whyToUse: 'Placeholder for missing content type'
-                }];
-                fixes.push('contentTypes');
+                fixed.contentTypes = [
+                  {
+                    type: "text",
+                    description: "Default content type",
+                    whyToUse: "Placeholder for missing content type",
+                  },
+                ];
+                fixes.push("contentTypes");
               }
-              
+
               // Validate contentTypes have required fields
               fixed.contentTypes = fixed.contentTypes.map((ct: any) => ({
-                type: ct.type || 'text',
-                description: ct.description || 'Content description',
-                whyToUse: ct.whyToUse || 'Reason for using this content type'
+                type: ct.type || "text",
+                description: ct.description || "Content description",
+                whyToUse: ct.whyToUse || "Reason for using this content type",
               }));
-              
+
               if (fixes.length > 0) {
-                console.log(`  Section ${index + 1} (${fixed.heading}): Fixed [${fixes.join(', ')}]`);
+                console.log(
+                  `  Section ${index + 1} (${fixed.heading}): Fixed [${fixes.join(", ")}]`,
+                );
               }
-              
+
               return fixed;
             });
           }
@@ -234,18 +247,20 @@ Notes:
           // Try parsing with our schema again
           const finalParseResult = technicalOutlineSchema.safeParse(parsed);
           if (finalParseResult.success) {
-            console.log('[revise_technical_outline] ✅ Repair successful!');
+            console.log("[revise_technical_outline] ✅ Repair successful!");
             return JSON.stringify(parsed);
           } else {
-            console.error('[revise_technical_outline] ❌ Schema validation still failing after repair:');
+            console.error(
+              "[revise_technical_outline] ❌ Schema validation still failing after repair:",
+            );
             finalParseResult.error.issues.forEach((issue, index) => {
-              console.error(`  ${index + 1}. Path: ${issue.path.join('.')}`);
+              console.error(`  ${index + 1}. Path: ${issue.path.join(".")}`);
               console.error(`     Error: ${issue.message}`);
             });
-            throw new Error('Could not repair the response to match schema');
+            throw new Error("Could not repair the response to match schema");
           }
         } catch (error) {
-          console.error('[revise_technical_outline] 💥 Repair failed:', error);
+          console.error("[revise_technical_outline] 💥 Repair failed:", error);
           throw error;
         }
       },
@@ -256,9 +271,7 @@ Notes:
       },
     });
 
-    console.info(
-      `[task=revise_technical_outline] Completed technical revision for term: ${term}`,
-    );
+    console.info(`[task=revise_technical_outline] Completed technical revision for term: ${term}`);
 
     return result.object;
   },

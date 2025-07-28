@@ -10,19 +10,22 @@ import {
   sectionContentTypes,
   sections,
   sectionsToKeywords,
-  selectKeywordsSchema,
 } from "@/lib/db-marketing/schemas";
 import { tryCatch } from "@/lib/utils/try-catch";
 import { openai } from "@ai-sdk/openai";
-import { AbortTaskRunError, type TaskOutput, task } from "@trigger.dev/sdk/v3";
+import { AbortTaskRunError, task } from "@trigger.dev/sdk/v3";
 import { generateObject } from "ai";
 import { and, eq, or } from "drizzle-orm";
 import { z } from "zod";
 import type { CacheStrategy } from "../_generate-glossary-entry";
-import { performEditorialEvalTask, performSEOEvalTask, performTechnicalEvalTask } from "../evaluate/evals";
-import { reviseTechnicalOutlineTask } from "./revise-technical-outline";
-import { reviseSEOOutlineTask } from "./revise-seo-outline";
+import {
+  performEditorialEvalTask,
+  performSEOEvalTask,
+  performTechnicalEvalTask,
+} from "../evaluate/evals";
 import { reviseEditorialOutlineTask } from "./revise-editorial-outline";
+import { reviseSEOOutlineTask } from "./revise-seo-outline";
+import { reviseTechnicalOutlineTask } from "./revise-technical-outline";
 
 // TODO: this task is a bit flake-y still
 // - split up into smaller tasks,  and/or
@@ -153,9 +156,10 @@ export const generateOutlineTask = task({
     // Step 7: SEO review on technically revised outline
     const seoEval = await performSEOEvalTask.triggerAndWait({
       input: term,
-      content: technicalRevision.output?.outline
-        .map((section) => `${section.heading}\n${section.description}`)
-        .join("\n\n") || "",
+      content:
+        technicalRevision.output?.outline
+          .map((section) => `${section.heading}\n${section.description}`)
+          .join("\n\n") || "",
       onCacheHit,
     });
     if (!seoEval.ok) {
@@ -180,42 +184,43 @@ export const generateOutlineTask = task({
       throw new AbortTaskRunError("SEO revision failed");
     }
     console.info(
-      `Step 8/9 - SEO OPTIMIZED OUTLINE RESULT: ${JSON.stringify(
-        seoRevision.output?.outline,
-      )}`,
+      `Step 8/9 - SEO OPTIMIZED OUTLINE RESULT: ${JSON.stringify(seoRevision.output?.outline)}`,
     );
 
     // Validate keywords after SEO revision
-    console.info('\n=== KEYWORD VALIDATION AFTER SEO REVISION ===');
-    const seoKeywordSet = new Set(seoKeywords.map(k => k.keyword));
+    console.info("\n=== KEYWORD VALIDATION AFTER SEO REVISION ===");
+    const seoKeywordSet = new Set(seoKeywords.map((k) => k.keyword));
     let invalidKeywordsFound = false;
-    
+
     if (seoRevision.output?.outline) {
       for (const section of seoRevision.output.outline) {
         if (section.keywords && Array.isArray(section.keywords)) {
           for (const kw of section.keywords) {
             if (!seoKeywordSet.has(kw.keyword)) {
-              console.warn(`⚠️  SEO Revision - Invalid keyword in section "${section.heading}": "${kw.keyword}"`);
+              console.warn(
+                `⚠️  SEO Revision - Invalid keyword in section "${section.heading}": "${kw.keyword}"`,
+              );
               invalidKeywordsFound = true;
             }
           }
         }
       }
     }
-    
+
     if (!invalidKeywordsFound) {
-      console.info('✅ All keywords from SEO revision are valid');
+      console.info("✅ All keywords from SEO revision are valid");
     } else {
-      console.warn('❌ SEO revision introduced keywords not in the provided list');
-      console.info('Available keywords were:', Array.from(seoKeywordSet).join(', '));
+      console.warn("❌ SEO revision introduced keywords not in the provided list");
+      console.info("Available keywords were:", Array.from(seoKeywordSet).join(", "));
     }
 
     // Step 9: Editorial review on SEO optimized outline
     const editorialEval = await performEditorialEvalTask.triggerAndWait({
       input: term,
-      content: seoRevision.output?.outline
-        .map((section) => `${section.heading}\n${section.description}`)
-        .join("\n\n") || "",
+      content:
+        seoRevision.output?.outline
+          .map((section) => `${section.heading}\n${section.description}`)
+          .join("\n\n") || "",
       onCacheHit,
     });
     if (!editorialEval.ok) {
@@ -231,20 +236,20 @@ export const generateOutlineTask = task({
     if (!editorialEval.output || !editorialEval.output.id) {
       throw new AbortTaskRunError("Editorial evaluation output or outline is missing.");
     }
-    
+
     // Step 10: Revise outline based on editorial feedback
     // Store keywords before editorial revision
     const keywordsByOrder = new Map();
-    seoRevision.output?.outline.forEach(section => {
+    seoRevision.output?.outline.forEach((section) => {
       keywordsByOrder.set(section.order, section.keywords || []);
     });
-    
+
     // Remove keywords from outline before sending to editorial revision
-    const outlineWithoutKeywords = (seoRevision.output?.outline || []).map(section => {
+    const outlineWithoutKeywords = (seoRevision.output?.outline || []).map((section) => {
       const { keywords, ...sectionWithoutKeywords } = section;
       return sectionWithoutKeywords;
     });
-    
+
     const editorialRevision = await reviseEditorialOutlineTask.triggerAndWait({
       term,
       outlineToRefine: outlineWithoutKeywords,
@@ -256,16 +261,16 @@ export const generateOutlineTask = task({
     }
     // Restore keywords to editorial revision output
     if (editorialRevision.output?.outline) {
-      editorialRevision.output.outline = editorialRevision.output.outline.map(section => {
+      editorialRevision.output.outline = editorialRevision.output.outline.map((section) => {
         // Restore keywords based on section order
         const originalKeywords = keywordsByOrder.get(section.order) || [];
         return {
           ...section,
-          keywords: originalKeywords
+          keywords: originalKeywords,
         };
       });
     }
-    
+
     console.info(
       `Step 10/10 - EDITORIAL OPTIMIZED OUTLINE RESULT: ${JSON.stringify(
         editorialRevision.output?.outline,
@@ -273,26 +278,28 @@ export const generateOutlineTask = task({
     );
 
     // Validate keywords after Editorial revision
-    console.info('\n=== KEYWORD VALIDATION AFTER EDITORIAL REVISION ===');
+    console.info("\n=== KEYWORD VALIDATION AFTER EDITORIAL REVISION ===");
     invalidKeywordsFound = false;
-    
+
     if (editorialRevision.output?.outline) {
       for (const section of editorialRevision.output.outline) {
         if (section.keywords && Array.isArray(section.keywords)) {
           for (const kw of section.keywords) {
             if (!seoKeywordSet.has(kw.keyword)) {
-              console.warn(`⚠️  Editorial Revision - Invalid keyword in section "${section.heading}": "${kw.keyword}"`);
+              console.warn(
+                `⚠️  Editorial Revision - Invalid keyword in section "${section.heading}": "${kw.keyword}"`,
+              );
               invalidKeywordsFound = true;
             }
           }
         }
       }
     }
-    
+
     if (!invalidKeywordsFound) {
-      console.info('✅ All keywords from Editorial revision are valid');
+      console.info("✅ All keywords from Editorial revision are valid");
     } else {
-      console.warn('❌ Editorial revision introduced/changed keywords not in the provided list');
+      console.warn("❌ Editorial revision introduced/changed keywords not in the provided list");
     }
 
     // persist to db as a new entry by with their related entities
@@ -337,18 +344,17 @@ export const generateOutlineTask = task({
       await db.insert(sectionsToKeywords).values(keywordInsertionPayload);
       console.info(`✅ Inserted ${keywordInsertionPayload.length} keyword associations`);
     } else {
-      console.warn('⚠️  No valid keywords to associate with sections - skipping keyword insertion');
+      console.warn("⚠️  No valid keywords to associate with sections - skipping keyword insertion");
     }
 
     // associate the content types with the sections
-    const contentTypesInsertionPayload = finalOutline.flatMap(
-      (section, index) =>
-        section.contentTypes.map((contentType: any) =>
-          insertSectionContentTypeSchema.parse({
-            ...contentType,
-            sectionId: newSectionIds[index].id,
-          }),
-        ),
+    const contentTypesInsertionPayload = finalOutline.flatMap((section, index) =>
+      section.contentTypes.map((contentType: any) =>
+        insertSectionContentTypeSchema.parse({
+          ...contentType,
+          sectionId: newSectionIds[index].id,
+        }),
+      ),
     );
     await db.insert(sectionContentTypes).values(contentTypesInsertionPayload);
 
@@ -446,4 +452,3 @@ async function generateInitialOutline({
     },
   });
 }
-

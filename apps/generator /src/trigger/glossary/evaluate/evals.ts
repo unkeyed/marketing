@@ -196,7 +196,7 @@ Guidelines:
 export const performTechnicalEvalTask = task({
   id: "perform_technical_eval",
   retry: {
-    maxAttempts: 5
+    maxAttempts: 5,
   },
   run: async ({ input, onCacheHit = "stale", ...options }: TaskInput & EvalOptions) => {
     console.info(`Starting technical evaluation for term: ${input}`);

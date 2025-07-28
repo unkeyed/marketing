@@ -1,14 +1,14 @@
-import { openai } from "@ai-sdk/openai";
-import { task, type TaskOutput } from "@trigger.dev/sdk/v3";
-import { generateObject } from "ai";
-import { z } from "zod";
-import type { CacheStrategy } from "../_generate-glossary-entry";
-import type { performEditorialEvalTask } from "../evaluate/evals";
 import {
   insertSectionContentTypeSchema,
   insertSectionSchema,
   selectKeywordsSchema,
 } from "@/lib/db-marketing/schemas";
+import { openai } from "@ai-sdk/openai";
+import { type TaskOutput, task } from "@trigger.dev/sdk/v3";
+import { generateObject } from "ai";
+import { z } from "zod";
+import type { CacheStrategy } from "../_generate-glossary-entry";
+import type { performEditorialEvalTask } from "../evaluate/evals";
 
 // Schema for the editorial revised outline (keywords will be restored after revision)
 const editorialOutlineSchema = z.object({
@@ -79,22 +79,28 @@ You have the ability to modify or merge sections in the outline as needed to cre
 `;
 
     // Parse ratings and recommendations if they are strings
-    const ratings = typeof reviewReport.ratings === 'string' ? JSON.parse(reviewReport.ratings) : reviewReport.ratings;
-    const recommendations = typeof reviewReport.recommendations === 'string' ? JSON.parse(reviewReport.recommendations) : reviewReport.recommendations;
+    const ratings =
+      typeof reviewReport.ratings === "string"
+        ? JSON.parse(reviewReport.ratings)
+        : reviewReport.ratings;
+    const recommendations =
+      typeof reviewReport.recommendations === "string"
+        ? JSON.parse(reviewReport.recommendations)
+        : reviewReport.recommendations;
 
     const editorialRevisionPrompt = `
 Review and polish the outline for "${term}" from an editorial perspective.
 
 Current sections (${outlineToRefine.length} total):
-${outlineToRefine.map((s, i) => `${i + 1}. ${s.heading}`).join('\n')}
+${outlineToRefine.map((s, i) => `${i + 1}. ${s.heading}`).join("\n")}
 
 Editorial Review Feedback:
-- Accuracy: ${ratings?.accuracy || 'N/A'}/10
-- Completeness: ${ratings?.completeness || 'N/A'}/10
-- Clarity: ${ratings?.clarity || 'N/A'}/10
+- Accuracy: ${ratings?.accuracy || "N/A"}/10
+- Completeness: ${ratings?.completeness || "N/A"}/10
+- Clarity: ${ratings?.clarity || "N/A"}/10
 
 Editorial Recommendations:
-${recommendations?.map((r: any) => `- ${r.type}: ${r.description}`).join('\n') || 'No specific recommendations'}
+${recommendations?.map((r: any) => `- ${r.type}: ${r.description}`).join("\n") || "No specific recommendations"}
 
 Refine the outline for clarity, flow, and engagement while maintaining technical accuracy.
 
@@ -115,42 +121,49 @@ BUT NEVER touch the keywords array - copy it exactly as is!
       schema: editorialOutlineSchema,
       experimental_repairText: async (res) => {
         console.warn(`[revise_editorial_outline] Schema mismatch, attempting repair`);
-        
+
         try {
           // Check if JSON appears complete
           const trimmedText = res.text.trim();
           const lastChars = trimmedText.slice(-20);
-          const hasProperEnding = trimmedText.endsWith('}]}') || trimmedText.endsWith('}]\n}');
-          
+          const hasProperEnding = trimmedText.endsWith("}]}") || trimmedText.endsWith("}]\n}");
+
           if (!hasProperEnding) {
-            console.error('[revise_editorial_outline] ❌ Response appears truncated');
-            console.error('Expected ending: }]} or }]\n}');
-            console.error('Actual ending:', lastChars);
-            console.error('Full length:', trimmedText.length, 'characters');
-            
+            console.error("[revise_editorial_outline] ❌ Response appears truncated");
+            console.error("Expected ending: }]} or }]\n}");
+            console.error("Actual ending:", lastChars);
+            console.error("Full length:", trimmedText.length, "characters");
+
             const openBrackets = (trimmedText.match(/[{\[]/g) || []).length;
             const closeBrackets = (trimmedText.match(/[}\]]/g) || []).length;
-            console.error('Bracket balance: { [ opened:', openBrackets, '} ] closed:', closeBrackets);
-            
-            throw new Error('Response was truncated. Try reducing sections or using shorter descriptions.');
+            console.error(
+              "Bracket balance: { [ opened:",
+              openBrackets,
+              "} ] closed:",
+              closeBrackets,
+            );
+
+            throw new Error(
+              "Response was truncated. Try reducing sections or using shorter descriptions.",
+            );
           }
 
           let parsed: any;
           try {
             parsed = JSON.parse(res.text);
           } catch (e) {
-            console.error('[revise_editorial_outline] ❌ JSON parse failed despite proper ending');
-            console.error('Parse error:', e);
-            console.error('Raw text (last 200 chars):', res.text.slice(-200));
-            throw new Error('Invalid JSON format.');
+            console.error("[revise_editorial_outline] ❌ JSON parse failed despite proper ending");
+            console.error("Parse error:", e);
+            console.error("Raw text (last 200 chars):", res.text.slice(-200));
+            throw new Error("Invalid JSON format.");
           }
 
           // Check initial validation errors
           const initialParseResult = editorialOutlineSchema.safeParse(parsed);
           if (!initialParseResult.success) {
-            console.error('[revise_editorial_outline] ❌ Initial Zod validation errors:');
+            console.error("[revise_editorial_outline] ❌ Initial Zod validation errors:");
             initialParseResult.error.issues.forEach((issue, index) => {
-              console.error(`  ${index + 1}. Path: ${issue.path.join('.')}`);
+              console.error(`  ${index + 1}. Path: ${issue.path.join(".")}`);
               console.error(`     Error: ${issue.message}`);
               console.error(`     Type: ${issue.code}`);
             });
@@ -158,7 +171,7 @@ BUT NEVER touch the keywords array - copy it exactly as is!
 
           // Ensure outline wrapper
           if (!parsed.outline) {
-            console.log('[revise_editorial_outline] 🔧 Adding missing outline wrapper');
+            console.log("[revise_editorial_outline] 🔧 Adding missing outline wrapper");
             parsed = { outline: Array.isArray(parsed) ? parsed : [parsed] };
           }
 
@@ -168,52 +181,56 @@ BUT NEVER touch the keywords array - copy it exactly as is!
             parsed.outline = parsed.outline.map((section: any, index: number) => {
               const fixes: string[] = [];
               const fixed: any = { ...section };
-              
+
               // Fix required fields
               if (!section.heading) {
                 fixed.heading = `Section ${index + 1}`;
-                fixes.push('heading');
+                fixes.push("heading");
               }
               if (!section.description) {
-                fixed.description = 'Description pending.';
-                fixes.push('description');
+                fixed.description = "Description pending.";
+                fixes.push("description");
               }
               if (!section.order) {
                 fixed.order = index + 1;
-                fixes.push('order');
+                fixes.push("order");
               }
               if (!section.citedSources) {
-                fixed.citedSources = 'https://www.w3.org/TR/trace-context/';
-                fixes.push('citedSources');
+                fixed.citedSources = "https://www.w3.org/TR/trace-context/";
+                fixes.push("citedSources");
               }
-              
+
               // IMPORTANT: Keywords should already be present from SEO revision
               if (!Array.isArray(section.keywords)) {
-                console.warn(`  ⚠️ Section ${index + 1}: Missing keywords (should have been added by SEO revision)`);
+                console.warn(
+                  `  ⚠️ Section ${index + 1}: Missing keywords (should have been added by SEO revision)`,
+                );
                 fixed.keywords = [];
-                fixes.push('keywords (WARNING: should not be missing)');
+                fixes.push("keywords (WARNING: should not be missing)");
               }
-              
+
               // Fix contentTypes
               if (!Array.isArray(section.contentTypes)) {
-                fixed.contentTypes = [{
-                  type: 'text',
-                  description: 'Default content',
-                  whyToUse: 'Default reason'
-                }];
-                fixes.push('contentTypes');
+                fixed.contentTypes = [
+                  {
+                    type: "text",
+                    description: "Default content",
+                    whyToUse: "Default reason",
+                  },
+                ];
+                fixes.push("contentTypes");
               } else {
                 fixed.contentTypes = section.contentTypes.map((ct: any) => ({
-                  type: ct.type || 'text',
-                  description: ct.description || 'Content description',
-                  whyToUse: ct.whyToUse || 'Reason for content type'
+                  type: ct.type || "text",
+                  description: ct.description || "Content description",
+                  whyToUse: ct.whyToUse || "Reason for content type",
                 }));
               }
-              
+
               if (fixes.length > 0) {
-                console.log(`  Section ${index + 1}: Fixed [${fixes.join(', ')}]`);
+                console.log(`  Section ${index + 1}: Fixed [${fixes.join(", ")}]`);
               }
-              
+
               return fixed;
             });
           }
@@ -221,18 +238,18 @@ BUT NEVER touch the keywords array - copy it exactly as is!
           // Final validation
           const finalParseResult = editorialOutlineSchema.safeParse(parsed);
           if (finalParseResult.success) {
-            console.log('[revise_editorial_outline] ✅ Repair successful!');
+            console.log("[revise_editorial_outline] ✅ Repair successful!");
             return JSON.stringify(parsed);
           } else {
-            console.error('[revise_editorial_outline] ❌ Still failing after repair:');
+            console.error("[revise_editorial_outline] ❌ Still failing after repair:");
             finalParseResult.error.issues.forEach((issue, index) => {
-              console.error(`  ${index + 1}. Path: ${issue.path.join('.')}`);
+              console.error(`  ${index + 1}. Path: ${issue.path.join(".")}`);
               console.error(`     Error: ${issue.message}`);
             });
-            throw new Error('Could not repair the response');
+            throw new Error("Could not repair the response");
           }
         } catch (error) {
-          console.error('[revise_editorial_outline] 💥 Repair failed:', error);
+          console.error("[revise_editorial_outline] 💥 Repair failed:", error);
           throw error;
         }
       },
@@ -243,9 +260,7 @@ BUT NEVER touch the keywords array - copy it exactly as is!
       },
     });
 
-    console.info(
-      `[task=revise_editorial_outline] Completed editorial revision for term: ${term}`,
-    );
+    console.info(`[task=revise_editorial_outline] Completed editorial revision for term: ${term}`);
 
     return result.object;
   },

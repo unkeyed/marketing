@@ -4,13 +4,13 @@ import { task } from "@trigger.dev/sdk/v3";
 import { AbortTaskRunError } from "@trigger.dev/sdk/v3";
 import { eq } from "drizzle-orm";
 import { contentTakeawaysTask } from "./generate/content-takeaways";
-import { createPrTask } from "./publish/create-pr";
 import { draftSectionsTask } from "./generate/draft-sections";
 import { generateFaqsTask } from "./generate/generate-faqs";
 import { generateOutlineTask } from "./generate/generate-outline";
+import { seoMetaTagsTask } from "./generate/seo-meta-tags";
+import { createPrTask } from "./publish/create-pr";
 import { keywordResearchTask } from "./research/keywords/keyword-research";
 import { technicalResearchTask } from "./research/technical/_technical-research";
-import { seoMetaTagsTask } from "./generate/seo-meta-tags";
 
 export type CacheStrategy = "revalidate" | "stale";
 /**

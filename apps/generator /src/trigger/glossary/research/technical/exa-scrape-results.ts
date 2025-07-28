@@ -20,7 +20,7 @@ export const scrapeSearchResults = task({
       onCacheHit: CacheStrategy;
     },
     retry: {
-      maxAttempts: 5,
+      maxAttempts: 5;
     },
   ) => {
     const { inputTerm, includedSearchResults, onCacheHit } = input;
