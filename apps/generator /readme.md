@@ -175,14 +175,12 @@ flowchart LR
         TR1 --> TR2 --> TR3
     end
     
-    subgraph SUB3["generate_outline ⚠️ Brittle"]
+    subgraph SUB3["generate_outline"]
         direction LR
         GO1[generateInitialOutline]
-        GO2["`perform_technical_eval
-        ⚠️ Not used`"]
+        GO2[perform_technical_eval]
         GO3[perform_seo_eval]
-        GO4["`reviseSEOOutline
-        ❌ >50% error rate`"]
+        GO4[reviseSEOOutline]
         GO5[perform_editorial_eval]
         GO6[reviseEditorialOutline]
         GO7[Save Outline]
