@@ -21,6 +21,7 @@ A Trigger.dev-based workflow for automatically generating marketing content, spe
       + [Instructions](#instructions)
 - [8. Tips for Engineers](#8-tips-for-engineers)
    * [Working with the Workflow](#working-with-the-workflow)
+- [9. How to come up with glossary terms](#9-how-to-come-up-with-glossary-terms)
 
 > [!NOTE]
 > **Video Walkthrough**
@@ -515,3 +516,29 @@ Result:
    - `triggerAndWait` ensures dependent tasks complete before proceeding
    - The workflow is designed to be resumable if interrupted
    - Each task stores its output for subsequent tasks to use
+  
+## 9. How to come up with glossary terms
+
+> [!NOTE]
+> **Video Walkthrough**
+> Check this video walkthrough if you want a guided overview of the ideation
+> [Walkthrough](https://procurato.neetorecord.com/watch/b55f1f7ccecbae6e5a34)
+
+
+If you have some API development related terms that you think are missing, use them.
+
+Otherwise, this is one way you could come up with ideas:
+1. **Gather keyword data.**
+    * Go into the search console's [Performance Report](https://search.google.com/search-console/performance/search-analytics?resource_id=sc-domain%3Aunkey.com) and select `Queries`
+    * Display 100 keywords on the page
+    * Filter out queries containing `unkey`
+    * Copy 100 entries
+2. **Prompt your LLM of choice.**
+    * This could be Claude, ChatGPT or whatever you work with
+    * Prompt it to propose 10 technical terms related to API development, drawing inspiration from below keyword data
+    * Insert the keyword data from step 1
+3. **Cross-check existing glossary entries.**
+    * You can [search the marketing repository](https://github.com/search?q=repo%3Aunkeyed%2Fmarketing%20gateway&type=code) for your term to see if an `.mdx` file already exists
+4. **🔁 Repeat steps 2 & 3 until you have enough terms.**
+5. **Generate the entry.**
+    * Test the workflow in [Trigger's Cloud console](https://cloud.trigger.dev/orgs/unkey-9e78/projects/billing-IzvK/env/prod/test/tasks/generate_glossary_entry)
