@@ -542,3 +542,22 @@ Otherwise, this is one way you could come up with ideas:
 4. **🔁 Repeat steps 2 & 3 until you have enough terms.**
 5. **Generate the entry.**
     * Test the workflow in [Trigger's Cloud console](https://cloud.trigger.dev/orgs/unkey-9e78/projects/billing-IzvK/env/prod/test/tasks/generate_glossary_entry)
+
+## 10. Troubleshooting
+
+> [!NOTE]
+> **Video Walkthrough**
+> Check this video walkthrough if you want a guided overview of how to deal with failed runs
+> [Walkthrough](https://procurato.neetorecord.com/watch/751a467813c1533e110e)
+
+Given that LLMs generate our outputs, generations may fail.
+Since there are lots of sub-tasks running in the workflow, I follow this workflow when encountering failures:
+1. Retry the attempt
+  * Oftentimes, it's just a matter of trying it 3 times and the workflow might work as the LLMs get it right
+2. Identify the erroneous sub-task
+  * Identify which sub-task threw the error, to see what's going on
+  * I go through the task logs and visually scan for the blue `T` entries to find the `Attempt` that failed
+  * On the `Attempt`, you can find more useful error information as it cites the function that threw the error
+3. You can optionally update the workflow to make it more resilient
+
+Trigger allows you to define `maxAttempts` for each task. For brittle sub-tasks use a higher value, at least 3.
