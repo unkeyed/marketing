@@ -1,13 +1,36 @@
 # Marketing Generator
 
+A Trigger.dev-based workflow for automatically generating marketing content, specifically focused on glossary entries (see e.g. [circuit breaker](https://unkey.com/glossary/api-circuit-breaker)). The system uses PlanetScale as its database with Drizzle ORM for data management.
+
+**Table of Contents**
+- [1. Running the Glossary Generation Workflow](#1-running-the-glossary-generation-workflow)
+   * [Production Environment](#production-environment)
+   * [Development vs Production](#development-vs-production)
+- [2. Understanding the Workflow](#2-understanding-the-workflow)
+   * [Workflow Visualization](#workflow-visualization)
+      + [Quick Overview](#quick-overview)
+      + [Detailed Workflow](#detailed-workflow)
+      + [Architecture Layers](#architecture-layers)
+   * [Workflow Steps](#workflow-steps)
+- [3. Database Schema](#3-database-schema)
+- [4. Available Scripts](#4-available-scripts)
+- [5. Dependencies](#5-dependencies)
+- [6. Notes](#6-notes)
+- [7. Testing](#7-testing)
+   * [Trigger.dev](#triggerdev)
+      + [Instructions](#instructions)
+- [8. Tips for Engineers](#8-tips-for-engineers)
+   * [Working with the Workflow](#working-with-the-workflow)
+- [9. How to come up with glossary terms](#9-how-to-come-up-with-glossary-terms)
+
 > [!NOTE]
 > **Video Walkthrough**
 > Check this video walkthrough if you want a guided overview of the workflow
 > [Walkthrough](https://procurato.neetorecord.com/watch/56fc81bd8423c43c4bd1)
 
-A Trigger.dev-based workflow for automatically generating marketing content, specifically focused on glossary entries. The system uses PlanetScale as its database with Drizzle ORM for data management.
+___
 
-## Running the Glossary Generation Workflow
+## 1. Running the Glossary Generation Workflow
 
 ### Production Environment
 
@@ -39,7 +62,7 @@ The glossary generation workflow runs in Trigger.dev's production environment. T
 - **Production (`prod`)**: Where actual glossary entries are generated
 - **Test Environment (`test`)**: Used for testing local WIP changes separately from production
 
-## Understanding the Workflow
+## 2. Understanding the Workflow
 
 The main workflow (`_generate-glossary-entry.ts`) orchestrates the generation of glossary entries through a series of sequential and parallel tasks. The workflow is idempotent and can be safely restarted if aborted.
 
@@ -366,7 +389,7 @@ Based on the actual execution logs, here's the detailed workflow:
    - Creates a GitHub PR with the generated content
    - Stores the PR URL in the database
 
-## Database Schema
+## 3. Database Schema
 
 The system uses PlanetScale with Drizzle ORM. The main `entries` table stores:
 
@@ -379,7 +402,7 @@ The system uses PlanetScale with Drizzle ORM. The main `entries` table stores:
 - Status tracking
 - Timestamps
 
-## Available Scripts
+## 4. Available Scripts
 
 - `dev`: Start development server
 - `dev:mcp`: Start development server with MCP support
@@ -390,7 +413,7 @@ The system uses PlanetScale with Drizzle ORM. The main `entries` table stores:
 - `db:migrate`: Run database migrations
 - `db:pull`: Pull database schema
 
-## Dependencies
+## 5. Dependencies
 
 The project uses:
 - Trigger.dev v4-beta for workflow orchestration
@@ -399,14 +422,14 @@ The project uses:
 - Various AI SDKs for content generation
 - GitHub integration for PR creation
 
-## Notes
+## 6. Notes
 
 - The workflow is designed to be idempotent
 - Each task has a maximum of 5 retry attempts
 - Tasks use caching by default but can be forced to revalidate
 - The system maintains a comprehensive audit trail of all operations
 
-## Testing
+## 7. Testing
 
 ### Trigger.dev
 
@@ -458,7 +481,7 @@ Result:
 ```
 
 
-## Tips for Engineers
+## 8. Tips for Engineers
 
 ### Working with the Workflow
 
@@ -491,3 +514,48 @@ Result:
    - `triggerAndWait` ensures dependent tasks complete before proceeding
    - The workflow is designed to be resumable if interrupted
    - Each task stores its output for subsequent tasks to use
+  
+## 9. How to come up with glossary terms
+
+> [!NOTE]
+> **Video Walkthrough**
+> Check this video walkthrough if you want a guided overview of the ideation
+> [Walkthrough](https://procurato.neetorecord.com/watch/b55f1f7ccecbae6e5a34)
+
+
+If you have some API development related terms that you think are missing, use them.
+
+Otherwise, this is one way you could come up with ideas:
+1. **Gather keyword data.**
+    * Go into the search console's [Performance Report](https://search.google.com/search-console/performance/search-analytics?resource_id=sc-domain%3Aunkey.com) and select `Queries`
+    * Display 100 keywords on the page
+    * Filter out queries containing `unkey`
+    * Copy 100 entries
+2. **Prompt your LLM of choice.**
+    * This could be Claude, ChatGPT or whatever you work with
+    * Prompt it to propose 10 technical terms related to API development, drawing inspiration from below keyword data
+    * Insert the keyword data from step 1
+3. **Cross-check existing glossary entries.**
+    * You can [search the marketing repository](https://github.com/search?q=repo%3Aunkeyed%2Fmarketing%20gateway&type=code) for your term to see if an `.mdx` file already exists
+4. **🔁 Repeat steps 2 & 3 until you have enough terms.**
+5. **Generate the entry.**
+    * Test the workflow in [Trigger's Cloud console](https://cloud.trigger.dev/orgs/unkey-9e78/projects/billing-IzvK/env/prod/test/tasks/generate_glossary_entry)
+
+## 10. Troubleshooting
+
+> [!NOTE]
+> **Video Walkthrough**
+> Check this video walkthrough if you want a guided overview of how to deal with failed runs
+> [Walkthrough](https://procurato.neetorecord.com/watch/751a467813c1533e110e)
+
+Given that LLMs generate our outputs, generations may fail.
+Since there are lots of sub-tasks running in the workflow, I follow this workflow when encountering failures:
+1. Retry the attempt
+  * Oftentimes, it's just a matter of trying it 3 times and the workflow might work as the LLMs get it right
+2. Identify the erroneous sub-task
+  * Identify which sub-task threw the error, to see what's going on
+  * I go through the task logs and visually scan for the blue `T` entries to find the `Attempt` that failed
+  * On the `Attempt`, you can find more useful error information as it cites the function that threw the error
+3. You can optionally update the workflow to make it more resilient
+
+Trigger allows you to define `maxAttempts` for each task. For brittle sub-tasks use a higher value, at least 3.
