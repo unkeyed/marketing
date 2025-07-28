@@ -1,13 +1,35 @@
 # Marketing Generator
 
+A Trigger.dev-based workflow for automatically generating marketing content, specifically focused on glossary entries (see e.g. [circuit breaker](https://unkey.com/glossary/api-circuit-breaker)). The system uses PlanetScale as its database with Drizzle ORM for data management.
+
+**Table of Contents**
+- [1. Running the Glossary Generation Workflow](#1-running-the-glossary-generation-workflow)
+   * [Production Environment](#production-environment)
+   * [Development vs Production](#development-vs-production)
+- [2. Understanding the Workflow](#2-understanding-the-workflow)
+   * [Workflow Visualization](#workflow-visualization)
+      + [Quick Overview](#quick-overview)
+      + [Detailed Workflow](#detailed-workflow)
+      + [Architecture Layers](#architecture-layers)
+   * [Workflow Steps](#workflow-steps)
+- [3. Database Schema](#3-database-schema)
+- [4. Available Scripts](#4-available-scripts)
+- [5. Dependencies](#5-dependencies)
+- [6. Notes](#6-notes)
+- [7. Testing](#7-testing)
+   * [Trigger.dev](#triggerdev)
+      + [Instructions](#instructions)
+- [8. Tips for Engineers](#8-tips-for-engineers)
+   * [Working with the Workflow](#working-with-the-workflow)
+
 > [!NOTE]
 > **Video Walkthrough**
 > Check this video walkthrough if you want a guided overview of the workflow
 > [Walkthrough](https://procurato.neetorecord.com/watch/56fc81bd8423c43c4bd1)
 
-A Trigger.dev-based workflow for automatically generating marketing content, specifically focused on glossary entries. The system uses PlanetScale as its database with Drizzle ORM for data management.
+___
 
-## Running the Glossary Generation Workflow
+## 1. Running the Glossary Generation Workflow
 
 ### Production Environment
 
@@ -39,7 +61,7 @@ The glossary generation workflow runs in Trigger.dev's production environment. T
 - **Production (`prod`)**: Where actual glossary entries are generated
 - **Test Environment (`test`)**: Used for testing local WIP changes separately from production
 
-## Understanding the Workflow
+## 2. Understanding the Workflow
 
 The main workflow (`_generate-glossary-entry.ts`) orchestrates the generation of glossary entries through a series of sequential and parallel tasks. The workflow is idempotent and can be safely restarted if aborted.
 
@@ -368,7 +390,7 @@ Based on the actual execution logs, here's the detailed workflow:
    - Creates a GitHub PR with the generated content
    - Stores the PR URL in the database
 
-## Database Schema
+## 3. Database Schema
 
 The system uses PlanetScale with Drizzle ORM. The main `entries` table stores:
 
@@ -381,7 +403,7 @@ The system uses PlanetScale with Drizzle ORM. The main `entries` table stores:
 - Status tracking
 - Timestamps
 
-## Available Scripts
+## 4. Available Scripts
 
 - `dev`: Start development server
 - `dev:mcp`: Start development server with MCP support
@@ -392,7 +414,7 @@ The system uses PlanetScale with Drizzle ORM. The main `entries` table stores:
 - `db:migrate`: Run database migrations
 - `db:pull`: Pull database schema
 
-## Dependencies
+## 5. Dependencies
 
 The project uses:
 - Trigger.dev v4-beta for workflow orchestration
@@ -401,14 +423,14 @@ The project uses:
 - Various AI SDKs for content generation
 - GitHub integration for PR creation
 
-## Notes
+## 6. Notes
 
 - The workflow is designed to be idempotent
 - Each task has a maximum of 5 retry attempts
 - Tasks use caching by default but can be forced to revalidate
 - The system maintains a comprehensive audit trail of all operations
 
-## Testing
+## 7. Testing
 
 ### Trigger.dev
 
@@ -460,7 +482,7 @@ Result:
 ```
 
 
-## Tips for Engineers
+## 8. Tips for Engineers
 
 ### Working with the Workflow
 
