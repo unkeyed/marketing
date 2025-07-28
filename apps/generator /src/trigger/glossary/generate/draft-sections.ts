@@ -12,12 +12,12 @@ import { openai } from "@ai-sdk/openai";
 import { AbortTaskRunError, task } from "@trigger.dev/sdk/v3";
 import { generateText } from "ai";
 import { eq } from "drizzle-orm";
-import type { CacheStrategy } from "./_generate-glossary-entry";
+import type { CacheStrategy } from "../_generate-glossary-entry";
 
 export const draftSectionsTask = task({
   id: "draft_sections",
   retry: {
-    maxAttempts: 3,
+    maxAttempts: 5,
   },
   run: async ({
     term,

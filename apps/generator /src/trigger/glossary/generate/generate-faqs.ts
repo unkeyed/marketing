@@ -6,7 +6,7 @@ import { AbortTaskRunError, task } from "@trigger.dev/sdk/v3";
 import { generateObject } from "ai";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import type { CacheStrategy } from "./_generate-glossary-entry";
+import type { CacheStrategy } from "../_generate-glossary-entry";
 
 export const generateFaqsTask = task({
   id: "generate_faqs",

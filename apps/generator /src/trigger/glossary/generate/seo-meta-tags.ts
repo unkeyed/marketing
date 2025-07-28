@@ -4,8 +4,8 @@ import { task } from "@trigger.dev/sdk/v3";
 import { generateObject } from "ai";
 import { and, eq, or } from "drizzle-orm";
 import { z } from "zod";
-import { entries, firecrawlResponses, keywords } from "../../lib/db-marketing/schemas";
-import type { CacheStrategy } from "./_generate-glossary-entry";
+import { entries, firecrawlResponses, keywords } from "../../../lib/db-marketing/schemas";
+import type { CacheStrategy } from "../_generate-glossary-entry";
 
 // Define the job
 export const seoMetaTagsTask = task({

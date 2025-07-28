@@ -4,8 +4,8 @@ import { openai } from "@ai-sdk/openai";
 import { task } from "@trigger.dev/sdk/v3";
 import { generateObject } from "ai";
 import { eq } from "drizzle-orm";
-import { entries, exaScrapedResults } from "../../lib/db-marketing/schemas";
-import type { CacheStrategy } from "./_generate-glossary-entry";
+import { entries, exaScrapedResults } from "../../../lib/db-marketing/schemas";
+import type { CacheStrategy } from "../_generate-glossary-entry";
 
 export const contentTakeawaysTask = task({
   id: "content_takeaways",

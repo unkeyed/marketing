@@ -10,7 +10,7 @@ import { openai } from "@ai-sdk/openai";
 import { AbortTaskRunError, task } from "@trigger.dev/sdk/v3";
 import { generateObject } from "ai";
 import { and, eq } from "drizzle-orm";
-import type { CacheStrategy } from "./_generate-glossary-entry";
+import type { CacheStrategy } from "../_generate-glossary-entry";
 
 type TaskInput = {
   input: string;
@@ -195,6 +195,9 @@ Guidelines:
 // Technical Review Task
 export const performTechnicalEvalTask = task({
   id: "perform_technical_eval",
+  retry: {
+    maxAttempts: 5
+  },
   run: async ({ input, onCacheHit = "stale", ...options }: TaskInput & EvalOptions) => {
     console.info(`Starting technical evaluation for term: ${input}`);
 
@@ -272,6 +275,9 @@ export const performTechnicalEvalTask = task({
 // SEO Eval Task
 export const performSEOEvalTask = task({
   id: "perform_seo_eval",
+  retry: {
+    maxAttempts: 5,
+  },
   run: async ({ input, onCacheHit = "stale", ...options }: TaskInput & EvalOptions) => {
     console.info(`Starting SEO evaluation for term: ${input}`);
 
@@ -344,6 +350,9 @@ export const performSEOEvalTask = task({
 // Editorial Eval Task
 export const performEditorialEvalTask = task({
   id: "perform_editorial_eval",
+  retry: {
+    maxAttempts: 5,
+  },
   run: async ({ input, onCacheHit = "stale", ...options }: TaskInput & EvalOptions) => {
     console.info(`[workflow=glossary] [task=editorial_eval] Starting for term: ${input}`);
 
