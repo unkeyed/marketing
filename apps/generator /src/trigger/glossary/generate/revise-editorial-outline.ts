@@ -120,7 +120,7 @@ BUT NEVER touch the keywords array - copy it exactly as is!
       prompt: editorialRevisionPrompt,
       schema: editorialOutlineSchema,
       experimental_repairText: async (res) => {
-        console.warn(`[revise_editorial_outline] Schema mismatch, attempting repair`);
+        console.warn("[revise_editorial_outline] Schema mismatch, attempting repair");
 
         try {
           // Check if JSON appears complete
@@ -171,13 +171,11 @@ BUT NEVER touch the keywords array - copy it exactly as is!
 
           // Ensure outline wrapper
           if (!parsed.outline) {
-            console.log("[revise_editorial_outline] 🔧 Adding missing outline wrapper");
             parsed = { outline: Array.isArray(parsed) ? parsed : [parsed] };
           }
 
           // Fix sections
           if (Array.isArray(parsed.outline)) {
-            console.log(`[revise_editorial_outline] 🔧 Fixing ${parsed.outline.length} sections`);
             parsed.outline = parsed.outline.map((section: any, index: number) => {
               const fixes: string[] = [];
               const fixed: any = { ...section };
@@ -228,7 +226,6 @@ BUT NEVER touch the keywords array - copy it exactly as is!
               }
 
               if (fixes.length > 0) {
-                console.log(`  Section ${index + 1}: Fixed [${fixes.join(", ")}]`);
               }
 
               return fixed;
@@ -238,16 +235,14 @@ BUT NEVER touch the keywords array - copy it exactly as is!
           // Final validation
           const finalParseResult = editorialOutlineSchema.safeParse(parsed);
           if (finalParseResult.success) {
-            console.log("[revise_editorial_outline] ✅ Repair successful!");
             return JSON.stringify(parsed);
-          } else {
-            console.error("[revise_editorial_outline] ❌ Still failing after repair:");
-            finalParseResult.error.issues.forEach((issue, index) => {
-              console.error(`  ${index + 1}. Path: ${issue.path.join(".")}`);
-              console.error(`     Error: ${issue.message}`);
-            });
-            throw new Error("Could not repair the response");
           }
+          console.error("[revise_editorial_outline] ❌ Still failing after repair:");
+          finalParseResult.error.issues.forEach((issue, index) => {
+            console.error(`  ${index + 1}. Path: ${issue.path.join(".")}`);
+            console.error(`     Error: ${issue.message}`);
+          });
+          throw new Error("Could not repair the response");
         } catch (error) {
           console.error("[revise_editorial_outline] 💥 Repair failed:", error);
           throw error;

@@ -19,7 +19,7 @@ export const scrapeSearchResults = task({
       includedSearchResults: { url: string; domainCategory: DomainCategory }[];
       onCacheHit: CacheStrategy;
     },
-    retry: {
+    _retry: {
       maxAttempts: 5;
     },
   ) => {

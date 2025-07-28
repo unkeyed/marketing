@@ -153,7 +153,7 @@ Example of INCORRECT (do not do this):
       prompt: seoRevisionPrompt,
       schema: seoOutlineSchema,
       experimental_repairText: async (res) => {
-        console.warn(`[revise_seo_outline] Schema mismatch, attempting repair`);
+        console.warn("[revise_seo_outline] Schema mismatch, attempting repair");
 
         try {
           // Check if JSON appears complete
@@ -204,13 +204,11 @@ Example of INCORRECT (do not do this):
 
           // Ensure outline wrapper
           if (!parsed.outline) {
-            console.log("[revise_seo_outline] 🔧 Adding missing outline wrapper");
             parsed = { outline: Array.isArray(parsed) ? parsed : [parsed] };
           }
 
           // Fix sections
           if (Array.isArray(parsed.outline)) {
-            console.log(`[revise_seo_outline] 🔧 Fixing ${parsed.outline.length} sections`);
             parsed.outline = parsed.outline.map((section: any, index: number) => {
               const fixes: string[] = [];
               const fixed: any = { ...section };
@@ -265,7 +263,6 @@ Example of INCORRECT (do not do this):
               }
 
               if (fixes.length > 0) {
-                console.log(`  Section ${index + 1}: Fixed [${fixes.join(", ")}]`);
               }
 
               return fixed;
@@ -275,16 +272,14 @@ Example of INCORRECT (do not do this):
           // Final validation
           const finalParseResult = seoOutlineSchema.safeParse(parsed);
           if (finalParseResult.success) {
-            console.log("[revise_seo_outline] ✅ Repair successful!");
             return JSON.stringify(parsed);
-          } else {
-            console.error("[revise_seo_outline] ❌ Still failing after repair:");
-            finalParseResult.error.issues.forEach((issue, index) => {
-              console.error(`  ${index + 1}. Path: ${issue.path.join(".")}`);
-              console.error(`     Error: ${issue.message}`);
-            });
-            throw new Error("Could not repair the response");
           }
+          console.error("[revise_seo_outline] ❌ Still failing after repair:");
+          finalParseResult.error.issues.forEach((issue, index) => {
+            console.error(`  ${index + 1}. Path: ${issue.path.join(".")}`);
+            console.error(`     Error: ${issue.message}`);
+          });
+          throw new Error("Could not repair the response");
         } catch (error) {
           console.error("[revise_seo_outline] 💥 Repair failed:", error);
           throw error;

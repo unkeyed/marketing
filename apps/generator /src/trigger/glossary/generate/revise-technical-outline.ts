@@ -131,7 +131,7 @@ Notes:
       prompt: technicalRevisionPrompt,
       schema: technicalOutlineSchema,
       experimental_repairText: async (res) => {
-        console.warn(`[revise_technical_outline] Schema mismatch, attempting repair`);
+        console.warn("[revise_technical_outline] Schema mismatch, attempting repair");
 
         try {
           // First check if JSON appears complete
@@ -187,13 +187,11 @@ Notes:
 
           // Ensure it has an outline array
           if (!parsed.outline) {
-            console.log("[revise_technical_outline] 🔧 Adding missing outline wrapper");
             parsed = { outline: Array.isArray(parsed) ? parsed : [parsed] };
           }
 
           // Fix each section in the outline
           if (Array.isArray(parsed.outline)) {
-            console.log(`[revise_technical_outline] 🔧 Fixing ${parsed.outline.length} sections`);
             parsed.outline = parsed.outline.map((section: any, index: number) => {
               const fixes: string[] = [];
 
@@ -235,9 +233,6 @@ Notes:
               }));
 
               if (fixes.length > 0) {
-                console.log(
-                  `  Section ${index + 1} (${fixed.heading}): Fixed [${fixes.join(", ")}]`,
-                );
               }
 
               return fixed;
@@ -247,18 +242,16 @@ Notes:
           // Try parsing with our schema again
           const finalParseResult = technicalOutlineSchema.safeParse(parsed);
           if (finalParseResult.success) {
-            console.log("[revise_technical_outline] ✅ Repair successful!");
             return JSON.stringify(parsed);
-          } else {
-            console.error(
-              "[revise_technical_outline] ❌ Schema validation still failing after repair:",
-            );
-            finalParseResult.error.issues.forEach((issue, index) => {
-              console.error(`  ${index + 1}. Path: ${issue.path.join(".")}`);
-              console.error(`     Error: ${issue.message}`);
-            });
-            throw new Error("Could not repair the response to match schema");
           }
+          console.error(
+            "[revise_technical_outline] ❌ Schema validation still failing after repair:",
+          );
+          finalParseResult.error.issues.forEach((issue, index) => {
+            console.error(`  ${index + 1}. Path: ${issue.path.join(".")}`);
+            console.error(`     Error: ${issue.message}`);
+          });
+          throw new Error("Could not repair the response to match schema");
         } catch (error) {
           console.error("[revise_technical_outline] 💥 Repair failed:", error);
           throw error;

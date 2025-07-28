@@ -3,8 +3,9 @@ import { takeawaysSchema } from "@/lib/db-marketing/schemas/takeaways-schema";
 import { google } from "@/lib/google";
 import { openai } from "@ai-sdk/openai";
 import { task } from "@trigger.dev/sdk/v3";
-import { RetryError, generateObject } from "ai";
+import { type GenerateObjectResult, RetryError, generateObject } from "ai";
 import { eq } from "drizzle-orm";
+import type { z } from "zod";
 import { entries, exaScrapedResults } from "../../../lib/db-marketing/schemas";
 import type { CacheStrategy } from "../_generate-glossary-entry";
 
@@ -115,7 +116,7 @@ export const contentTakeawaysTask = task({
         7. Interesting fact (did you know)
       `;
 
-    let takeaways;
+    let takeaways: GenerateObjectResult<z.infer<typeof takeawaysSchema>>;
 
     try {
       takeaways = await generateObject({
@@ -132,8 +133,6 @@ export const contentTakeawaysTask = task({
     } catch (error) {
       // Check if it's a retry error (which includes rate limit errors)
       if (RetryError.isInstance(error)) {
-        console.log("OpenAI rate limit hit, falling back to Google Gemini...");
-
         takeaways = await generateObject({
           model: google("gemini-2.5-pro-exp-03-25"),
           system: systemPrompt,
