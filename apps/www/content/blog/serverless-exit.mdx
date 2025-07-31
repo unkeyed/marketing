@@ -7,7 +7,6 @@ author: andreas
 tags: ["engineering"]
 ---
 
-
 Every millisecond matters when you're in the critical path of API authentication. After two years of fighting serverless limitations, we rebuilt our entire API stack and slashed the end-to-end latency.
 
 <Image src="/images/blog-images/serverless-exit/latency_drop.png" alt="Latency Drop" width="1920" height="1080"/>
@@ -27,7 +26,7 @@ Here's the story of why we made this move, the problems that forced our hand, an
 
 ## The Performance Wall We Hit
 
-For an API authentication service, every millisecond matters. When developers integrate Unkey into their request path, our latency directly impacts their users' experience. We knew we needed to be fast, but serverless was fighting us every step of the way.
+When developers integrate Unkey into their request path, our latency directly impacts their users' experience. We knew we needed to be fast, but serverless was fighting us every step of the way.
 
 ### The Caching Problem
 
@@ -177,4 +176,4 @@ We're currently running on AWS Fargate behind Global Accelerator, but this is te
 
 The move to stateful Go servers was the first step in making Unkey truly portable and self-hostable. Stay tuned for more details on that front.
 
-Want to see the implementation details? Both our serverless and stateful APIs are open source in our GitHub repository. The serverless version is in `apps/api/` and the new Go version is in `go/apps/api/`.
+Want to see the implementation details? Both our serverless and stateful APIs are open source in our GitHub repository. The serverless version is in [`apps/api/`](https://github.com/unkeyed/unkey/tree/main/apps/api) and the new Go version is in [`go/apps/api/`](https://github.com/unkeyed/unkey/tree/main/go/apps/api).
