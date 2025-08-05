@@ -30,7 +30,7 @@ When developers integrate Unkey into their request path, our latency directly im
 
 ### The Caching Problem
 
-The fundamental issue was caching. In serverless, you have no persistent memory between function invocations. Every cache read requires a network request to an external store, and that's where things got painful. We still used the global scope trick to cache some data across invocations, but the hit rates were very low.
+The fundamental issue was caching. In serverless, you have no guaranteed persistent memory between function invocations. Every cache read requires a network request to an external store, and that's where things got painful. We still used the global scope trick to cache some data across invocations, but the hit rates were very low.
 
 <Image src="/images/blog-images/serverless-exit/cf-cache-hits.png" alt="Cache Hits" width="1920" height="1080"/>
 
