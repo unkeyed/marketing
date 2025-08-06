@@ -25,16 +25,16 @@ export function getStepsData() {
       color: "text-white",
     },
     {
-      content: `curl --request POST --url https://api.unkey.dev/v1/keys.createKey
---header 'Authorization: Bearer <token>
+      content: `curl --request POST --url https://api.unkey.com/v2/keys.createKey
+--header 'Authorization: Bearer <token>'
 --header 'Content-Type: application/json
 --data '{"apiId": "${apiId}"}'`,
       color: "text-white",
     },
   ];
-  const step1CurlCommand = `curl --request POST --url https://api.unkey.dev/v1/keys.createKey
---header 'Authorization: Bearer <token>
---header 'Content-Type: application/json
+  const step1CurlCommand = `curl --request POST --url https://api.unkey.com/v2/keys.createKey
+--header 'Authorization: Bearer <token>'
+--header 'Content-Type: application/json'
 --data '{"apiId": "${apiId}"}'`;
   steps.push({
     header: step1Header,
@@ -46,13 +46,15 @@ export function getStepsData() {
   const step2Messages = [
     {
       content:
-        "Nice Job! Now that we have created a user key let us use the getKey endpoint to get some info. A typical key will have useful information like roles, permissions, remaining uses, ownerId and more. A full list can be found on our docs https://www.unkey.com/docs/api-reference/keys/get",
+        "Nice Job! Now that we have created a user key let us use the getKey endpoint to get some info. A typical key will have useful information like roles, permissions, remaining uses, externalId and more. A full list can be found on our docs https://www.unkey.com/docs/api-reference/keys/get",
       color: "text-white",
     },
   ];
-  const step2CurlCommand = `curl --request GET
---url https://api.unkey.dev/v1/keys.getKey?keyId=<keyId>
---header 'Authorization: Bearer <token>'`;
+  const step2CurlCommand = `curl --request POST
+--url https://api.unkey.com/v2/keys.getKey
+--header 'Authorization: Bearer <token>'
+--header 'Content-Type: application/json
+--data '{"keyId": "<keyId>"}'`;
   steps.push({
     header: step2Header,
     messages: step2Messages,
@@ -68,28 +70,29 @@ export function getStepsData() {
     },
   ];
   const step3CurlCommand = `curl --request POST
---url https://api.unkey.dev/v1/keys.verifyKey
+--url https://api.unkey.com/v2/keys.verifyKey
+--header 'Authorization: Bearer <token>'
 --header 'Content-Type: application/json'
---data '{"apiId": "${apiId}", "key": "<key>"}'`;
+--data '{key": "<key>"}'`;
   steps.push({
     header: step3Header,
     messages: step3Messages,
     curlCommand: step3CurlCommand,
   });
-  // Step 4  Update the key with ownerId
-  const step4Header = "Step 4: Update the key with ownerId";
+  // Step 4  Update the key with externalId
+  const step4Header = "Step 4: Update the key with externalId";
   const step4Messages = [
     {
       content:
-        "You will notice the enabled: true meaning meaning it can be used for authenticating. Now lets try to update the key with an ownerId. The ownerId can help you link your user to a spacific key or set of keys. For example if our customer was Acme we could mark all the keys with Acme_Company. This could then be searched to see all keys witht he Acme_Company ownerId. Making it easier for you to track keys for each customer. Lets add that now. Feel free to put any OwnerId you want in place of user_1234.",
+        "You will notice the enabled: true meaning meaning it can be used for authenticating. Now lets try to update the key with an externalId. The externalId can help you link your user to a specific key or set of keys. For example if our customer was Acme we could mark all the keys with Acme_Company. This could then be searched to see all keys witht he Acme_Company externalId. Making it easier for you to track keys for each customer. Lets add that now. Feel free to put any externalId you want in place of user_1234.",
       color: "text-white",
     },
   ];
   const step4CurlCommand = `curl --request POST
---url https://api.unkey.dev/v1/keys.updateKey
+--url https://api.unkey.com/v2/keys.updateKey
 --header 'Authorization: Bearer <token>'
 --header 'Content-Type: application/json'
---data '{"keyId": "<keyId>", "ownerId": "user_1234"}'`;
+--data '{"keyId": "<keyId>", "externalId": "user_1234"}'`;
   steps.push({
     header: step4Header,
     messages: step4Messages,
@@ -100,14 +103,15 @@ export function getStepsData() {
   const step5Messages = [
     {
       content:
-        "If this worked correctly you should get back a {} in response. This is normal and signifies success. If there was an error you would have gotten back an error in stead. Lets now verify the key just to make sure your key is updated with the ownerId. Just to give you piece of mind.",
+        "If this worked correctly you should get back a {} in response. This is normal and signifies success. If there was an error you would have gotten back an error in stead. Lets now verify the key just to make sure your key is updated with the externalId. Just to give you piece of mind.",
       color: "text-white",
     },
   ];
   const step5CurlCommand = `curl --request POST
---url https://api.unkey.dev/v1/keys.verifyKey
+--url https://api.unkey.com/v2/keys.verifyKey
+--header 'Authorization: Bearer <token>'
 --header 'Content-Type: application/json'
---data '{"apiId": "${apiId}", "key": "<key>"}'`;
+--data '{"key": "<key>"}'`;
   steps.push({
     header: step5Header,
     messages: step5Messages,
@@ -118,12 +122,12 @@ export function getStepsData() {
   const step6Messages = [
     {
       content:
-        "The response from step 5 should show the ownerId you enter in step 4. If you want to only allow a user access for a day or month. This can be done by adding an expiration date in unix timestamp in milliseconds. This will disable the key from being used after that time has passed. You may also change that expiration to a later time after it expires. Say a user pays for another month it can be re activated.",
+        "The response from step 5 should show the externalId you entered in step 4. If you want to only allow a user access for a day or month. This can be done by adding an expiration date in unix timestamp in milliseconds. This will disable the key from being used after that time has passed. You may also change that expiration to a later time after it expires. Say a user pays for another month it can be re activated.",
       color: "text-white",
     },
   ];
   const step6CurlCommand = `curl --request POST
---url https://api.unkey.dev/v1/keys.updateKey
+--url https://api.unkey.com/v2/keys.updateKey
 --header 'Authorization: Bearer <token>'
 --header 'Content-Type: application/json'
 --data '{"keyId": "<keyId>", "expires": <timeStamp>}'`;
@@ -142,9 +146,10 @@ export function getStepsData() {
     },
   ];
   const step7CurlCommand = `curl --request POST
---url https://api.unkey.dev/v1/keys.verifyKey
+--url https://api.unkey.com/v2/keys.verifyKey
+--header 'Authorization: Bearer <token>'
 --header 'Content-Type: application/json'
---data '{"apiId": "${apiId}","key": "<key>"}'`;
+--data '{"key": "<key>"}'`;
   steps.push({
     header: step7Header,
     messages: step7Messages,
@@ -177,7 +182,8 @@ export function getStepsData() {
     },
   ];
   const step9CurlCommand = `curl --request POST
---url https://api.unkey.dev/v1/keys.deleteKey
+--url https://api.unkey.com/v2/keys.deleteKey
+--header 'Authorization: Bearer <token>'
 --header 'Content-Type: application/json'
 --data '{"keyId": "<keyId>"}'`;
   steps.push({
@@ -195,9 +201,10 @@ export function getStepsData() {
     },
   ];
   const step10CurlCommand = `curl --request POST
---url https://api.unkey.dev/v1/keys.verifyKey
+--url https://api.unkey.com/v2/keys.verifyKey
+--header 'Authorization: Bearer <token>'
 --header 'Content-Type: application/json'
---data '{"apiId": "${apiId}", "key": "<key>"}'`;
+--data '{"key": "<key>"}'`;
   steps.push({
     header: step10Header,
     messages: step10Messages,
