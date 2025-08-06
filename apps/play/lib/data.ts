@@ -27,7 +27,7 @@ export function getStepsData() {
     {
       content: `curl --request POST --url https://api.unkey.com/v2/keys.createKey
 --header 'Authorization: Bearer <token>'
---header 'Content-Type: application/json
+--header 'Content-Type: application/json'
 --data '{"apiId": "${apiId}"}'`,
       color: "text-white",
     },
@@ -53,7 +53,7 @@ export function getStepsData() {
   const step2CurlCommand = `curl --request POST
 --url https://api.unkey.com/v2/keys.getKey
 --header 'Authorization: Bearer <token>'
---header 'Content-Type: application/json
+--header 'Content-Type: application/json'
 --data '{"keyId": "<keyId>"}'`;
   steps.push({
     header: step2Header,
@@ -73,7 +73,7 @@ export function getStepsData() {
 --url https://api.unkey.com/v2/keys.verifyKey
 --header 'Authorization: Bearer <token>'
 --header 'Content-Type: application/json'
---data '{key": "<key>"}'`;
+--data '{"key": "<key>"}'`;
   steps.push({
     header: step3Header,
     messages: step3Messages,
