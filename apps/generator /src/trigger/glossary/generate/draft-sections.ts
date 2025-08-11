@@ -64,10 +64,14 @@ export const draftSectionsTask = task({
     };
 
     const draftedContent = await draftSections({ term, entry: entryWithMarkdownEnsured });
-    console.info(`[DRAFT_SECTIONS] Step 1/3: Drafted content for term="${entry.inputTerm}" length=${draftedContent.length}`);
+    console.info(
+      `[DRAFT_SECTIONS] Step 1/3: Drafted content for term="${entry.inputTerm}" length=${draftedContent.length}`,
+    );
 
     const reviewedContent = await reviewContent({ term, content: draftedContent });
-    console.info(`[DRAFT_SECTIONS] Step 2/3: Reviewed content for term="${entry.inputTerm}" length=${reviewedContent.length}`);
+    console.info(
+      `[DRAFT_SECTIONS] Step 2/3: Reviewed content for term="${entry.inputTerm}" length=${reviewedContent.length}`,
+    );
 
     const optimizedContent = await seoOptimizeContent({
       term: entry.inputTerm,
@@ -76,7 +80,9 @@ export const draftSectionsTask = task({
         ds.sectionsToKeywords.map((stk) => stk.keyword.keyword),
       ),
     });
-    console.info(`[DRAFT_SECTIONS] Step 3/3: SEO optimized content for term="${entry.inputTerm}" length=${optimizedContent.length}`);
+    console.info(
+      `[DRAFT_SECTIONS] Step 3/3: SEO optimized content for term="${entry.inputTerm}" length=${optimizedContent.length}`,
+    );
 
     // Strip any leading single # header if present
     const finalContent = optimizedContent.replace(/^#\s+[^\n]+\n/, "");

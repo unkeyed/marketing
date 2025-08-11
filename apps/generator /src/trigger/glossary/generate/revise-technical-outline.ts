@@ -233,7 +233,9 @@ Notes:
               }));
 
               if (fixes.length > 0) {
-                console.info(`[revise_technical_outline] Applied fixes to section ${index + 1}: ${fixes.join(', ')}`);
+                console.info(
+                  `[revise_technical_outline] Applied fixes to section ${index + 1}: ${fixes.join(", ")}`,
+                );
               }
 
               return fixed;

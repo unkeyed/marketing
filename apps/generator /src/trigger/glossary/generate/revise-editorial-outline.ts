@@ -7,7 +7,6 @@ import { openai } from "@ai-sdk/openai";
 import { type TaskOutput, task } from "@trigger.dev/sdk/v3";
 import { generateObject } from "ai";
 import { z } from "zod";
-import type { CacheStrategy } from "../_generate-glossary-entry";
 import type { performEditorialEvalTask } from "../evaluate/evals";
 
 // Schema for the editorial revised outline (keywords will be restored after revision)
