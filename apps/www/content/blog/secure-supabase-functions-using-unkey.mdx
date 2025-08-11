@@ -99,7 +99,7 @@ Now that we have a function, we must add Unkey to secure the endpoint. Supabase 
 
 ```typescript {2} title="./functions/hello-world/index.ts"
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { verifyKey } from "https://esm.sh/@unkey/api";
+import { verifyKey } from "https://esm.sh/@unkey/api@0.38.0";
 ```
 
 ### What does `verifyKey` do?
@@ -124,7 +124,7 @@ First, let's remove the boilerplate code from the function so we can work on add
 
 ```typescript title="./functions/hello-world/index.ts"
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { verifyKey } from "https://esm.sh/@unkey/api";
+import { verifyKey } from "https://esm.sh/@unkey/api@0.38.0";
 
 serve(async (req) => {});
 ```
@@ -133,7 +133,7 @@ Next, we will wrap the `serve` function inside a try-catch. Just in case somethi
 
 ```typescript title="./functions/hello-world/index.ts"
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { verifyKey } from "https://esm.sh/@unkey/api";
+import { verifyKey } from "https://esm.sh/@unkey/api@0.38.0";
 
 serve(async (req) => {
   try {
@@ -153,7 +153,7 @@ Inside our try, we can look for a header containing the user's API Key. In this 
 
 ```typescript title="./functions/hello-world/index.ts"
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { verifyKey } from "https://esm.sh/@unkey/api";
+import { verifyKey } from "https://esm.sh/@unkey/api@0.38.0";
 
 serve(async (req) => {
   try {
