@@ -27,7 +27,6 @@ type TaskInput = {
   outlineToRefine: z.infer<typeof seoOutlineSchema>["outline"];
   reviewReport: TaskOutput<typeof performSEOEvalTask>;
   seoKeywordsToAllocate: Array<SelectKeywords>;
-  onCacheHit?: CacheStrategy;
 };
 
 export const reviseSEOOutlineTask = task({

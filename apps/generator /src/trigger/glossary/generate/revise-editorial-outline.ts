@@ -25,7 +25,6 @@ type TaskInput = {
   term: string;
   outlineToRefine: z.infer<typeof editorialOutlineSchema>["outline"];
   reviewReport: TaskOutput<typeof performEditorialEvalTask>;
-  onCacheHit?: CacheStrategy;
 };
 
 export const reviseEditorialOutlineTask = task({

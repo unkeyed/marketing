@@ -211,7 +211,7 @@ Notes:
                 fixes.push("order");
               }
               if (!section.citedSources) {
-                fixed.citedSources = "https://www.w3.org/TR/trace-context/";
+                fixed.citedSources = "https://developer.mozilla.org/";
                 fixes.push("citedSources");
               }
               if (!Array.isArray(section.contentTypes)) {
@@ -233,6 +233,7 @@ Notes:
               }));
 
               if (fixes.length > 0) {
+                console.info(`[revise_technical_outline] Applied fixes to section ${index + 1}: ${fixes.join(', ')}`);
               }
 
               return fixed;

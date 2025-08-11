@@ -104,7 +104,7 @@ export const generateOutlineTask = task({
       contentKeywords,
     });
     console.info(
-      `Step 4/8 - INITIAL OUTLINE RESULT: ${JSON.stringify(initialOutline.object.outline)}`,
+      `Step 4/7 - INITIAL OUTLINE RESULT: ${JSON.stringify(initialOutline.object.outline)}`,
     );
 
     // Step 5: Technical review by domain expert
@@ -121,7 +121,7 @@ export const generateOutlineTask = task({
     if (!technicalEval.output?.id) {
       throw new AbortTaskRunError(`The technical evaluation task didn't return an eval id.`);
     }
-    console.info(`Step 5/9 - TECHNICAL EVALUATION RESULT: 
+    console.info(`Step 5/7 - TECHNICAL EVALUATION RESULT: 
         ===
         Ratings: ${JSON.stringify(technicalEval?.output?.ratings)}
         ===
@@ -142,7 +142,7 @@ export const generateOutlineTask = task({
       throw new AbortTaskRunError("Technical revision failed");
     }
     console.info(
-      `Step 6/9 - TECHNICAL REVISED OUTLINE RESULT: ${JSON.stringify(
+      `Step 6/7 - TECHNICAL REVISED OUTLINE RESULT: ${JSON.stringify(
         technicalRevision.output?.outline,
       )}`,
     );
@@ -165,7 +165,7 @@ export const generateOutlineTask = task({
     if (!seoEval.ok) {
       throw new AbortTaskRunError("SEO evaluation failed");
     }
-    console.info(`Step 7/9 - SEO EVALUATION RESULT: 
+    console.info(`Step 7/7 - SEO EVALUATION RESULT: 
         ===
         Ratings: ${JSON.stringify(seoEval.output.ratings)}
         ===
@@ -175,7 +175,10 @@ export const generateOutlineTask = task({
     // Step 8: Revise outline based on SEO feedback
     const seoRevision = await reviseSEOOutlineTask.triggerAndWait({
       term,
-      outlineToRefine: technicalRevision.output?.outline || [],
+      outlineToRefine: (technicalRevision.output?.outline || []).map((section) => ({
+        ...section,
+        keywords: [], // SEO revision task will populate these
+      })),
       reviewReport: seoEval.output,
       seoKeywordsToAllocate: seoKeywords,
       onCacheHit,
@@ -184,7 +187,7 @@ export const generateOutlineTask = task({
       throw new AbortTaskRunError("SEO revision failed");
     }
     console.info(
-      `Step 8/9 - SEO OPTIMIZED OUTLINE RESULT: ${JSON.stringify(seoRevision.output?.outline)}`,
+      `Step 8/7 - SEO OPTIMIZED OUTLINE RESULT: ${JSON.stringify(seoRevision.output?.outline)}`,
     );
 
     // Validate keywords after SEO revision
@@ -226,7 +229,7 @@ export const generateOutlineTask = task({
     if (!editorialEval.ok) {
       throw new AbortTaskRunError("Editorial evaluation failed");
     }
-    console.info(`Step 9/9 - EDITORIAL EVALUATION RESULT: 
+    console.info(`Step 9/7 - EDITORIAL EVALUATION RESULT: 
         ===
         Ratings: ${JSON.stringify(editorialEval.output.ratings)}
         ===
@@ -272,7 +275,7 @@ export const generateOutlineTask = task({
     }
 
     console.info(
-      `Step 10/10 - EDITORIAL OPTIMIZED OUTLINE RESULT: ${JSON.stringify(
+      `Step 10/7 - EDITORIAL OPTIMIZED OUTLINE RESULT: ${JSON.stringify(
         editorialRevision.output?.outline,
       )}`,
     );
