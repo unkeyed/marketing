@@ -11,7 +11,6 @@ import { NamedInput } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { protectedApiRequestSchema } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
-import ms from "ms";
 
 function getBaseUrl() {
   if (typeof window !== "undefined") {
@@ -28,7 +27,6 @@ function getBaseUrl() {
   return `http://localhost:${process.env.PORT ?? 3000}`;
 }
 
-const API_UNKEY_DEV_V1 = "https://api.unkey.dev/v1/";
 const API_UNKEY_DEV_V2 = "https://api.unkey.com/v2/";
 
 // Avoid initial layout shift
@@ -391,11 +389,6 @@ export default function Page() {
         getJSXText: () => {
           return (
             <>
-              The total usage numbers reveal that we've used the key three times!
-              <br />
-              As the API response suggests, we offer a variety of features, such as{" "}
-              <Code>per key rate limiting</Code> and <Code>usage based limits</Code>.
-              <br />
               <strong>Finally, let's delete our key.</strong>
             </>
           );
