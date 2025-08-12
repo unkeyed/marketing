@@ -1,11 +1,13 @@
 import { db } from "@/lib/db-marketing/client";
 import { takeawaysSchema } from "@/lib/db-marketing/schemas/takeaways-schema";
+import { google } from "@/lib/google";
 import { openai } from "@ai-sdk/openai";
 import { task } from "@trigger.dev/sdk/v3";
-import { generateObject } from "ai";
+import { type GenerateObjectResult, RetryError, generateObject } from "ai";
 import { eq } from "drizzle-orm";
-import { entries, exaScrapedResults } from "../../lib/db-marketing/schemas";
-import type { CacheStrategy } from "./_generate-glossary-entry";
+import type { z } from "zod";
+import { entries, exaScrapedResults } from "../../../lib/db-marketing/schemas";
+import type { CacheStrategy } from "../_generate-glossary-entry";
 
 export const contentTakeawaysTask = task({
   id: "content_takeaways",
@@ -53,16 +55,15 @@ export const contentTakeawaysTask = task({
       {} as Record<string, typeof scrapedContent>,
     );
 
-    const takeaways = await generateObject({
-      model: openai("gpt-4"),
-      system: `
+    const systemPrompt = `
         You are an API documentation expert. Create comprehensive takeaways for API-related terms.
         Focus on practical, accurate, and developer-friendly content.
         Each section should be concise but informative.
         For best practices, include only the 3 most critical and widely-adopted practices.
         For usage in APIs, provide a maximum of 3 short, focused sentences highlighting key terms and primary use cases.
-      `,
-      prompt: `
+      `;
+
+    const userPrompt = `
         Term: "${term}"
         
         ## Scraped Content summaries
@@ -113,14 +114,41 @@ export const contentTakeawaysTask = task({
              - We don't want to name competitors.
              - Omit the URL if you're in doubt if it's a API DevTooling vendor or not
         7. Interesting fact (did you know)
-      `,
-      schema: takeawaysSchema,
-      temperature: 0.2,
-      experimental_telemetry: {
-        functionId: "content_takeaways",
-        isEnabled: true,
-      },
-    });
+      `;
+
+    let takeaways: GenerateObjectResult<z.infer<typeof takeawaysSchema>>;
+
+    try {
+      takeaways = await generateObject({
+        model: openai("gpt-4o-mini"),
+        system: systemPrompt,
+        prompt: userPrompt,
+        schema: takeawaysSchema,
+        temperature: 0.2,
+        experimental_telemetry: {
+          functionId: "content_takeaways",
+          isEnabled: true,
+        },
+      });
+    } catch (error) {
+      // Check if it's a retry error (which includes rate limit errors)
+      if (RetryError.isInstance(error)) {
+        takeaways = await generateObject({
+          model: google("gemini-2.5-pro-exp-03-25"),
+          system: systemPrompt,
+          prompt: userPrompt,
+          schema: takeawaysSchema,
+          temperature: 0.2,
+          experimental_telemetry: {
+            functionId: "content_takeaways_gemini",
+            isEnabled: true,
+          },
+        });
+      } else {
+        // Re-throw if it's not a retry error
+        throw error;
+      }
+    }
 
     await db
       .update(entries)

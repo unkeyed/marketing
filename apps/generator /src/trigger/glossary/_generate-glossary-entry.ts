@@ -3,14 +3,14 @@ import { entries } from "@/lib/db-marketing/schemas";
 import { task } from "@trigger.dev/sdk/v3";
 import { AbortTaskRunError } from "@trigger.dev/sdk/v3";
 import { eq } from "drizzle-orm";
-import { contentTakeawaysTask } from "./content-takeaways";
-import { createPrTask } from "./create-pr";
-import { draftSectionsTask } from "./draft-sections";
-import { generateFaqsTask } from "./generate-faqs";
-import { generateOutlineTask } from "./generate-outline";
-import { keywordResearchTask } from "./keyword-research";
+import { contentTakeawaysTask } from "./generate/content-takeaways";
+import { draftSectionsTask } from "./generate/draft-sections";
+import { generateFaqsTask } from "./generate/generate-faqs";
+import { generateOutlineTask } from "./generate/generate-outline";
+import { seoMetaTagsTask } from "./generate/seo-meta-tags";
+import { createPrTask } from "./publish/create-pr";
+import { keywordResearchTask } from "./research/keywords/keyword-research";
 import { technicalResearchTask } from "./research/technical/_technical-research";
-import { seoMetaTagsTask } from "./seo-meta-tags";
 
 export type CacheStrategy = "revalidate" | "stale";
 /**
@@ -39,7 +39,7 @@ export type CacheStrategy = "revalidate" | "stale";
 export const generateGlossaryEntryTask = task({
   id: "generate_glossary_entry",
   retry: {
-    maxAttempts: 0,
+    maxAttempts: 3,
   },
   run: async ({
     term,
