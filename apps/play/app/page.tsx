@@ -189,17 +189,6 @@ export default function Page() {
           },
         },
       },
-      "keys.getVerifications": {
-        method: "GET",
-        route: "keys.getVerifications",
-        prefixUrl: API_UNKEY_DEV_V1,
-        fields: {
-          keyId: {
-            getDefaultValue: () => cache.current.keyId ?? "",
-            schema: z.string(),
-          },
-        },
-      },
       "keys.deleteKey": {
         method: "POST",
         route: "keys.deleteKey",
@@ -390,26 +379,6 @@ export default function Page() {
               <br />
               Again, let's double check if the <Code>expires</Code> is applied by verifying the key
               again.
-            </>
-          );
-        },
-      },
-      {
-        endpoint: ALL_ENDPOINTS["keys.getVerifications"],
-        onResponse: () => {
-          toast("You retrieved usage data! 🔍", {});
-        },
-        getJSXText: () => {
-          const remainingExpirationTime = cache.current.expires
-            ? ms(new Date(cache.current.expires).getTime() - Date.now())
-            : "never";
-
-          return (
-            <>
-              Seems like the <Code>expires</Code> date is <strong>{remainingExpirationTime}</strong>{" "}
-              from now!
-              <br />
-              We've now used our key more than once. Let's check its usage numbers!
             </>
           );
         },
@@ -738,11 +707,10 @@ export default function Page() {
                 .
                 <br />
                 <br />
-                The first 200 users to sign up will receive an Unkey swag pack!
                 <br />
                 <br />
                 <Button asChild className="w-full text-center">
-                  <Link href="https://go.unkey.com/swag">Get Started for free</Link>
+                  <Link href="https://app.unkey.com/">Get Started for free</Link>
                 </Button>
               </div>
             )}
