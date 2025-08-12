@@ -330,8 +330,8 @@ export default function Page() {
               <br />
               <br />
               As an example, you could mark all employees from ACME company with an{" "}
-              <Code>externalId</Code> equal to <Code>acme-inc</Code>. That will allow you to filter key
-              usage by ACME at any point in the future to understand the overall usage of a
+              <Code>externalId</Code> equal to <Code>acme-inc</Code>. That will allow you to filter
+              key usage by ACME at any point in the future to understand the overall usage of a
               particular customer.
             </>
           );
@@ -668,8 +668,8 @@ export default function Page() {
                         : "") +
                       (lastResponseJson !== undefined && lastResponseJson !== null
                         ? lastResponseJson
-                          .replace(/(?:\r\n|\r|\n)/g, "<br>")
-                          .replace(/ /g, "&nbsp;")
+                            .replace(/(?:\r\n|\r|\n)/g, "<br>")
+                            .replace(/ /g, "&nbsp;")
                         : '{ "whoops": "nothing to show." }'),
                   }}
                 />
