@@ -13,7 +13,7 @@
     "@c15t/nextjs": "^1.4.4",
     "@faker-js/faker": "^8.4.1",
     "@hookform/resolvers": "^3.3.4",
-    "@next/bundle-analyzer": "^14.2.3",
+    "@next/bundle-analyzer": "^15.5.0",
     "@planetscale/database": "^1.11.0",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-avatar": "^1.0.3",
