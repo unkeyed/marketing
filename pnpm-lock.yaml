@@ -309,8 +309,8 @@ importers:
         specifier: ^3.3.4
         version: 3.10.0(react-hook-form@7.55.0(react@18.3.1))
       '@next/bundle-analyzer':
-        specifier: ^14.2.3
-        version: 14.2.28
+        specifier: ^15.5.4
+        version: 15.5.4
       '@planetscale/database':
         specifier: ^1.11.0
         version: 1.19.0
@@ -461,7 +461,7 @@ importers:
         version: 0.7.3(typescript@5.8.2)
       '@content-collections/mdx':
         specifier: ^0.1.3
-        version: 0.1.6(@content-collections/core@0.7.3(typescript@5.8.2))(acorn@8.14.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 0.1.6(@content-collections/core@0.7.3(typescript@5.8.2))(acorn@8.15.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@content-collections/next':
         specifier: ^0.2.0
         version: 0.2.6(@content-collections/core@0.7.3(typescript@5.8.2))(next@14.2.26(@opentelemetry/api@1.8.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
@@ -1585,8 +1585,8 @@ packages:
   '@mermaid-js/parser@0.4.0':
     resolution: {integrity: sha512-wla8XOWvQAwuqy+gxiZqY+c7FokraOTHRWMsbB4AgRx9Sy7zKslNyejy7E+a77qHfey5GXw/ik3IXv/NHMJgaA==}
 
-  '@next/bundle-analyzer@14.2.28':
-    resolution: {integrity: sha512-pqhPkJ1W2ZjSWI2N4X/fLFFcRfTKSn+ss2F17RcBuRo4qakwg/eFF2YEknCBN/9LPTKGrjMd8P6TSLWpLhaM0A==}
+  '@next/bundle-analyzer@15.5.4':
+    resolution: {integrity: sha512-wMtpIjEHi+B/wC34ZbEcacGIPgQTwTFjjp0+F742s9TxC6QwT0MwB/O0QEgalMe8s3SH/K09DO0gmTvUSJrLRA==}
 
   '@next/env@14.2.15':
     resolution: {integrity: sha512-S1qaj25Wru2dUpcIZMjxeMVSwkt8BK4dmWHHiBuRstcIyOsMapqT4A4jSB6onvqeygkSSmOkyny9VVx8JIGamQ==}
@@ -2013,6 +2013,7 @@ packages:
   '@opentelemetry/otlp-proto-exporter-base@0.51.1':
     resolution: {integrity: sha512-gxxxwfk0inDMb5DLeuxQ3L8TtptxSiTNHE4nnAJH34IQXAVRhXSXW1rK8PmDKDngRPIZ6J7ncUCjjIn8b+AgqQ==}
     engines: {node: '>=14'}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
     peerDependencies:
       '@opentelemetry/api': ^1.0.0
 
@@ -3390,8 +3391,8 @@ packages:
     resolution: {integrity: sha512-ueEepnujpqee2o5aIYnvHU6C0A42MNdsIDeqy5BydrkuC5R1ZuUFnm27EeFJGoEHJQgn3uleRvmTXaJgfXbt4g==}
     engines: {node: '>=0.4.0'}
 
-  acorn@8.14.1:
-    resolution: {integrity: sha512-OvQ/2pUDKmgfCg++xsTX1wGxfTaszcHVcTctW4UJB4hibJx2HXxxO5UmVgyjMa+ZDsiaf5wWLXYpRWMmBI0QHg==}
+  acorn@8.15.0:
+    resolution: {integrity: sha512-NZyJarBfL7nWwIq+FDL6Zp/yHEhePMNnnJ0y3qfieCrmNvYct8uvtiV41UvlSe6apAfk0fY1FbWx+NwfmpvtTg==}
     engines: {node: '>=0.4.0'}
     hasBin: true
 
@@ -7576,11 +7577,11 @@ snapshots:
     dependencies:
       '@content-collections/core': 0.7.3(typescript@5.8.2)
 
-  '@content-collections/mdx@0.1.6(@content-collections/core@0.7.3(typescript@5.8.2))(acorn@8.14.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@content-collections/mdx@0.1.6(@content-collections/core@0.7.3(typescript@5.8.2))(acorn@8.15.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@content-collections/core': 0.7.3(typescript@5.8.2)
       esbuild: 0.21.5
-      mdx-bundler: 10.1.1(acorn@8.14.1)(esbuild@0.21.5)
+      mdx-bundler: 10.1.1(acorn@8.15.0)(esbuild@0.21.5)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       unified: 11.0.5
@@ -8117,9 +8118,9 @@ snapshots:
 
   '@jsonhero/path@1.0.21': {}
 
-  '@mdx-js/esbuild@3.1.0(acorn@8.14.1)(esbuild@0.21.5)':
+  '@mdx-js/esbuild@3.1.0(acorn@8.15.0)(esbuild@0.21.5)':
     dependencies:
-      '@mdx-js/mdx': 3.1.0(acorn@8.14.1)
+      '@mdx-js/mdx': 3.1.0(acorn@8.15.0)
       '@types/unist': 3.0.3
       esbuild: 0.21.5
       source-map: 0.7.4
@@ -8151,7 +8152,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@mdx-js/mdx@3.1.0(acorn@8.14.1)':
+  '@mdx-js/mdx@3.1.0(acorn@8.15.0)':
     dependencies:
       '@types/estree': 1.0.7
       '@types/estree-jsx': 1.0.5
@@ -8165,7 +8166,7 @@ snapshots:
       hast-util-to-jsx-runtime: 2.3.6
       markdown-extensions: 2.0.0
       recma-build-jsx: 1.0.0
-      recma-jsx: 1.0.0(acorn@8.14.1)
+      recma-jsx: 1.0.0(acorn@8.15.0)
       recma-stringify: 1.0.0
       rehype-recma: 1.0.0
       remark-mdx: 3.1.0
@@ -8200,7 +8201,7 @@ snapshots:
     dependencies:
       langium: 3.3.1
 
-  '@next/bundle-analyzer@14.2.28':
+  '@next/bundle-analyzer@15.5.4':
     dependencies:
       webpack-bundle-analyzer: 4.10.1
     transitivePeerDependencies:
@@ -10344,19 +10345,19 @@ snapshots:
       mime-types: 2.1.35
       negotiator: 0.6.3
 
-  acorn-import-attributes@1.9.5(acorn@8.14.1):
+  acorn-import-attributes@1.9.5(acorn@8.15.0):
     dependencies:
-      acorn: 8.14.1
+      acorn: 8.15.0
 
-  acorn-jsx@5.3.2(acorn@8.14.1):
+  acorn-jsx@5.3.2(acorn@8.15.0):
     dependencies:
-      acorn: 8.14.1
+      acorn: 8.15.0
 
   acorn-walk@8.3.4:
     dependencies:
-      acorn: 8.14.1
+      acorn: 8.15.0
 
-  acorn@8.14.1: {}
+  acorn@8.15.0: {}
 
   ai@4.3.9(react@19.1.0)(zod@3.24.2):
     dependencies:
@@ -11103,7 +11104,7 @@ snapshots:
   esast-util-from-js@2.0.1:
     dependencies:
       '@types/estree-jsx': 1.0.5
-      acorn: 8.14.1
+      acorn: 8.15.0
       esast-util-from-estree: 2.0.0
       vfile-message: 4.0.2
 
@@ -11737,15 +11738,15 @@ snapshots:
 
   import-in-the-middle@1.13.1:
     dependencies:
-      acorn: 8.14.1
-      acorn-import-attributes: 1.9.5(acorn@8.14.1)
+      acorn: 8.15.0
+      acorn-import-attributes: 1.9.5(acorn@8.15.0)
       cjs-module-lexer: 1.4.3
       module-details-from-path: 1.0.3
 
   import-in-the-middle@1.7.4:
     dependencies:
-      acorn: 8.14.1
-      acorn-import-attributes: 1.9.5(acorn@8.14.1)
+      acorn: 8.15.0
+      acorn-import-attributes: 1.9.5(acorn@8.15.0)
       cjs-module-lexer: 1.4.3
       module-details-from-path: 1.0.3
 
@@ -12352,12 +12353,12 @@ snapshots:
     dependencies:
       '@types/mdast': 4.0.4
 
-  mdx-bundler@10.1.1(acorn@8.14.1)(esbuild@0.21.5):
+  mdx-bundler@10.1.1(acorn@8.15.0)(esbuild@0.21.5):
     dependencies:
       '@babel/runtime': 7.27.0
       '@esbuild-plugins/node-resolve': 0.2.2(esbuild@0.21.5)
       '@fal-works/esbuild-plugin-global-externals': 2.1.2
-      '@mdx-js/esbuild': 3.1.0(acorn@8.14.1)(esbuild@0.21.5)
+      '@mdx-js/esbuild': 3.1.0(acorn@8.15.0)(esbuild@0.21.5)
       esbuild: 0.21.5
       gray-matter: 4.0.3
       remark-frontmatter: 5.0.0
@@ -12640,8 +12641,8 @@ snapshots:
 
   micromark-extension-mdxjs@1.0.1:
     dependencies:
-      acorn: 8.14.1
-      acorn-jsx: 5.3.2(acorn@8.14.1)
+      acorn: 8.15.0
+      acorn-jsx: 5.3.2(acorn@8.15.0)
       micromark-extension-mdx-expression: 1.0.8
       micromark-extension-mdx-jsx: 1.0.5
       micromark-extension-mdx-md: 1.0.1
@@ -12651,8 +12652,8 @@ snapshots:
 
   micromark-extension-mdxjs@3.0.0:
     dependencies:
-      acorn: 8.14.1
-      acorn-jsx: 5.3.2(acorn@8.14.1)
+      acorn: 8.15.0
+      acorn-jsx: 5.3.2(acorn@8.15.0)
       micromark-extension-mdx-expression: 3.0.1
       micromark-extension-mdx-jsx: 3.0.2
       micromark-extension-mdx-md: 2.0.0
@@ -12971,7 +12972,7 @@ snapshots:
 
   mlly@1.7.4:
     dependencies:
-      acorn: 8.14.1
+      acorn: 8.15.0
       pathe: 2.0.3
       pkg-types: 1.3.1
       ufo: 1.6.1
@@ -13594,9 +13595,9 @@ snapshots:
       estree-util-build-jsx: 3.0.1
       vfile: 6.0.3
 
-  recma-jsx@1.0.0(acorn@8.14.1):
+  recma-jsx@1.0.0(acorn@8.15.0):
     dependencies:
-      acorn-jsx: 5.3.2(acorn@8.14.1)
+      acorn-jsx: 5.3.2(acorn@8.15.0)
       estree-util-to-js: 2.0.0
       recma-parse: 1.0.0
       recma-stringify: 1.0.0
@@ -14570,7 +14571,7 @@ snapshots:
   webpack-bundle-analyzer@4.10.1:
     dependencies:
       '@discoveryjs/json-ext': 0.5.7
-      acorn: 8.14.1
+      acorn: 8.15.0
       acorn-walk: 8.3.4
       commander: 7.2.0
       debounce: 1.2.1
