@@ -19,6 +19,9 @@ export const scrapeSearchResults = task({
       includedSearchResults: { url: string; domainCategory: DomainCategory }[];
       onCacheHit: CacheStrategy;
     },
+    _retry: {
+      maxAttempts: 5;
+    },
   ) => {
     const { inputTerm, includedSearchResults, onCacheHit } = input;
     const existingResults = await db.query.exaScrapedResults.findMany({

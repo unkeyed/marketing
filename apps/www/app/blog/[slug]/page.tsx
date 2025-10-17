@@ -3,7 +3,6 @@ import { CTA } from "@/components/cta";
 import { MDX } from "@/components/mdx-content";
 import { TopLeftShiningLight, TopRightShiningLight } from "@/components/svg/background-shiny";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MeteorLinesAngular } from "@/components/ui/meteorLines";
 import { authors } from "@/content/blog/authors";
 import { cn } from "@/lib/utils";
 import { allPosts } from "content-collections";
@@ -79,64 +78,6 @@ const BlogArticleWrapper = async ({ params }: { params: { slug: string } }) => {
       <div className="container pt-48 mx-auto sm:overflow-hidden md:overflow-visible scroll-smooth ">
         <div>
           <TopLeftShiningLight className="hidden h-full -z-40 sm:block" />
-        </div>
-        <div className="w-full h-full overflow-hidden -z-20">
-          <MeteorLinesAngular
-            number={1}
-            xPos={0}
-            speed={10}
-            delay={5}
-            className="overflow-hidden"
-          />
-          <MeteorLinesAngular
-            number={1}
-            xPos={0}
-            speed={10}
-            delay={0}
-            className="overflow-hidden"
-          />
-          <MeteorLinesAngular
-            number={1}
-            xPos={100}
-            speed={10}
-            delay={7}
-            className="overflow-hidden md:hidden"
-          />
-          <MeteorLinesAngular
-            number={1}
-            xPos={100}
-            speed={10}
-            delay={2}
-            className="overflow-hidden md:hidden"
-          />
-          <MeteorLinesAngular
-            number={1}
-            xPos={200}
-            speed={10}
-            delay={7}
-            className="hidden overflow-hidden md:block"
-          />
-          <MeteorLinesAngular
-            number={1}
-            xPos={200}
-            speed={10}
-            delay={2}
-            className="hidden overflow-hidden md:block"
-          />
-          <MeteorLinesAngular
-            number={1}
-            xPos={400}
-            speed={10}
-            delay={5}
-            className="hidden overflow-hidden lg:block"
-          />
-          <MeteorLinesAngular
-            number={1}
-            xPos={400}
-            speed={10}
-            delay={0}
-            className="hidden overflow-hidden lg:block"
-          />
         </div>
         <div className="overflow-hidden -z-40">
           <TopRightShiningLight />
