@@ -6,7 +6,7 @@ import { AbortTaskRunError, task } from "@trigger.dev/sdk/v3";
 import { generateObject } from "ai";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import type { CacheStrategy } from "./_generate-glossary-entry";
+import type { CacheStrategy } from "../_generate-glossary-entry";
 
 export const generateFaqsTask = task({
   id: "generate_faqs",
@@ -48,7 +48,7 @@ export const generateFaqsTask = task({
 
     // Generate comprehensive answers for each question
     const faqs = await generateObject({
-      model: openai("gpt-4"),
+      model: openai("gpt-4o-mini"),
       system: `You are an API documentation expert. Your task is to provide clear, accurate, and comprehensive answers to frequently asked questions about API-related concepts.
 
       Guidelines for answers:

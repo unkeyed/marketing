@@ -10,16 +10,22 @@ import {
   sectionContentTypes,
   sections,
   sectionsToKeywords,
-  selectKeywordsSchema,
 } from "@/lib/db-marketing/schemas";
 import { tryCatch } from "@/lib/utils/try-catch";
 import { openai } from "@ai-sdk/openai";
-import { AbortTaskRunError, type TaskOutput, task } from "@trigger.dev/sdk/v3";
+import { AbortTaskRunError, task } from "@trigger.dev/sdk/v3";
 import { generateObject } from "ai";
 import { and, eq, or } from "drizzle-orm";
 import { z } from "zod";
-import type { CacheStrategy } from "./_generate-glossary-entry";
-import { performEditorialEvalTask, performSEOEvalTask, performTechnicalEvalTask } from "./evals";
+import type { CacheStrategy } from "../_generate-glossary-entry";
+import {
+  performEditorialEvalTask,
+  performSEOEvalTask,
+  performTechnicalEvalTask,
+} from "../evaluate/evals";
+import { reviseEditorialOutlineTask } from "./revise-editorial-outline";
+import { reviseSEOOutlineTask } from "./revise-seo-outline";
+import { reviseTechnicalOutlineTask } from "./revise-technical-outline";
 
 // TODO: this task is a bit flake-y still
 // - split up into smaller tasks,  and/or
@@ -28,7 +34,7 @@ import { performEditorialEvalTask, performSEOEvalTask, performTechnicalEvalTask 
 export const generateOutlineTask = task({
   id: "generate_outline",
   retry: {
-    maxAttempts: 3,
+    maxAttempts: 5,
   },
   run: async ({
     term,
@@ -55,21 +61,10 @@ export const generateOutlineTask = task({
         },
       },
     });
-    if (process.env.NODE_ENV === "development") {
-      console.debug(`[DEBUG] Check the drizzle query:\n
-        ${drizzleQuery.toSQL().sql}\n
-        ---------
-        params:
-        ${JSON.stringify(drizzleQuery.toSQL().params)}
-        `);
-    }
     const { data: existing, error } = await tryCatch(drizzleQuery);
 
     if (error) {
       throw new AbortTaskRunError(`Database error: ${error}`);
-    }
-    if (process.env.NODE_ENV === "development") {
-      console.debug("[DEBUG] first read query performed successfully");
     }
 
     if (
@@ -109,13 +104,15 @@ export const generateOutlineTask = task({
       contentKeywords,
     });
     console.info(
-      `Step 4/8 - INITIAL OUTLINE RESULT: ${JSON.stringify(initialOutline.object.outline)}`,
+      `Step 4/7 - INITIAL OUTLINE RESULT: ${JSON.stringify(initialOutline.object.outline)}`,
     );
 
     // Step 5: Technical review by domain expert
     const technicalEval = await performTechnicalEvalTask.triggerAndWait({
       input: term,
-      content: technicalResearchSummaries.map((s) => `${s.url}\n${s.summary}`).join("\n\n"),
+      content: initialOutline.object.outline
+        .map((section) => `${section.heading}\n${section.description}`)
+        .join("\n\n"),
       onCacheHit,
     });
     if (!technicalEval.ok) {
@@ -124,12 +121,31 @@ export const generateOutlineTask = task({
     if (!technicalEval.output?.id) {
       throw new AbortTaskRunError(`The technical evaluation task didn't return an eval id.`);
     }
-    console.info(`Step 5/8 - TECHNICAL EVALUATION RESULT: 
+    console.info(`Step 5/7 - TECHNICAL EVALUATION RESULT: 
         ===
         Ratings: ${JSON.stringify(technicalEval?.output?.ratings)}
         ===
         Recommendations: ${JSON.stringify(technicalEval?.output?.recommendations)}
         `);
+
+    // Step 6: Revise outline based on technical feedback
+    const technicalRevision = await reviseTechnicalOutlineTask.triggerAndWait({
+      term,
+      outlineToRefine: initialOutline.object.outline,
+      reviewReport: technicalEval.output,
+      technicalContext: technicalResearchSummaries
+        .map((s) => `${s.url}\n${s.summary}`)
+        .join("\n\n"),
+      onCacheHit,
+    });
+    if (!technicalRevision.ok) {
+      throw new AbortTaskRunError("Technical revision failed");
+    }
+    console.info(
+      `Step 6/7 - TECHNICAL REVISED OUTLINE RESULT: ${JSON.stringify(
+        technicalRevision.output?.outline,
+      )}`,
+    );
     const seoKeywords = await db.query.keywords.findMany({
       where: and(
         or(eq(keywords.source, "related_searches"), eq(keywords.source, "auto_suggest")),
@@ -137,48 +153,83 @@ export const generateOutlineTask = task({
       ),
     });
 
-    // Step 6: SEO review
+    // Step 7: SEO review on technically revised outline
     const seoEval = await performSEOEvalTask.triggerAndWait({
       input: term,
-      content: technicalResearchSummaries
-        .map((result) => `${result.url}\n${result.summary}`)
-        .join("\n\n"),
+      content:
+        technicalRevision.output?.outline
+          .map((section) => `${section.heading}\n${section.description}`)
+          .join("\n\n") || "",
       onCacheHit,
     });
     if (!seoEval.ok) {
       throw new AbortTaskRunError("SEO evaluation failed");
     }
-    console.info(`Step 6/8 - SEO EVALUATION RESULT: 
+    console.info(`Step 7/7 - SEO EVALUATION RESULT: 
         ===
         Ratings: ${JSON.stringify(seoEval.output.ratings)}
         ===
         Recommendations: ${JSON.stringify(seoEval.output.recommendations)}
         `);
 
-    const seoOptimizedOutline = await reviseSEOOutline({
+    // Step 8: Revise outline based on SEO feedback
+    const seoRevision = await reviseSEOOutlineTask.triggerAndWait({
       term,
-      outlineToRefine: initialOutline.object.outline,
+      outlineToRefine: (technicalRevision.output?.outline || []).map((section) => ({
+        ...section,
+        keywords: [], // SEO revision task will populate these
+      })),
       reviewReport: seoEval.output,
       seoKeywordsToAllocate: seoKeywords,
+      onCacheHit,
     });
+    if (!seoRevision.ok) {
+      throw new AbortTaskRunError("SEO revision failed");
+    }
     console.info(
-      `Step 7/8 - SEO OPTIMIZED OUTLINE RESULT: ${JSON.stringify(
-        seoOptimizedOutline.object.outline,
-      )}`,
+      `Step 8/7 - SEO OPTIMIZED OUTLINE RESULT: ${JSON.stringify(seoRevision.output?.outline)}`,
     );
 
-    // Step 7: Editorial review
+    // Validate keywords after SEO revision
+    console.info("\n=== KEYWORD VALIDATION AFTER SEO REVISION ===");
+    const seoKeywordSet = new Set(seoKeywords.map((k) => k.keyword));
+    let invalidKeywordsFound = false;
+
+    if (seoRevision.output?.outline) {
+      for (const section of seoRevision.output.outline) {
+        if (section.keywords && Array.isArray(section.keywords)) {
+          for (const kw of section.keywords) {
+            if (!seoKeywordSet.has(kw.keyword)) {
+              console.warn(
+                `⚠️  SEO Revision - Invalid keyword in section "${section.heading}": "${kw.keyword}"`,
+              );
+              invalidKeywordsFound = true;
+            }
+          }
+        }
+      }
+    }
+
+    if (!invalidKeywordsFound) {
+      console.info("✅ All keywords from SEO revision are valid");
+    } else {
+      console.warn("❌ SEO revision introduced keywords not in the provided list");
+      console.info("Available keywords were:", Array.from(seoKeywordSet).join(", "));
+    }
+
+    // Step 9: Editorial review on SEO optimized outline
     const editorialEval = await performEditorialEvalTask.triggerAndWait({
       input: term,
-      content: seoOptimizedOutline.object.outline
-        .map((section) => `${section.heading}\n${section.description}`)
-        .join("\n\n"),
+      content:
+        seoRevision.output?.outline
+          .map((section) => `${section.heading}\n${section.description}`)
+          .join("\n\n") || "",
       onCacheHit,
     });
     if (!editorialEval.ok) {
       throw new AbortTaskRunError("Editorial evaluation failed");
     }
-    console.info(`Step 8/8 - EDITORIAL EVALUATION RESULT: 
+    console.info(`Step 9/7 - EDITORIAL EVALUATION RESULT: 
         ===
         Ratings: ${JSON.stringify(editorialEval.output.ratings)}
         ===
@@ -188,19 +239,75 @@ export const generateOutlineTask = task({
     if (!editorialEval.output || !editorialEval.output.id) {
       throw new AbortTaskRunError("Editorial evaluation output or outline is missing.");
     }
-    const editorialOptimizedOutline = await reviseEditorialOutline({
-      term,
-      outlineToRefine: seoOptimizedOutline.object.outline,
-      reviewReport: editorialEval.output,
+
+    // Step 10: Revise outline based on editorial feedback
+    // Store keywords before editorial revision
+    const keywordsByOrder = new Map();
+    seoRevision.output?.outline.forEach((section) => {
+      keywordsByOrder.set(section.order, section.keywords || []);
     });
+
+    // Remove keywords from outline before sending to editorial revision
+    const outlineWithoutKeywords = (seoRevision.output?.outline || []).map((section) => {
+      const { keywords, ...sectionWithoutKeywords } = section;
+      return sectionWithoutKeywords;
+    });
+
+    const editorialRevision = await reviseEditorialOutlineTask.triggerAndWait({
+      term,
+      outlineToRefine: outlineWithoutKeywords,
+      reviewReport: editorialEval.output,
+      onCacheHit,
+    });
+    if (!editorialRevision.ok) {
+      throw new AbortTaskRunError("Editorial revision failed");
+    }
+    // Restore keywords to editorial revision output
+    if (editorialRevision.output?.outline) {
+      editorialRevision.output.outline = editorialRevision.output.outline.map((section) => {
+        // Restore keywords based on section order
+        const originalKeywords = keywordsByOrder.get(section.order) || [];
+        return {
+          ...section,
+          keywords: originalKeywords,
+        };
+      });
+    }
+
     console.info(
-      `Step 9/9 - EDITORIAL OPTIMIZED OUTLINE RESULT: ${JSON.stringify(
-        editorialOptimizedOutline.object.outline,
+      `Step 10/7 - EDITORIAL OPTIMIZED OUTLINE RESULT: ${JSON.stringify(
+        editorialRevision.output?.outline,
       )}`,
     );
 
+    // Validate keywords after Editorial revision
+    console.info("\n=== KEYWORD VALIDATION AFTER EDITORIAL REVISION ===");
+    invalidKeywordsFound = false;
+
+    if (editorialRevision.output?.outline) {
+      for (const section of editorialRevision.output.outline) {
+        if (section.keywords && Array.isArray(section.keywords)) {
+          for (const kw of section.keywords) {
+            if (!seoKeywordSet.has(kw.keyword)) {
+              console.warn(
+                `⚠️  Editorial Revision - Invalid keyword in section "${section.heading}": "${kw.keyword}"`,
+              );
+              invalidKeywordsFound = true;
+            }
+          }
+        }
+      }
+    }
+
+    if (!invalidKeywordsFound) {
+      console.info("✅ All keywords from Editorial revision are valid");
+    } else {
+      console.warn("❌ Editorial revision introduced/changed keywords not in the provided list");
+    }
+
     // persist to db as a new entry by with their related entities
-    const sectionInsertionPayload = editorialOptimizedOutline.object.outline.map((section) =>
+    const finalOutline = editorialRevision.output?.outline || [];
+    const sectionInsertionPayload = finalOutline.map((section) =>
       insertSectionSchema.parse({
         ...section,
         entryId: existing?.id,
@@ -210,10 +317,10 @@ export const generateOutlineTask = task({
 
     // associate the keywords with the sections
     const keywordInsertionPayload = [];
-    for (let i = 0; i < editorialOptimizedOutline.object.outline?.length; i++) {
+    for (let i = 0; i < finalOutline.length; i++) {
       // add the newly inserted section id to our outline
       const section = {
-        ...(editorialOptimizedOutline.object.outline[i] as unknown as object),
+        ...(finalOutline[i] as unknown as object),
         id: newSectionIds[i].id,
       };
       for (let j = 0; j < (section as any).keywords.length; j++) {
@@ -235,17 +342,22 @@ export const generateOutlineTask = task({
       }
     }
 
-    await db.insert(sectionsToKeywords).values(keywordInsertionPayload);
+    // Only insert if we have keywords to insert
+    if (keywordInsertionPayload.length > 0) {
+      await db.insert(sectionsToKeywords).values(keywordInsertionPayload);
+      console.info(`✅ Inserted ${keywordInsertionPayload.length} keyword associations`);
+    } else {
+      console.warn("⚠️  No valid keywords to associate with sections - skipping keyword insertion");
+    }
 
     // associate the content types with the sections
-    const contentTypesInsertionPayload = editorialOptimizedOutline.object.outline.flatMap(
-      (section, index) =>
-        section.contentTypes.map((contentType: any) =>
-          insertSectionContentTypeSchema.parse({
-            ...contentType,
-            sectionId: newSectionIds[index].id,
-          }),
-        ),
+    const contentTypesInsertionPayload = finalOutline.flatMap((section, index) =>
+      section.contentTypes.map((contentType: any) =>
+        insertSectionContentTypeSchema.parse({
+          ...contentType,
+          sectionId: newSectionIds[index].id,
+        }),
+      ),
     );
     await db.insert(sectionContentTypes).values(contentTypesInsertionPayload);
 
@@ -270,25 +382,14 @@ export const generateOutlineTask = task({
   },
 });
 
-export const reviewSchema = z.object({
-  evaluation: z.string(),
-  missing: z.string().optional(),
-  rating: z.number().min(0).max(10),
-});
-
-// Schema for initial outline: array of sections, each with content types and keywords
-const finalOutlineSchema = z.object({
+// the keywords are associated later
+const initialOutlineSchema = z.object({
   outline: z.array(
     insertSectionSchema.omit({ entryId: true }).extend({
       citedSources: z.string().url(),
       contentTypes: z.array(insertSectionContentTypeSchema.omit({ sectionId: true })),
-      keywords: z.array(selectKeywordsSchema.pick({ keyword: true })),
     }),
   ),
-});
-// the keywords are associated later
-const initialOutlineSchema = finalOutlineSchema.extend({
-  outline: z.array(finalOutlineSchema.shape.outline.element.omit({ keywords: true })),
 });
 
 async function generateInitialOutline({
@@ -349,137 +450,6 @@ async function generateInitialOutline({
     },
     experimental_telemetry: {
       functionId: "generateInitialOutline",
-      recordInputs: true,
-      recordOutputs: true,
-    },
-  });
-}
-
-async function reviseSEOOutline({
-  term,
-  outlineToRefine,
-  reviewReport,
-  seoKeywordsToAllocate,
-}: {
-  term: string;
-  outlineToRefine: z.infer<typeof initialOutlineSchema>["outline"];
-  reviewReport: TaskOutput<typeof performSEOEvalTask>;
-  seoKeywordsToAllocate: Array<SelectKeywords>;
-}) {
-  const seoRevisionSystem = `
-   You are a **Senior SEO Strategist & Technical Content Specialist** with over 10 years of experience in optimizing content for API development and computer science domains.
-
-   Task:
-   - Refine the outline you're given based on the review report and guidelines
-   - Allocate the provided keyworeds to the provided outline items
-
-   **Guidelines for Revised Outline:**
-   1. Make each header unique and descriptive
-   2. Include relevant keywords in headers (use only provided keywords)
-   3. Keep headers concise (ideally under 60 characters)
-   4. Make headers compelling and engaging
-   5. Optimize headers for featured snippets
-   6. Avoid keyword stuffing in headers
-   7. Use long-tail keywords where appropriate
-   8. Ensure headers effectively break up the text
-   9. Allocate keywords from the provided list to each section (ie outline item) in the 'keywords' field as an object with the following structure: { keyword: string }
-   10. Allocate each keyword only once across all sections
-   11. Ensure the keyword allocation makes sense for each section's content
-   12. If a keyword doesn't fit any section, leave it unallocated
-
-   **Additional Considerations:**
-   - Headers should read technically and logically
-   - Headers should explain the content of their respective sections
-   - Headers should be distinct from each other
-   - Optimize for SEO without sacrificing readability
-   - Write for API developers, not general internet users
-   - Maintain a technical tone appropriate for the audience
-
-   You have the ability to add, modify, or merge sections in the outline as needed to create the most effective and SEO-optimized structure.
-   `;
-
-  const seoRevisionPrompt = `
-   Review the following outline for the term "${term}":
-
-   Outline to refine:
-   ${JSON.stringify(outlineToRefine)}
-
-   Review report:
-   ${JSON.stringify(reviewReport)}
-
-   Provided keywords:
-  Related Searches: ${JSON.stringify(
-    seoKeywordsToAllocate
-      .filter((k) => k.source === "related_searches")
-      .map((k) => k.keyword)
-      .join(", "),
-  )}
-  Auto Suggest: ${JSON.stringify(
-    seoKeywordsToAllocate
-      .filter((k) => k.source === "auto_suggest")
-      .map((k) => k.keyword)
-      .join(", "),
-  )}
-   `;
-
-  return await generateObject({
-    model: openai("gpt-4o-mini"),
-    system: seoRevisionSystem,
-    prompt: seoRevisionPrompt,
-    schema: finalOutlineSchema,
-  });
-}
-
-async function reviseEditorialOutline({
-  term,
-  outlineToRefine,
-  reviewReport,
-}: {
-  term: string;
-  outlineToRefine: z.infer<typeof initialOutlineSchema>["outline"];
-  reviewReport: TaskOutput<typeof performEditorialEvalTask>;
-}) {
-  console.info(`[DEBUG] Revising editorial outline for term "${term}"`);
-  const editorialRevisionSystem = `
-  You are a **Senior Editor & Content Strategist** with extensive experience in creating engaging and accurate technical content for API development and computer science audiences.
-
-  Task:
-  - Refine the provided outline based on the editorial review report and guidelines.
-  - Ensure the content flows logically, is engaging, and meets high editorial standards.
-
-  **Guidelines for Revised Outline:**
-  1. Clarity and Conciseness: Ensure each section heading and description is clear, concise, and easy to understand.
-  2. Accuracy: Verify that the information presented is factually correct and up-to-date.
-  3. Engagement: Make headers and descriptions compelling to maintain reader interest.
-  4. Tone and Style: Maintain a professional and technical tone suitable for API developers and computer scientists.
-  5. Completeness: Ensure the outline comprehensively covers the topic without being redundant.
-  6. Flow and Structure: Organize sections logically for a smooth reading experience.
-  7. Actionability: Where appropriate, ensure the content provides actionable insights or information.
-  8. Uniqueness: Each section should offer unique value and avoid repetition.
-
-  You have the ability to add, modify, or merge sections in the outline as needed to create the most effective and editorially sound structure.
-  Focus on the quality of the content, its organization, and its appeal to the target audience.
-  `;
-
-  const editorialRevisionPrompt = `
-  Review the following outline for the term "${term}":
-
-  Outline to refine:
-  ${JSON.stringify(outlineToRefine)}
-
-  Editorial Review Report:
-  ${JSON.stringify(reviewReport)}
-
-  Please refine the outline according to the guidelines and the review report to produce a polished, publish-ready structure.
-  `;
-
-  return await generateObject({
-    model: openai("gpt-4o-mini"),
-    system: editorialRevisionSystem,
-    prompt: editorialRevisionPrompt,
-    schema: finalOutlineSchema,
-    experimental_telemetry: {
-      functionId: "reviseEditorialOutline",
       recordInputs: true,
       recordOutputs: true,
     },
