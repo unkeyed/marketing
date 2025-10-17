@@ -11,7 +11,6 @@ import { NamedInput } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { protectedApiRequestSchema } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
-import ms from "ms";
 
 function getBaseUrl() {
   if (typeof window !== "undefined") {
@@ -28,10 +27,10 @@ function getBaseUrl() {
   return `http://localhost:${process.env.PORT ?? 3000}`;
 }
 
-const API_UNKEY_DEV_V1 = "https://api.unkey.dev/v1/";
+const API_UNKEY_DEV_V2 = "https://api.unkey.com/v2/";
 
 // Avoid initial layout shift
-const CURL_PLACEHOLDER = `curl --request POST \\\n   --url https://api.unkey.dev/v1/apis.createApi \\\n   --header 'Authorization: Bearer <token>' \\\n   --header 'Content-Type: application/json'  \\\n   --data '{\n     "name": "my-untitled-api"\n   }'`;
+const CURL_PLACEHOLDER = `curl --request POST \\\n   --url https://api.unkey.com/v2/apis.createApi \\\n   --header 'Authorization: Bearer <token>' \\\n   --header 'Content-Type: application/json'  \\\n   --data '{\n     "name": "my-untitled-api"\n   }'`;
 
 const formDataSchema = z.record(z.string());
 
@@ -71,7 +70,7 @@ export default function Page() {
       "apis.createApi": {
         method: "POST",
         route: "apis.createApi",
-        prefixUrl: API_UNKEY_DEV_V1,
+        prefixUrl: API_UNKEY_DEV_V2,
         fields: {
           name: {
             getDefaultValue: () => "my-untitled-api",
@@ -89,7 +88,7 @@ export default function Page() {
       "keys.createKey": {
         method: "POST",
         route: "keys.createKey",
-        prefixUrl: API_UNKEY_DEV_V1,
+        prefixUrl: API_UNKEY_DEV_V2,
         fields: {
           apiId: {
             getDefaultValue: () => cache.current.apiId ?? "",
@@ -107,15 +106,15 @@ export default function Page() {
           },
         },
         getMutatedCache: (cache, _, response) => {
-          cache.keyId = response.keyId;
-          cache.key = response.key;
+          cache.keyId = response.data.keyId;
+          cache.key = response.data.key;
           return cache;
         },
       },
       "keys.getKey": {
-        method: "GET",
+        method: "POST",
         route: "keys.getKey",
-        prefixUrl: API_UNKEY_DEV_V1,
+        prefixUrl: API_UNKEY_DEV_V2,
         fields: {
           keyId: {
             getDefaultValue: () => cache.current.keyId ?? "",
@@ -123,34 +122,34 @@ export default function Page() {
           },
         },
       },
-      "keys.updateKeyWithOwnerId": {
+      "keys.updateKeyWithExternalId": {
         method: "POST",
         route: "keys.updateKey",
-        prefixUrl: API_UNKEY_DEV_V1,
+        prefixUrl: API_UNKEY_DEV_V2,
         fields: {
           keyId: {
             getDefaultValue: () => cache.current.keyId ?? "",
             schema: z.string(),
           },
-          ownerId: {
-            getDefaultValue: () => cache.current.ownerId ?? "acme-inc",
+          externalId: {
+            getDefaultValue: () => cache.current.externalId ?? "acme-inc",
             schema: z
               .string()
               .min(1)
               .max(30)
               .regex(/^[A-Za-z0-9-_]+$/g, "Must be A-Z, a-z, 0-9, - or _"),
-            cacheAs: "ownerId",
+            cacheAs: "externalId",
           },
         },
         getMutatedCache: (cache, payload) => {
-          cache.ownerId = payload.ownerId;
+          cache.externalId = payload.externalId;
           return cache;
         },
       },
       "keys.updateKeyWithExpires": {
         method: "POST",
         route: "keys.updateKey",
-        prefixUrl: API_UNKEY_DEV_V1,
+        prefixUrl: API_UNKEY_DEV_V2,
         fields: {
           keyId: {
             getDefaultValue: () => cache.current.keyId ?? "",
@@ -180,25 +179,10 @@ export default function Page() {
       "keys.verifyKey": {
         method: "POST",
         route: "keys.verifyKey",
-        prefixUrl: API_UNKEY_DEV_V1,
+        prefixUrl: API_UNKEY_DEV_V2,
         fields: {
-          apiId: {
-            getDefaultValue: () => cache.current.apiId,
-            schema: z.string(),
-          },
           key: {
             getDefaultValue: () => cache.current.key ?? "",
-            schema: z.string(),
-          },
-        },
-      },
-      "keys.getVerifications": {
-        method: "GET",
-        route: "keys.getVerifications",
-        prefixUrl: API_UNKEY_DEV_V1,
-        fields: {
-          keyId: {
-            getDefaultValue: () => cache.current.keyId ?? "",
             schema: z.string(),
           },
         },
@@ -206,7 +190,7 @@ export default function Page() {
       "keys.deleteKey": {
         method: "POST",
         route: "keys.deleteKey",
-        prefixUrl: API_UNKEY_DEV_V1,
+        prefixUrl: API_UNKEY_DEV_V2,
         fields: {
           keyId: {
             getDefaultValue: () => cache.current.keyId ?? "",
@@ -281,9 +265,9 @@ export default function Page() {
             <>
               Now, you have created a key for your API.
               <br />
+              <br />- <Code>key</Code> is the actual secret key.
               <br />- <Code>keyId</Code> is a unique identifier for the key, you can use it later to
               fetch the key or update it.
-              <br />- <Code>key</Code> is the actual secret key.
               <br />
               <br />
               When a user wants to access your API, they will need to provide the <Code>key</Code>{" "}
@@ -317,9 +301,9 @@ export default function Page() {
         },
       },
       {
-        endpoint: ALL_ENDPOINTS["keys.updateKeyWithOwnerId"],
+        endpoint: ALL_ENDPOINTS["keys.updateKeyWithExternalId"],
         onResponse: () => {
-          toast("You updated the key by setting an ownerId! ⚒️", {});
+          toast("You updated the key by setting an externalId! ⚒️", {});
         },
         getJSXText: () => {
           return (
@@ -329,12 +313,12 @@ export default function Page() {
               <br />
               <br />
               Now, let's assume we want to link the key to a specific user or identifier. We can do
-              that by updating the key to include an <Code>ownerId</Code>.
+              that by updating the key to include an <Code>externalId</Code>.
               <br />
               <br />
               As an example, you could mark all employees from ACME company with an{" "}
-              <Code>ownerId</Code> equal to <Code>acme-inc</Code>. That will allow you to filter key
-              usage by ACME at any point in the future to understand the overall usage of a
+              <Code>externalId</Code> equal to <Code>acme-inc</Code>. That will allow you to filter
+              key usage by ACME at any point in the future to understand the overall usage of a
               particular customer.
             </>
           );
@@ -344,16 +328,16 @@ export default function Page() {
         endpoint: ALL_ENDPOINTS["keys.verifyKey"],
         onResponse: () => {
           toast("You just verified the key.", {
-            description: "There's indeed a new ownerId associated!",
+            description: "There's indeed a new externalId associated!",
           });
         },
         getJSXText: () => {
           return (
             <>
-              You just updated the key by setting an <Code>ownerId</Code>.
+              You just updated the key by setting an <Code>externalId</Code>.
               <br />
               <br />
-              Let's double check the <Code>ownerId</Code> was applied by verifying the key again.
+              Let's double check the <Code>externalId</Code> was applied by verifying the key again.
             </>
           );
         },
@@ -367,7 +351,7 @@ export default function Page() {
           return (
             <>
               Well done! Whoever consumes that API key will now be linked to{" "}
-              <Code>{cache.current.ownerId}</Code>.
+              <Code>{cache.current.externalId}</Code>.
               <br />
               <br />
               Next, let's add a <strong>1-hour expiration time</strong> for this key, using a unix
@@ -398,26 +382,6 @@ export default function Page() {
         },
       },
       {
-        endpoint: ALL_ENDPOINTS["keys.getVerifications"],
-        onResponse: () => {
-          toast("You retrieved usage data! 🔍", {});
-        },
-        getJSXText: () => {
-          const remainingExpirationTime = cache.current.expires
-            ? ms(new Date(cache.current.expires).getTime() - Date.now())
-            : "never";
-
-          return (
-            <>
-              Seems like the <Code>expires</Code> date is <strong>{remainingExpirationTime}</strong>{" "}
-              from now!
-              <br />
-              We've now used our key more than once. Let's check its usage numbers!
-            </>
-          );
-        },
-      },
-      {
         endpoint: ALL_ENDPOINTS["keys.deleteKey"],
         onResponse: () => {
           toast("You deleted your first key! 🗑️", {});
@@ -425,11 +389,6 @@ export default function Page() {
         getJSXText: () => {
           return (
             <>
-              The total usage numbers reveal that we've used the key three times!
-              <br />
-              As the API response suggests, we offer a variety of features, such as{" "}
-              <Code>per key rate limiting</Code> and <Code>usage based limits</Code>.
-              <br />
               <strong>Finally, let's delete our key.</strong>
             </>
           );
@@ -741,11 +700,10 @@ export default function Page() {
                 .
                 <br />
                 <br />
-                The first 200 users to sign up will receive an Unkey swag pack!
                 <br />
                 <br />
                 <Button asChild className="w-full text-center">
-                  <Link href="https://go.unkey.com/swag">Get Started for free</Link>
+                  <Link href="https://app.unkey.com/">Get Started for free</Link>
                 </Button>
               </div>
             )}

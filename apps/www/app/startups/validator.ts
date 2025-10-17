@@ -20,6 +20,7 @@ export const vcAcceleratorOptions = [
   "Sunflower Capital",
   "Techstars",
   "Uncork",
+  "Vercel OSS",
   "YC",
   "Other",
 ];

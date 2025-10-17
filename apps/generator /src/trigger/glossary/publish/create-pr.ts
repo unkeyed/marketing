@@ -6,7 +6,7 @@ import { AbortTaskRunError, task } from "@trigger.dev/sdk/v3";
 import { eq } from "drizzle-orm";
 import GithubSlugger from "github-slugger";
 import yaml from "js-yaml"; // install @types/js-yaml?
-import type { CacheStrategy } from "./_generate-glossary-entry";
+import type { CacheStrategy } from "../_generate-glossary-entry";
 
 // =====================
 // GLOSSARY PR CREATION WORKFLOW (IDEMPOTENT, CASE-BASED)
@@ -15,7 +15,7 @@ import type { CacheStrategy } from "./_generate-glossary-entry";
 export const createPrTask = task({
   id: "create_pr",
   retry: {
-    maxAttempts: 0,
+    maxAttempts: 3,
   },
   run: async ({
     input,

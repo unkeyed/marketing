@@ -4,8 +4,8 @@ import { task } from "@trigger.dev/sdk/v3";
 import { generateObject } from "ai";
 import { and, eq, or } from "drizzle-orm";
 import { z } from "zod";
-import { entries, firecrawlResponses, keywords } from "../../lib/db-marketing/schemas";
-import type { CacheStrategy } from "./_generate-glossary-entry";
+import { entries, firecrawlResponses, keywords } from "../../../lib/db-marketing/schemas";
+import type { CacheStrategy } from "../_generate-glossary-entry";
 
 // Define the job
 export const seoMetaTagsTask = task({
@@ -60,7 +60,7 @@ export const seoMetaTagsTask = task({
 
     // Step 3: Craft SEO-optimized title and description
     const craftedMetaTags = await generateObject({
-      model: openai("gpt-4"),
+      model: openai("gpt-4o-mini"),
       system: `
         You are three specialized experts collaborating on creating meta tags for an API documentation glossary:
 
@@ -151,7 +151,7 @@ export const seoMetaTagsTask = task({
 
     // Step 4: Validate and optimize lengths
     const validatedMetaTags = await generateObject({
-      model: openai("gpt-4"),
+      model: openai("gpt-4o-mini"),
       system: `
         You are an expert SEO consultant with 10 years of experience optimizing content for search engines.
         Your task is to validate and optimize meta tags to ensure they meet strict character limits while

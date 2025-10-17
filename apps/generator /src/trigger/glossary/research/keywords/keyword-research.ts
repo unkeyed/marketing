@@ -5,10 +5,13 @@ import { AbortTaskRunError, task } from "@trigger.dev/sdk/v3";
 import { sql } from "drizzle-orm";
 import { inArray } from "drizzle-orm";
 import { and, eq } from "drizzle-orm";
-import { getOrCreateKeywordsFromHeaders, getOrCreateKeywordsFromTitles } from "../../lib/keywords";
-import { getOrCreateSearchQuery } from "../../lib/search-query";
-import { getOrCreateSearchResponse } from "../../lib/serper";
-import type { CacheStrategy } from "./_generate-glossary-entry";
+import {
+  getOrCreateKeywordsFromHeaders,
+  getOrCreateKeywordsFromTitles,
+} from "../../../../lib/keywords";
+import { getOrCreateSearchQuery } from "../../../../lib/search-query";
+import { getOrCreateSearchResponse } from "../../../../lib/serper";
+import type { CacheStrategy } from "../../_generate-glossary-entry";
 
 export const THREE = 3;
 
