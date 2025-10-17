@@ -1,7 +1,6 @@
 import { RainbowDarkButton } from "@/components/button";
 import { CTA } from "@/components/cta";
 import { ChangelogLight } from "@/components/svg/changelog";
-import { MeteorLines } from "@/components/ui/meteorLines";
 
 import { ChangelogGridItem } from "@/components/changelog/changelog-grid-item";
 import { SideList } from "@/components/changelog/side-list";
@@ -26,52 +25,6 @@ export default async function Changelogs(_props: Props) {
         <div>
           <div className="relative -z-100 max-w-[1000px] mx-auto">
             <ChangelogLight className="w-full -top-[20rem]" />
-          </div>
-          <div className="w-full">
-            <MeteorLines number={1} xPos={60} direction="left" speed={10} delay={0} />
-            <MeteorLines number={1} xPos={60} direction="left" speed={10} delay={5} />
-
-            <MeteorLines number={1} xPos={200} direction="left" speed={10} delay={4} />
-            <MeteorLines number={1} xPos={200} direction="left" speed={10} delay={8} />
-
-            <MeteorLines
-              className="hidden sm:block"
-              number={1}
-              xPos={350}
-              direction="left"
-              speed={10}
-              delay={2}
-            />
-            <MeteorLines
-              className="hidden sm:block"
-              number={1}
-              xPos={350}
-              direction="left"
-              speed={10}
-              delay={8}
-            />
-            <MeteorLines number={1} xPos={60} direction="right" speed={10} delay={0} />
-            <MeteorLines number={1} xPos={60} direction="right" speed={10} delay={5} />
-
-            <MeteorLines number={1} xPos={200} direction="right" speed={10} delay={4} />
-            <MeteorLines number={1} xPos={200} direction="right" speed={10} delay={8} />
-
-            <MeteorLines
-              className="hidden sm:block"
-              number={1}
-              xPos={350}
-              direction="right"
-              speed={10}
-              delay={2}
-            />
-            <MeteorLines
-              className="hidden sm:block"
-              number={1}
-              xPos={350}
-              direction="right"
-              speed={10}
-              delay={8}
-            />
           </div>
         </div>
         <div>

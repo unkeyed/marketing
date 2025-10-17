@@ -2,7 +2,6 @@ import { BlogHero } from "@/components/blog/blog-hero";
 import { ClientBlogGrid } from "@/components/blog/client-blog-grid";
 import { CTA } from "@/components/cta";
 import { TopLeftShiningLight, TopRightShiningLight } from "@/components/svg/background-shiny";
-import { MeteorLinesAngular } from "@/components/ui/meteorLines";
 import { authors } from "@/content/blog/authors";
 import { type Post, allPosts } from "content-collections";
 import Link from "next/link";
@@ -46,64 +45,6 @@ export default async function Blog() {
       <div className="container w-full pt-48 mx-auto overflow-hidden scroll-smooth">
         <div>
           <TopLeftShiningLight />
-        </div>
-        <div className="w-full h-full overflow-hidden -z-20">
-          <MeteorLinesAngular
-            number={1}
-            xPos={0}
-            speed={10}
-            delay={5}
-            className="overflow-hidden"
-          />
-          <MeteorLinesAngular
-            number={1}
-            xPos={0}
-            speed={10}
-            delay={0}
-            className="overflow-hidden"
-          />
-          <MeteorLinesAngular
-            number={1}
-            xPos={100}
-            speed={10}
-            delay={7}
-            className="overflow-hidden md:hidden"
-          />
-          <MeteorLinesAngular
-            number={1}
-            xPos={100}
-            speed={10}
-            delay={2}
-            className="overflow-hidden md:hidden"
-          />
-          <MeteorLinesAngular
-            number={1}
-            xPos={200}
-            speed={10}
-            delay={7}
-            className="hidden overflow-hidden md:block"
-          />
-          <MeteorLinesAngular
-            number={1}
-            xPos={200}
-            speed={10}
-            delay={2}
-            className="hidden overflow-hidden md:block"
-          />
-          <MeteorLinesAngular
-            number={1}
-            xPos={400}
-            speed={10}
-            delay={5}
-            className="hidden overflow-hidden lg:block"
-          />
-          <MeteorLinesAngular
-            number={1}
-            xPos={400}
-            speed={10}
-            delay={0}
-            className="hidden overflow-hidden lg:block"
-          />
         </div>
         <div>
           <TopRightShiningLight />
