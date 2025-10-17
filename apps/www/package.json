@@ -10,7 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@c15t/nextjs": "^1.6.1",
+    "@c15t/nextjs": "^1.7.0",
     "@faker-js/faker": "^8.4.1",
     "@hookform/resolvers": "^3.3.4",
     "@next/bundle-analyzer": "^14.2.3",
