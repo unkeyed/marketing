@@ -2,7 +2,10 @@ import { CTA } from "@/components/cta";
 import { Frame } from "@/components/frame";
 
 import { MDX } from "@/components/mdx-content";
-import { TopLeftShiningLight, TopRightShiningLight } from "@/components/svg/background-shiny";
+import {
+  TopLeftShiningLight,
+  TopRightShiningLight,
+} from "@/components/svg/background-shiny";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { MeteorLinesAngular } from "@/components/ui/meteorLines";
 import { cn } from "@/lib/utils";
@@ -19,12 +22,13 @@ export const generateStaticParams = async () =>
     slug: term.slug,
   }));
 
-export function generateMetadata({
+export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
-}): Metadata {
-  const term = allGlossaries.find((term) => term.slug === params.slug);
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const resolvedParams = await params;
+  const term = allGlossaries.find((term) => term.slug === resolvedParams.slug);
   if (!term) {
     notFound();
   }
@@ -54,9 +58,10 @@ export function generateMetadata({
 const GlossaryTermWrapper = async ({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) => {
-  const term = allGlossaries.find((term) => term.slug === params.slug);
+  const resolvedParams = await params;
+  const term = allGlossaries.find((term) => term.slug === resolvedParams.slug);
   if (!term) {
     notFound();
   }
@@ -171,7 +176,9 @@ const GlossaryTermWrapper = async ({
           <div className="items-start hidden h-full gap-4 pt-8 space-y-4 prose lg:sticky top-24 lg:w-1/4 not-prose lg:mt-12 lg:flex lg:flex-col min-w-0 max-w-full overflow-hidden">
             {term.tableOfContents?.length !== 0 ? (
               <div className="flex flex-col gap-4 not-prose lg:gap-2">
-                <p className="text-sm prose text-nowrap text-white/50">Contents</p>
+                <p className="text-sm prose text-nowrap text-white/50">
+                  Contents
+                </p>
                 <ul className="relative flex flex-col gap-1 overflow-hidden min-w-0">
                   {term.tableOfContents.map((heading) => {
                     if (!heading) {
@@ -215,7 +222,9 @@ const GlossaryTermWrapper = async ({
                                 <h3 className="text-sm font-semibold flex items-center text-white">
                                   <Zap className="mr-2 h-5 w-5" /> TL;DR
                                 </h3>
-                                <p className="text-sm text-white/80">{relatedTerm.tldr}</p>
+                                <p className="text-sm text-white/80">
+                                  {relatedTerm.tldr}
+                                </p>
                               </div>
                             </Frame>
                           </CardHeader>
@@ -229,7 +238,9 @@ const GlossaryTermWrapper = async ({
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-white/50">No related terms found.</p>
+                  <p className="text-sm text-white/50">
+                    No related terms found.
+                  </p>
                 )}
               </div>
             </div>

@@ -15,9 +15,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 type Props = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
 export const revalidate = 3600; // 1 hour
@@ -28,7 +28,8 @@ export async function generateStaticParams() {
   }));
 }
 export default async function Templates(props: Props) {
-  const template = templates[props.params.slug];
+  const params = await props.params;
+  const template = templates[params.slug];
   if (!template) {
     return notFound();
   }
@@ -46,8 +47,20 @@ export default async function Templates(props: Props) {
       </div>
 
       <div className="w-full h-full overflow-clip -z-20">
-        <MeteorLinesAngular number={1} xPos={0} speed={10} delay={5} className="overflow-hidden" />
-        <MeteorLinesAngular number={1} xPos={0} speed={10} delay={0} className="overflow-hidden" />
+        <MeteorLinesAngular
+          number={1}
+          xPos={0}
+          speed={10}
+          delay={5}
+          className="overflow-hidden"
+        />
+        <MeteorLinesAngular
+          number={1}
+          xPos={0}
+          speed={10}
+          delay={0}
+          className="overflow-hidden"
+        />
         <MeteorLinesAngular
           number={1}
           xPos={100}
@@ -141,7 +154,9 @@ export default async function Templates(props: Props) {
                   <Separator orientation="horizontal" />
                   <dl className="flex flex-row w-full my-4">
                     <dt className="w-1/2 text-sm text-white/50">{key}</dt>
-                    <dl className="w-1/2 text-sm font-medium text-white text-end">{value}</dl>
+                    <dl className="w-1/2 text-sm font-medium text-white text-end">
+                      {value}
+                    </dl>
                   </dl>
                 </div>
               ))}
@@ -174,7 +189,8 @@ export default async function Templates(props: Props) {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // read route params
-  const template = templates[params.slug];
+  const resolvedParams = await params;
+  const template = templates[resolvedParams.slug];
 
   return {
     title: `${template?.title} | Unkey`,
@@ -182,7 +198,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: `${template?.title} | Unkey`,
       description: template?.description,
-      url: `https://unkey.com/blog/${params.slug}`,
+      url: `https://unkey.com/blog/${resolvedParams.slug}`,
       siteName: "unkey.com",
     },
     twitter: {

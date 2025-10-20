@@ -7,14 +7,16 @@ import { Highlight } from "prism-react-renderer";
 import { useState } from "react";
 
 export function CodeBlock(props: any) {
-  let language = props.node.children[0].properties?.className;
+  let language = props.node?.children?.[0]?.properties?.className;
   // for some reason... occasionally for no reason at all. the className is not in the properties
   if (!language) {
     language = ["language-jsx"];
   }
   const block =
-    props.node.children[0].properties?.value || props.node.children[0].children[0].value;
-  const [copyData, _setCopyData] = useState(block);
+    props.node?.children?.[0]?.properties?.value ||
+    props.node?.children?.[0]?.children?.[0]?.value ||
+    "";
+  const [copyData, _setCopyData] = useState(block || "");
 
   function handleDownload() {
     const element = document.createElement("a");
@@ -42,7 +44,11 @@ export function CodeBlock(props: any) {
           <BlogCodeDownload />
         </button>
       </div>
-      <Highlight theme={darkTheme} code={block} language={language[0].replace(/language-/, "")}>
+      <Highlight
+        theme={darkTheme}
+        code={block || ""}
+        language={language?.[0]?.replace(/language-/, "") || "text"}
+      >
         {({ tokens, getLineProps, getTokenProps }) => {
           return (
             <pre className="pt-0 pb-5 mt-0 overflow-x-auto leading-7 bg-transparent border-none rounded-none">
@@ -57,9 +63,14 @@ export function CodeBlock(props: any) {
                     key={`${line}-${i}`}
                     {...getLineProps({ line })}
                   >
-                    <span className="pl-4 pr-8 text-center text-white/20">{i + 1}</span>
+                    <span className="pl-4 pr-8 text-center text-white/20">
+                      {i + 1}
+                    </span>
                     {line.map((token, key) => (
-                      <span key={` ${key}-${token}`} {...getTokenProps({ token })} />
+                      <span
+                        key={` ${key}-${token}`}
+                        {...getTokenProps({ token })}
+                      />
                     ))}
                   </div>
                 );

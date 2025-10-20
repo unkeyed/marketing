@@ -8,13 +8,14 @@ import { allChangelogs } from "content-collections";
 import { formatDate } from "date-fns";
 import { ArrowRight } from "lucide-react";
 type Props = {
-  searchParams?: {
+  searchParams?: Promise<{
     tag?: string[];
     page?: number;
-  };
+  }>;
 };
 
-export default async function Changelogs(_props: Props) {
+export default async function Changelogs(props: Props) {
+  const searchParams = await props.searchParams;
   const changelogs = allChangelogs.sort((a, b) => {
     return new Date(b.date).getTime() - new Date(a.date).getTime();
   });
@@ -31,12 +32,17 @@ export default async function Changelogs(_props: Props) {
           <div className="flex flex-row text-center">
             <div className="mx-auto flex-flex-col ">
               <a href="https://x.com/unkeydev" target="_blank" rel="noreferrer">
-                <RainbowDarkButton label="Follow us on X" IconRight={ArrowRight} />
+                <RainbowDarkButton
+                  label="Follow us on X"
+                  IconRight={ArrowRight}
+                />
               </a>
-              <h2 className="blog-heading-gradient text-6xl font-medium mt-12">Changelog</h2>
+              <h2 className="blog-heading-gradient text-6xl font-medium mt-12">
+                Changelog
+              </h2>
               <p className="mt-6 font-normal leading-7 text-balance">
-                We are constantly improving our product, fixing bugs and introducing features.{" "}
-                <br className="hidden lg:inline" />
+                We are constantly improving our product, fixing bugs and
+                introducing features. <br className="hidden lg:inline" />
                 Here you can find the latest updates and changes to Unkey.
               </p>
             </div>
@@ -55,7 +61,10 @@ export default async function Changelogs(_props: Props) {
             </div>
             <div className="flex flex-col w-full sm:overflow-hidden">
               {changelogs?.map((changelog) => (
-                <ChangelogGridItem key={changelog.title} changelog={changelog} />
+                <ChangelogGridItem
+                  key={changelog.title}
+                  changelog={changelog}
+                />
               ))}
             </div>
           </div>

@@ -11,9 +11,12 @@ export const generateStaticParams = async () =>
 export const generateMetadata = async ({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) => {
-  const policy = allPolicies.find((policy) => policy.slug === `${params.slug}`);
+  const resolvedParams = await params;
+  const policy = allPolicies.find(
+    (policy) => policy.slug === `${resolvedParams.slug}`,
+  );
   if (!policy) {
     notFound();
   }
@@ -28,8 +31,15 @@ export const generateMetadata = async ({
   };
 };
 
-const PolicyLayout = async ({ params }: { params: { slug: string } }) => {
-  const policy = allPolicies.find((post) => post.slug === `${params.slug}`) as Policy;
+const PolicyLayout = async ({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) => {
+  const resolvedParams = await params;
+  const policy = allPolicies.find(
+    (post) => post.slug === `${resolvedParams.slug}`,
+  ) as Policy;
 
   return (
     <>
