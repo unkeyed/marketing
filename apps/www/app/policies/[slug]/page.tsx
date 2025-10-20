@@ -14,9 +14,7 @@ export const generateMetadata = async ({
   params: Promise<{ slug: string }>;
 }) => {
   const resolvedParams = await params;
-  const policy = allPolicies.find(
-    (policy) => policy.slug === `${resolvedParams.slug}`,
-  );
+  const policy = allPolicies.find((policy) => policy.slug === `${resolvedParams.slug}`);
   if (!policy) {
     notFound();
   }
@@ -37,9 +35,7 @@ const PolicyLayout = async ({
   params: Promise<{ slug: string }>;
 }) => {
   const resolvedParams = await params;
-  const policy = allPolicies.find(
-    (post) => post.slug === `${resolvedParams.slug}`,
-  ) as Policy;
+  const policy = allPolicies.find((post) => post.slug === `${resolvedParams.slug}`) as Policy;
 
   return (
     <>

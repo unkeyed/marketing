@@ -63,14 +63,9 @@ export function CodeBlock(props: any) {
                     key={`${line}-${i}`}
                     {...getLineProps({ line })}
                   >
-                    <span className="pl-4 pr-8 text-center text-white/20">
-                      {i + 1}
-                    </span>
+                    <span className="pl-4 pr-8 text-center text-white/20">{i + 1}</span>
                     {line.map((token, key) => (
-                      <span
-                        key={` ${key}-${token}`}
-                        {...getTokenProps({ token })}
-                      />
+                      <span key={` ${key}-${token}`} {...getTokenProps({ token })} />
                     ))}
                   </div>
                 );

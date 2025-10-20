@@ -1,10 +1,7 @@
 import { SuggestedBlogs } from "@/components/blog/suggested-blogs";
 import { CTA } from "@/components/cta";
 import { MDX } from "@/components/mdx-content";
-import {
-  TopLeftShiningLight,
-  TopRightShiningLight,
-} from "@/components/svg/background-shiny";
+import { TopLeftShiningLight, TopRightShiningLight } from "@/components/svg/background-shiny";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { authors } from "@/content/blog/authors";
 import { cn } from "@/lib/utils";
@@ -77,9 +74,7 @@ const BlogArticleWrapper = async ({
   params: Promise<{ slug: string }>;
 }) => {
   const resolvedParams = await params;
-  const post = allPosts.find(
-    (post) => post.slug === `${resolvedParams.slug}`,
-  ) as Post;
+  const post = allPosts.find((post) => post.slug === `${resolvedParams.slug}`) as Post;
   if (!post) {
     notFound();
   }
@@ -182,9 +177,7 @@ const BlogArticleWrapper = async ({
             </div>
             {post.tableOfContents?.length !== 0 ? (
               <div className="flex flex-col gap-4 not-prose lg:gap-2">
-                <p className="text-sm prose text-nowrap text-white/50">
-                  Contents
-                </p>
+                <p className="text-sm prose text-nowrap text-white/50">Contents</p>
                 <ul className="relative flex flex-col gap-1 overflow-hidden">
                   {post.tableOfContents.map((heading) => {
                     return (
