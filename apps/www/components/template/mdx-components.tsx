@@ -40,7 +40,7 @@ export const TemplateComponents = {
     <li {...filterDOMProps(props)} className="pl-6 mb-3 mr-2 leading-8 text-white/60" />
   ),
   h1: (props: any) => (
-    <h2
+    <h1
       {...filterDOMProps(props)}
       className="text-[32px] font-medium leading-8 blog-heading-gradient "
     />
