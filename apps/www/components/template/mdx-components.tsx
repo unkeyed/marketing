@@ -11,7 +11,13 @@ const filterDOMProps = (props: any) => {
 export const TemplateComponents = {
   Callout: Alert,
   img: (props: any) => (
-    <img {...filterDOMProps(props)} className="object-cover object-center p-0 rounded-3xl" alt="" />
+    <img
+      {...filterDOMProps(props)}
+      alt={typeof props?.alt === "string" ? props.alt : ""}
+      loading="lazy"
+      decoding="async"
+      className="object-cover object-center p-0 rounded-3xl"
+    />
   ),
   th: (props: any) => (
     <th {...filterDOMProps(props)} className="text-base font-semibold text-white" />
