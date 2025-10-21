@@ -184,7 +184,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: `${template?.title} | Unkey`,
       description: template?.description,
-      url: `https://unkey.com/blog/${resolvedParams.slug}`,
+      url: `https://unkey.com/templates/${resolvedParams.slug}`,
       siteName: "unkey.com",
     },
     twitter: {
