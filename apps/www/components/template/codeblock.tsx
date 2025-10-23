@@ -7,10 +7,16 @@ import { Highlight } from "prism-react-renderer";
 import { useState } from "react";
 
 export function CodeBlock(props: any) {
-  let language = props.node?.children?.[0]?.properties?.className;
-  // for some reason... occasionally for no reason at all. the className is not in the properties
-  if (!language) {
-    language = ["language-jsx"];
+  const rawClassName = props.node?.children?.[0]?.properties?.className;
+
+  // Normalize className to array and find language class
+  let language = "jsx"; // default fallback
+  if (rawClassName) {
+    const classNames = Array.isArray(rawClassName) ? rawClassName : [rawClassName];
+    const languageClass = classNames.find((cls) => cls.startsWith("language-"));
+    if (languageClass) {
+      language = languageClass.replace(/^language-/, "");
+    }
   }
   const block =
     props.node?.children?.[0]?.properties?.value ||
@@ -44,11 +50,7 @@ export function CodeBlock(props: any) {
           <BlogCodeDownload />
         </button>
       </div>
-      <Highlight
-        theme={darkTheme}
-        code={block || ""}
-        language={language?.[0]?.replace(/language-/, "") || "text"}
-      >
+      <Highlight theme={darkTheme} code={block || ""} language={language}>
         {({ tokens, getLineProps, getTokenProps }) => {
           return (
             <pre className="pt-0 pb-5 mt-0 overflow-x-auto leading-7 bg-transparent border-none rounded-none">
