@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Frame } from "../frame";
 import { ImageWithBlur } from "../image-with-blur";
 
+import type { JSX } from "react";
+
 type BlogListProps = {
   className?: string;
   currentPostSlug?: string;

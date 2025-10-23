@@ -3,7 +3,13 @@ import { CopyButton } from "@/components/copy-button";
 import { BlogCodeDownload } from "@/components/svg/blog-code-block";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/code-tabs";
 import { cn } from "@/lib/utils";
-import { type ClassAttributes, type HTMLAttributes, type ReactElement, useState } from "react";
+import {
+  type ClassAttributes,
+  type HTMLAttributes,
+  type JSX,
+  type ReactElement,
+  useState,
+} from "react";
 import React from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import darkTheme from "./darkTheme";

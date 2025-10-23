@@ -16,7 +16,7 @@ export const AnimatedList = React.memo(
 
     const ref = useRef(null);
     const inView = useInView(ref);
-    const timeoutRef = useRef<NodeJS.Timeout>();
+    const timeoutRef = useRef<NodeJS.Timeout>(undefined);
 
     useEffect(() => {
       return () => {
@@ -57,7 +57,7 @@ export const AnimatedList = React.memo(
       <div className={`flex flex-col items-center gap-4 ${className}`} ref={ref}>
         <AnimatePresence>
           {itemsToShow.map((item) => (
-            <AnimatedListItem key={(item as ReactElement).key}>{item}</AnimatedListItem>
+            <AnimatedListItem key={(item as ReactElement<any>).key}>{item}</AnimatedListItem>
           ))}
         </AnimatePresence>
       </div>
@@ -80,7 +80,7 @@ export function AnimatedListItem({ children }: { children: React.ReactNode }) {
   };
   return (
     <motion.div {...animations} layout className="mx-auto" style={{ willChange }}>
-      {children}
+      {children as any}
     </motion.div>
   );
 }
