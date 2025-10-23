@@ -10,6 +10,22 @@ import darkTheme from "./darkTheme";
 
 const CN_BLOG_CODE_BLOCK =
   "flex flex-col bg-gradient-to-t from-[rgba(255,255,255,0.1)] to-[rgba(255,255,255,0.07)] rounded-[20px] border-[.5px] border-[rgba(255,255,255,0.1)] not-prose text-[0.8125rem]";
+// Helper function to extract language from className
+const extractLanguageFromClassName = (className: string | undefined): string => {
+  if (!className) {
+    return "text";
+  }
+
+  const classes = className.split(/\s+/);
+  const languageClass = classes.find((cls) => cls.startsWith("language-"));
+
+  if (!languageClass) {
+    return "text";
+  }
+
+  return languageClass.replace(/^language-/, "") || "text";
+};
+
 export type CodeBlockProps = {
   className: string;
   children: ReactElement<ChildNode>;
@@ -22,9 +38,7 @@ export function BlogCodeBlock({
     Boolean,
   );
 
-  const buttonLabels = React.Children.map(children, (child: any) =>
-    child?.props?.children?.props?.className?.replace(/language-/, "")?.split(" "),
-  ).filter(Boolean);
+  const buttonLabels: string[] = blocks.map((b: any) => extractLanguageFromClassName(b?.className));
   const [copyData, setCopyData] = useState(blocks?.[0]?.children || "");
 
   function handleDownload() {
@@ -35,15 +49,11 @@ export function BlogCodeBlock({
     document.body.appendChild(element); // Required for this to work in FireFox
     element.click();
   }
-  function handlelOnChange(current: any) {
-    blocks.forEach((block: any) => {
-      if (block?.className && block.children) {
-        const lang = block.className.replace(/language-/, "");
-        if (lang === current[0]?.toString()) {
-          setCopyData(block.children);
-        }
-      }
-    });
+  function handlelOnChange(value: string) {
+    const idx = buttonLabels.indexOf(value);
+    if (idx >= 0 && blocks[idx]?.children) {
+      setCopyData(blocks[idx].children);
+    }
   }
   return (
     <div className={cn(CN_BLOG_CODE_BLOCK, className)}>
@@ -63,7 +73,6 @@ export function BlogCodeBlock({
             })}
           </TabsList>
           <div className="flex flex-row gap-4 pt-0 pr-4">
-            <div>{}</div>
             <CopyButton value={copyData} />
             <button type="button" className="p-0 m-0 bg-transparent" onClick={handleDownload}>
               <BlogCodeDownload />
@@ -77,7 +86,7 @@ export function BlogCodeBlock({
           return (
             <TabsContent value={buttonLabels[index]} key={buttonLabels[index]} className="pr-12">
               <SyntaxHighlighter
-                language={block.className.replace(/language-/, "")}
+                language={extractLanguageFromClassName(block.className)}
                 style={darkTheme}
                 showLineNumbers={true}
                 wrapLongLines={true}
@@ -126,7 +135,7 @@ export function BlogCodeBlockSingle({ className, children }: any) {
       </div>
       <div className={`flex ${isSingleLine ? "items-center justify-between" : ""}`}>
         <SyntaxHighlighter
-          language={block?.className?.replace(/language-/, "") || "text"}
+          language={extractLanguageFromClassName(block?.className)}
           style={darkTheme}
           showLineNumbers={true}
           highlighter={"hljs"}
