@@ -4,7 +4,7 @@ import { CodeBlock } from "./codeblock";
 
 // Helper function to filter out non-DOM attributes
 const filterDOMProps = (props: any) => {
-  const { ordered, inline, ...domProps } = props;
+  const { ordered, inline, node, ...domProps } = props;
   return domProps;
 };
 
@@ -20,36 +20,21 @@ export const TemplateComponents = {
     />
   ),
   th: (props: any) => (
-    <th
-      {...filterDOMProps(props)}
-      className="text-base font-semibold text-white"
-    />
+    <th {...filterDOMProps(props)} className="text-base font-semibold text-white" />
   ),
   tr: (props: any) => (
-    <tr
-      {...filterDOMProps(props)}
-      className="border-b-[.75px] border-white/10 "
-    />
+    <tr {...filterDOMProps(props)} className="border-b-[.75px] border-white/10 " />
   ),
   td: (props: any) => (
-    <td
-      {...filterDOMProps(props)}
-      className="py-2 text-base font-normal text-white/70"
-    />
+    <td {...filterDOMProps(props)} className="py-2 text-base font-normal text-white/70" />
   ),
 
   a: (props: any) => (
-    <a
-      {...filterDOMProps(props)}
-      className="text-white underline hover:text-white/60 ellipsis"
-    />
+    <a {...filterDOMProps(props)} className="text-white underline hover:text-white/60 ellipsis" />
   ),
 
   ol: (props: any) => (
-    <ol
-      {...filterDOMProps(props)}
-      className="pl-4 text-white list-decimal marker:text-white"
-    />
+    <ol {...filterDOMProps(props)} className="pl-4 text-white list-decimal marker:text-white" />
   ),
   ul: (props: any) => (
     <ul
@@ -58,10 +43,7 @@ export const TemplateComponents = {
     />
   ),
   li: (props: any) => (
-    <li
-      {...filterDOMProps(props)}
-      className="pl-6 mb-3 mr-2 leading-8 text-white/60"
-    />
+    <li {...filterDOMProps(props)} className="pl-6 mb-3 mr-2 leading-8 text-white/60" />
   ),
   h1: (props: any) => (
     <h1
