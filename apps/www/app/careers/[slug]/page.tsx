@@ -18,8 +18,6 @@ type Props = {
   }>;
 };
 
-export const revalidate = 3600; // 1 hour
-
 export async function generateStaticParams() {
   return allCareers
     .filter((c) => c.visible)
