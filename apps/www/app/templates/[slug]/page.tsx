@@ -15,9 +15,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 type Props = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
 export const revalidate = 3600; // 1 hour
@@ -28,7 +28,8 @@ export async function generateStaticParams() {
   }));
 }
 export default async function Templates(props: Props) {
-  const template = templates[props.params.slug];
+  const params = await props.params;
+  const template = templates[params.slug];
   if (!template) {
     return notFound();
   }
@@ -174,7 +175,12 @@ export default async function Templates(props: Props) {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // read route params
-  const template = templates[params.slug];
+  const resolvedParams = await params;
+  const template = templates[resolvedParams.slug];
+
+  if (!template) {
+    return notFound();
+  }
 
   return {
     title: `${template?.title} | Unkey`,
@@ -182,7 +188,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: `${template?.title} | Unkey`,
       description: template?.description,
-      url: `https://unkey.com/blog/${params.slug}`,
+      url: `https://unkey.com/templates/${resolvedParams.slug}`,
       siteName: "unkey.com",
     },
     twitter: {

@@ -19,12 +19,13 @@ export const generateStaticParams = async () =>
     slug: term.slug,
   }));
 
-export function generateMetadata({
+export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
-}): Metadata {
-  const term = allGlossaries.find((term) => term.slug === params.slug);
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const resolvedParams = await params;
+  const term = allGlossaries.find((term) => term.slug === resolvedParams.slug);
   if (!term) {
     notFound();
   }
@@ -54,9 +55,10 @@ export function generateMetadata({
 const GlossaryTermWrapper = async ({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) => {
-  const term = allGlossaries.find((term) => term.slug === params.slug);
+  const resolvedParams = await params;
+  const term = allGlossaries.find((term) => term.slug === resolvedParams.slug);
   if (!term) {
     notFound();
   }

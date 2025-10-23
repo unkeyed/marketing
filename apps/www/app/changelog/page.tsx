@@ -7,14 +7,8 @@ import { SideList } from "@/components/changelog/side-list";
 import { allChangelogs } from "content-collections";
 import { formatDate } from "date-fns";
 import { ArrowRight } from "lucide-react";
-type Props = {
-  searchParams?: {
-    tag?: string[];
-    page?: number;
-  };
-};
 
-export default async function Changelogs(_props: Props) {
+export default async function Changelogs() {
   const changelogs = allChangelogs.sort((a, b) => {
     return new Date(b.date).getTime() - new Date(a.date).getTime();
   });

@@ -10,6 +10,22 @@ import darkTheme from "./darkTheme";
 
 const CN_BLOG_CODE_BLOCK =
   "flex flex-col bg-gradient-to-t from-[rgba(255,255,255,0.1)] to-[rgba(255,255,255,0.07)] rounded-[20px] border-[.5px] border-[rgba(255,255,255,0.1)] not-prose text-[0.8125rem]";
+// Helper function to extract language from className
+const extractLanguageFromClassName = (className: string | undefined): string => {
+  if (!className) {
+    return "text";
+  }
+
+  const classes = className.split(/\s+/);
+  const languageClass = classes.find((cls) => cls.startsWith("language-"));
+
+  if (!languageClass) {
+    return "text";
+  }
+
+  return languageClass.replace(/^language-/, "") || "text";
+};
+
 export type CodeBlockProps = {
   className: string;
   children: ReactElement<ChildNode>;
@@ -18,12 +34,12 @@ export function BlogCodeBlock({
   className,
   children,
 }: JSX.IntrinsicAttributes & ClassAttributes<HTMLElement> & HTMLAttributes<HTMLElement>) {
-  const blocks = React.Children.map(children, (child: any) => child.props.children.props);
-
-  const buttonLabels = React.Children.map(children, (child: any) =>
-    child?.props?.children?.props?.className.replace(/language-/, "").split(" "),
+  const blocks = React.Children.map(children, (child: any) => child?.props?.children?.props).filter(
+    Boolean,
   );
-  const [copyData, setCopyData] = useState(blocks[0].children);
+
+  const buttonLabels: string[] = blocks.map((b: any) => extractLanguageFromClassName(b?.className));
+  const [copyData, setCopyData] = useState(blocks?.[0]?.children || "");
 
   function handleDownload() {
     const element = document.createElement("a");
@@ -33,13 +49,11 @@ export function BlogCodeBlock({
     document.body.appendChild(element); // Required for this to work in FireFox
     element.click();
   }
-  function handlelOnChange(current: any) {
-    blocks.map((block: any) => {
-      const lang = block.className.replace(/language-/, "");
-      if (lang === current[0].toString()) {
-        setCopyData(block.children);
-      }
-    });
+  function handlelOnChange(value: string) {
+    const idx = buttonLabels.indexOf(value);
+    if (idx >= 0 && blocks[idx]?.children) {
+      setCopyData(blocks[idx].children);
+    }
   }
   return (
     <div className={cn(CN_BLOG_CODE_BLOCK, className)}>
@@ -59,7 +73,6 @@ export function BlogCodeBlock({
             })}
           </TabsList>
           <div className="flex flex-row gap-4 pt-0 pr-4">
-            <div>{}</div>
             <CopyButton value={copyData} />
             <button type="button" className="p-0 m-0 bg-transparent" onClick={handleDownload}>
               <BlogCodeDownload />
@@ -67,16 +80,19 @@ export function BlogCodeBlock({
           </div>
         </div>
         {blocks.map((block: any, index: number) => {
+          if (!block || !block.className) {
+            return null;
+          }
           return (
             <TabsContent value={buttonLabels[index]} key={buttonLabels[index]} className="pr-12">
               <SyntaxHighlighter
-                language={block.className.replace(/language-/, "")}
+                language={extractLanguageFromClassName(block.className)}
                 style={darkTheme}
                 showLineNumbers={true}
                 wrapLongLines={true}
                 wrapLines={true}
               >
-                {block}
+                {block.children || ""}
               </SyntaxHighlighter>
             </TabsContent>
           );
@@ -86,8 +102,8 @@ export function BlogCodeBlock({
   );
 }
 export function BlogCodeBlockSingle({ className, children }: any) {
-  const block = children.props;
-  const [copyData, _setCopyData] = useState(block.children);
+  const block = children?.props;
+  const [copyData, _setCopyData] = useState(block?.children || "");
 
   function handleDownload() {
     const element = document.createElement("a");
@@ -98,7 +114,7 @@ export function BlogCodeBlockSingle({ className, children }: any) {
     element.click();
   }
 
-  const isSingleLine = (block.children.match(/\n/g) || []).length < 2;
+  const isSingleLine = (block?.children?.match?.(/\n/g) || []).length < 2;
 
   return (
     <div className={cn(CN_BLOG_CODE_BLOCK, className, `${isSingleLine ? "p-4" : "pl-4 pb-4"}`)}>
@@ -119,12 +135,12 @@ export function BlogCodeBlockSingle({ className, children }: any) {
       </div>
       <div className={`flex ${isSingleLine ? "items-center justify-between" : ""}`}>
         <SyntaxHighlighter
-          language={block.className.replace(/language-/, "")}
+          language={extractLanguageFromClassName(block?.className)}
           style={darkTheme}
           showLineNumbers={true}
           highlighter={"hljs"}
         >
-          {block.children.trim()}
+          {block?.children?.trim?.() || ""}
         </SyntaxHighlighter>
 
         {isSingleLine && (

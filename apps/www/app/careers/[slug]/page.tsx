@@ -13,9 +13,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 type Props = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
 export const revalidate = 3600; // 1 hour
@@ -28,7 +28,8 @@ export async function generateStaticParams() {
     }));
 }
 export default async function Templates(props: Props) {
-  const career = allCareers.find((c) => c.visible && c.slug === props.params.slug);
+  const params = await props.params;
+  const career = allCareers.find((c) => c.visible && c.slug === params.slug);
   if (!career) {
     return notFound();
   }
@@ -194,7 +195,8 @@ We value thoughtful, genuine responses over formal applications. The best candid
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // read route params
-  const career = allCareers.find((c) => c.slug === params.slug);
+  const resolvedParams = await params;
+  const career = allCareers.find((c) => c.slug === resolvedParams.slug);
 
   return {
     title: `${career?.title} | Unkey`,
@@ -202,7 +204,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: `${career?.title} | Unkey`,
       description: career?.description,
-      url: `https://unkey.com/careers/${params.slug}`,
+      url: `https://unkey.com/careers/${resolvedParams.slug}`,
       siteName: "unkey.com",
     },
     twitter: {
