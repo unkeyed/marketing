@@ -47,8 +47,20 @@ export default async function Templates(props: Props) {
       </div>
 
       <div className="w-full h-full overflow-clip -z-20">
-        <MeteorLinesAngular number={1} xPos={0} speed={10} delay={5} className="overflow-hidden" />
-        <MeteorLinesAngular number={1} xPos={0} speed={10} delay={0} className="overflow-hidden" />
+        <MeteorLinesAngular
+          number={1}
+          xPos={0}
+          speed={10}
+          delay={5}
+          className="overflow-hidden"
+        />
+        <MeteorLinesAngular
+          number={1}
+          xPos={0}
+          speed={10}
+          delay={0}
+          className="overflow-hidden"
+        />
         <MeteorLinesAngular
           number={1}
           xPos={100}
@@ -142,7 +154,9 @@ export default async function Templates(props: Props) {
                   <Separator orientation="horizontal" />
                   <dl className="flex flex-row w-full my-4">
                     <dt className="w-1/2 text-sm text-white/50">{key}</dt>
-                    <dl className="w-1/2 text-sm font-medium text-white text-end">{value}</dl>
+                    <dl className="w-1/2 text-sm font-medium text-white text-end">
+                      {value}
+                    </dl>
                   </dl>
                 </div>
               ))}
@@ -177,6 +191,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // read route params
   const resolvedParams = await params;
   const template = templates[resolvedParams.slug];
+
+  if (!template) {
+    return notFound();
+  }
 
   return {
     title: `${template?.title} | Unkey`,
