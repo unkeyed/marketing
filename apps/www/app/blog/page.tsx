@@ -6,8 +6,6 @@ import { authors } from "@/content/blog/authors";
 import { type Post, allPosts } from "content-collections";
 import Link from "next/link";
 
-export const dynamic = "force-static";
-
 export const metadata = {
   title: "Blog | Unkey",
   description: "Latest blog posts and news from the Unkey team.",

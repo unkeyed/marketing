@@ -14,6 +14,7 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 const nextConfig = {
   pageExtensions: ["tsx", "mdx", "ts", "js"],
   reactStrictMode: true,
+  cacheComponents: true,
   async headers() {
     return [
       {
