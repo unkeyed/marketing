@@ -5,6 +5,7 @@ import { TopLeftShiningLight, TopRightShiningLight } from "@/components/svg/back
 import { authors } from "@/content/blog/authors";
 import { type Post, allPosts } from "content-collections";
 import Link from "next/link";
+import { Suspense } from "react";
 
 export const metadata = {
   title: "Blog | Unkey",
@@ -63,7 +64,9 @@ export default async function Blog() {
           </div>
         ) : null}
 
-        <ClientBlogGrid posts={blogGridPosts} />
+        <Suspense fallback={<div className="animate-pulse bg-gray-200 h-96 rounded-lg" />}>
+          <ClientBlogGrid posts={blogGridPosts} />
+        </Suspense>
         <CTA />
       </div>
     </>
