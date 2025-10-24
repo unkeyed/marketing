@@ -3,6 +3,7 @@ import { CTA } from "@/components/cta";
 
 import { ChangelogGridItem } from "@/components/changelog/changelog-grid-item";
 import { SideList } from "@/components/changelog/side-list";
+import { ChangelogLight } from "@/components/svg/changelog";
 import { allChangelogs } from "content-collections";
 import { formatDate } from "date-fns";
 import { ArrowRight } from "lucide-react";
@@ -16,7 +17,9 @@ export default async function Changelogs() {
     <>
       <div className="container mt-48 text-white/60">
         <div>
-          <div className="relative -z-100 max-w-[1000px] mx-auto"></div>
+          <div className="relative -z-100 max-w-[1000px] mx-auto">
+            <ChangelogLight />
+          </div>
         </div>
         <div>
           <div className="flex flex-row text-center">
