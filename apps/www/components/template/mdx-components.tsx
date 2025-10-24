@@ -3,6 +3,8 @@ import { Alert } from "../ui/alert/alert";
 import { Separator } from "../ui/separator";
 import { CodeBlock } from "./codeblock";
 
+import type { JSX } from "react";
+
 // Type for MDX component props that includes common MDX-specific properties
 type MDXComponentProps<T extends keyof JSX.IntrinsicElements> =
   React.ComponentPropsWithoutRef<T> & {

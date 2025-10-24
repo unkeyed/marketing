@@ -2,7 +2,7 @@
 import { CTA } from "@/components/cta";
 import { Particles } from "@/components/particles";
 import { ShinyCardGroup } from "@/components/shiny-card";
-import { TopLeftShiningLight, TopRightShiningLight } from "@/components/svg/hero";
+import { TopLeftShiningLight, TopRightShiningLight } from "@/components/svg/background-shiny";
 import { Check, Stars } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";

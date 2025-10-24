@@ -1,9 +1,9 @@
 import { RainbowDarkButton } from "@/components/button";
 import { CTA } from "@/components/cta";
-import { ChangelogLight } from "@/components/svg/changelog";
 
 import { ChangelogGridItem } from "@/components/changelog/changelog-grid-item";
 import { SideList } from "@/components/changelog/side-list";
+import { ChangelogLight } from "@/components/svg/changelog";
 import { allChangelogs } from "content-collections";
 import { formatDate } from "date-fns";
 import { ArrowRight } from "lucide-react";
@@ -18,7 +18,7 @@ export default async function Changelogs() {
       <div className="container mt-48 text-white/60">
         <div>
           <div className="relative -z-100 max-w-[1000px] mx-auto">
-            <ChangelogLight className="w-full -top-[20rem]" />
+            <ChangelogLight />
           </div>
         </div>
         <div>

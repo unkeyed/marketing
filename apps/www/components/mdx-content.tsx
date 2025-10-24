@@ -94,10 +94,12 @@ export function MDX({ code }: MDXProps) {
   const Component = useMDXComponent(code);
   return (
     <Component
-      components={{
-        Mermaid,
-        ...MdxComponents,
-      }}
+      components={
+        {
+          Mermaid,
+          ...MdxComponents,
+        } as any
+      }
     />
   );
 }

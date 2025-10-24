@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import type { PropsWithChildren } from "react";
+import { useId } from "react";
 
 export enum Color {
   White = "#FFFFFF",
@@ -228,6 +229,8 @@ export const KeyIcon: React.FC<{ className?: string; color: Color }> = ({ classN
   );
 };
 export const FreeCardHighlight: React.FC<{ className: string }> = ({ className }) => {
+  const id = useId();
+
   return (
     <svg
       className={className}
@@ -238,98 +241,98 @@ export const FreeCardHighlight: React.FC<{ className: string }> = ({ className }
       xmlns="http://www.w3.org/2000/svg"
     >
       <g opacity="0.4">
-        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter0_f_2076_3302)">
+        <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter0_f_${id})`}>
           <ellipse
             cx="16.3892"
             cy="146.673"
             rx="16.3892"
             ry="146.673"
             transform="matrix(-0.966169 -0.257911 -0.257911 0.966169 357.14 -44.3057)"
-            fill="url(#paint0_linear_2076_3302)"
+            fill={`url(#paint0_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
-        <g style={{ mixBlendMode: "color-dodge" }} filter="url(#filter1_f_2076_3302)">
+        <g style={{ mixBlendMode: "color-dodge" }} filter={`url(#filter1_f_${id})`}>
           <ellipse
             cx="13.25"
             cy="146.625"
             rx="13.25"
             ry="146.625"
             transform="matrix(-0.866025 -0.5 -0.5 0.866025 347.709 -62.7411)"
-            fill="url(#paint1_linear_2076_3302)"
+            fill={`url(#paint1_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
-        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter2_f_2076_3302)">
+        <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter2_f_${id})`}>
           <ellipse
             cx="11.1897"
             cy="190.642"
             rx="11.1897"
             ry="190.642"
             transform="matrix(-0.707107 -0.707107 -0.707107 0.707107 343.057 -64.2233)"
-            fill="url(#paint2_linear_2076_3302)"
+            fill={`url(#paint2_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
-        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter3_f_2076_3302)">
+        <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter3_f_${id})`}>
           <ellipse
             cx="11.1897"
             cy="90.3336"
             rx="11.1897"
             ry="90.3336"
             transform="matrix(-0.707107 -0.707107 -0.707107 0.707107 343.057 -64.2235)"
-            fill="url(#paint3_linear_2076_3302)"
+            fill={`url(#paint3_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
-        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter4_f_2076_3302)">
+        <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter4_f_${id})`}>
           <ellipse
             cx="11.125"
             cy="190.75"
             rx="11.125"
             ry="190.75"
-            transform="matrix(-0.866025 -0.5 -0.5 0.866025 339.651 -49.7842)"
-            fill="url(#paint4_linear_2076_3302)"
+            transform="matrix(-0.5 -0.866025 -0.866025 0.5 343.75 -45.5063)"
+            fill={`url(#paint4_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
-        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter5_f_2076_3302)">
+        <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter5_f_${id})`}>
           <ellipse
             cx="160.75"
             cy="93.75"
             rx="160.75"
             ry="93.75"
             transform="matrix(-0.866025 -0.5 -0.5 0.866025 476.963 11.8842)"
-            fill="url(#paint5_linear_2076_3302)"
+            fill={`url(#paint5_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
-        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter6_f_2076_3302)">
+        <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter6_f_${id})`}>
           <ellipse
             cx="80.25"
             cy="47.75"
             rx="80.25"
             ry="47.75"
             transform="matrix(-0.866025 -0.5 -0.5 0.866025 407.248 -28.366)"
-            fill="url(#paint6_linear_2076_3302)"
+            fill={`url(#paint6_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
-        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter7_f_2076_3302)">
+        <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter7_f_${id})`}>
           <ellipse
             cx="67.5"
             cy="40.125"
             rx="67.5"
             ry="40.125"
             transform="matrix(-0.866025 -0.5 -0.5 0.866025 390.581 -24.9982)"
-            fill="url(#paint7_linear_2076_3302)"
+            fill={`url(#paint7_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
       </g>
       <defs>
         <filter
-          id="filter0_f_2076_3302"
+          id={`filter0_f_${id}`}
           x="217.957"
           y="-93.0969"
           width="171.039"
@@ -342,7 +345,7 @@ export const FreeCardHighlight: React.FC<{ className: string }> = ({ className }
           <feGaussianBlur stdDeviation="22.25" result="effect1_foregroundBlur_2076_3302" />
         </filter>
         <filter
-          id="filter1_f_2076_3302"
+          id={`filter1_f_${id}`}
           x="144.206"
           y="-114.042"
           width="237.432"
@@ -355,7 +358,7 @@ export const FreeCardHighlight: React.FC<{ className: string }> = ({ className }
           <feGaussianBlur stdDeviation="22.25" result="effect1_foregroundBlur_2076_3302" />
         </filter>
         <filter
-          id="filter2_f_2076_3302"
+          id={`filter2_f_${id}`}
           x="20.8005"
           y="-116.872"
           width="359.08"
@@ -368,7 +371,7 @@ export const FreeCardHighlight: React.FC<{ className: string }> = ({ className }
           <feGaussianBlur stdDeviation="22.25" result="effect1_foregroundBlur_2076_3302" />
         </filter>
         <filter
-          id="filter3_f_2076_3302"
+          id={`filter3_f_${id}`}
           x="162.399"
           y="-117.131"
           width="217.741"
@@ -381,7 +384,7 @@ export const FreeCardHighlight: React.FC<{ className: string }> = ({ className }
           <feGaussianBlur stdDeviation="22.25" result="effect1_foregroundBlur_2076_3302" />
         </filter>
         <filter
-          id="filter4_f_2076_3302"
+          id={`filter4_f_${id}`}
           x="94.2737"
           y="-99.9421"
           width="280.735"
@@ -394,7 +397,7 @@ export const FreeCardHighlight: React.FC<{ className: string }> = ({ className }
           <feGaussianBlur stdDeviation="22.25" result="effect1_foregroundBlur_2076_3302" />
         </filter>
         <filter
-          id="filter5_f_2076_3302"
+          id={`filter5_f_${id}`}
           x="68.9412"
           y="-176.546"
           width="443.867"
@@ -407,7 +410,7 @@ export const FreeCardHighlight: React.FC<{ className: string }> = ({ className }
           <feGaussianBlur stdDeviation="37.5" result="effect1_foregroundBlur_2076_3302" />
         </filter>
         <filter
-          id="filter6_f_2076_3302"
+          id={`filter6_f_${id}`}
           x="165.37"
           y="-159.758"
           width="297.01"
@@ -420,7 +423,7 @@ export const FreeCardHighlight: React.FC<{ className: string }> = ({ className }
           <feGaussianBlur stdDeviation="37.5" result="effect1_foregroundBlur_2076_3302" />
         </filter>
         <filter
-          id="filter7_f_2076_3302"
+          id={`filter7_f_${id}`}
           x="175.242"
           y="-147.44"
           width="273.641"
@@ -433,7 +436,7 @@ export const FreeCardHighlight: React.FC<{ className: string }> = ({ className }
           <feGaussianBlur stdDeviation="37.5" result="effect1_foregroundBlur_2076_3302" />
         </filter>
         <linearGradient
-          id="paint0_linear_2076_3302"
+          id={`paint0_linear_${id}`}
           x1="16.3892"
           y1="0"
           x2="16.3892"
@@ -444,7 +447,7 @@ export const FreeCardHighlight: React.FC<{ className: string }> = ({ className }
           <stop offset="1" stopColor="white" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint1_linear_2076_3302"
+          id={`paint1_linear_${id}`}
           x1="13.25"
           y1="0"
           x2="13.25"
@@ -455,7 +458,7 @@ export const FreeCardHighlight: React.FC<{ className: string }> = ({ className }
           <stop offset="1" stopColor="white" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint2_linear_2076_3302"
+          id={`paint2_linear_${id}`}
           x1="11.1897"
           y1="0"
           x2="11.1897"
@@ -466,7 +469,7 @@ export const FreeCardHighlight: React.FC<{ className: string }> = ({ className }
           <stop offset="1" stopColor="white" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint3_linear_2076_3302"
+          id={`paint3_linear_${id}`}
           x1="11.1897"
           y1="0"
           x2="11.1897"
@@ -477,7 +480,7 @@ export const FreeCardHighlight: React.FC<{ className: string }> = ({ className }
           <stop offset="1" stopColor="white" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint4_linear_2076_3302"
+          id={`paint4_linear_${id}`}
           x1="11.125"
           y1="0"
           x2="11.125"
@@ -488,7 +491,7 @@ export const FreeCardHighlight: React.FC<{ className: string }> = ({ className }
           <stop offset="1" stopColor="white" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint5_linear_2076_3302"
+          id={`paint5_linear_${id}`}
           x1="160.75"
           y1="0"
           x2="160.75"
@@ -499,7 +502,7 @@ export const FreeCardHighlight: React.FC<{ className: string }> = ({ className }
           <stop offset="1" stopColor="white" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint6_linear_2076_3302"
+          id={`paint6_linear_${id}`}
           x1="80.25"
           y1="0"
           x2="80.25"
@@ -510,7 +513,7 @@ export const FreeCardHighlight: React.FC<{ className: string }> = ({ className }
           <stop offset="1" stopColor="white" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint7_linear_2076_3302"
+          id={`paint7_linear_${id}`}
           x1="67.5"
           y1="0"
           x2="67.5"
@@ -526,6 +529,8 @@ export const FreeCardHighlight: React.FC<{ className: string }> = ({ className }
 };
 
 export const ProCardHighlight: React.FC<{ className: string }> = ({ className }) => {
+  const id = useId();
+
   return (
     <svg
       className={className}
@@ -536,98 +541,98 @@ export const ProCardHighlight: React.FC<{ className: string }> = ({ className })
       xmlns="http://www.w3.org/2000/svg"
     >
       <g opacity="0.4">
-        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter0_f_2076_3350)">
+        <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter0_f_${id})`}>
           <ellipse
             cx="16.3892"
             cy="146.673"
             rx="16.3892"
             ry="146.673"
             transform="matrix(-0.966169 -0.257911 -0.257911 0.966169 357.14 -44.3057)"
-            fill="url(#paint0_linear_2076_3350)"
+            fill={`url(#paint0_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
-        <g style={{ mixBlendMode: "color-dodge" }} filter="url(#filter1_f_2076_3350)">
+        <g style={{ mixBlendMode: "color-dodge" }} filter={`url(#filter1_f_${id})`}>
           <ellipse
             cx="13.25"
             cy="146.625"
             rx="13.25"
             ry="146.625"
             transform="matrix(-0.866025 -0.5 -0.5 0.866025 347.709 -62.7411)"
-            fill="url(#paint1_linear_2076_3350)"
+            fill={`url(#paint1_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
-        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter2_f_2076_3350)">
+        <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter2_f_${id})`}>
           <ellipse
             cx="11.1897"
             cy="190.642"
             rx="11.1897"
             ry="190.642"
             transform="matrix(-0.707107 -0.707107 -0.707107 0.707107 343.057 -64.2233)"
-            fill="url(#paint2_linear_2076_3350)"
+            fill={`url(#paint2_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
-        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter3_f_2076_3350)">
+        <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter3_f_${id})`}>
           <ellipse
             cx="11.1897"
             cy="90.3336"
             rx="11.1897"
             ry="90.3336"
             transform="matrix(-0.707107 -0.707107 -0.707107 0.707107 343.057 -64.2235)"
-            fill="url(#paint3_linear_2076_3350)"
+            fill={`url(#paint3_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
-        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter4_f_2076_3350)">
+        <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter4_f_${id})`}>
           <ellipse
             cx="11.125"
             cy="190.75"
             rx="11.125"
             ry="190.75"
             transform="matrix(-0.866025 -0.5 -0.5 0.866025 339.651 -49.7842)"
-            fill="url(#paint4_linear_2076_3350)"
+            fill={`url(#paint4_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
-        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter5_f_2076_3350)">
+        <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter5_f_${id})`}>
           <ellipse
             cx="160.75"
             cy="93.75"
             rx="160.75"
             ry="93.75"
             transform="matrix(-0.866025 -0.5 -0.5 0.866025 476.963 11.8842)"
-            fill="url(#paint5_linear_2076_3350)"
+            fill={`url(#paint5_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
-        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter6_f_2076_3350)">
+        <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter6_f_${id})`}>
           <ellipse
             cx="80.25"
             cy="47.75"
             rx="80.25"
             ry="47.75"
             transform="matrix(-0.866025 -0.5 -0.5 0.866025 407.248 -28.366)"
-            fill="url(#paint6_linear_2076_3350)"
+            fill={`url(#paint6_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
-        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter7_f_2076_3350)">
+        <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter7_f_${id})`}>
           <ellipse
             cx="67.5"
             cy="40.125"
             rx="67.5"
             ry="40.125"
             transform="matrix(-0.866025 -0.5 -0.5 0.866025 390.581 -24.9982)"
-            fill="url(#paint7_linear_2076_3350)"
+            fill={`url(#paint7_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
       </g>
       <defs>
         <filter
-          id="filter0_f_2076_3350"
+          id={`filter0_f_${id}`}
           x="217.957"
           y="-93.0969"
           width="171.039"
@@ -640,7 +645,7 @@ export const ProCardHighlight: React.FC<{ className: string }> = ({ className })
           <feGaussianBlur stdDeviation="22.25" result="effect1_foregroundBlur_2076_3350" />
         </filter>
         <filter
-          id="filter1_f_2076_3350"
+          id={`filter1_f_${id}`}
           x="144.206"
           y="-114.042"
           width="237.432"
@@ -653,7 +658,7 @@ export const ProCardHighlight: React.FC<{ className: string }> = ({ className })
           <feGaussianBlur stdDeviation="22.25" result="effect1_foregroundBlur_2076_3350" />
         </filter>
         <filter
-          id="filter2_f_2076_3350"
+          id={`filter2_f_${id}`}
           x="20.8005"
           y="-116.872"
           width="359.08"
@@ -666,7 +671,7 @@ export const ProCardHighlight: React.FC<{ className: string }> = ({ className })
           <feGaussianBlur stdDeviation="22.25" result="effect1_foregroundBlur_2076_3350" />
         </filter>
         <filter
-          id="filter3_f_2076_3350"
+          id={`filter3_f_${id}`}
           x="162.399"
           y="-117.131"
           width="217.741"
@@ -679,7 +684,7 @@ export const ProCardHighlight: React.FC<{ className: string }> = ({ className })
           <feGaussianBlur stdDeviation="22.25" result="effect1_foregroundBlur_2076_3350" />
         </filter>
         <filter
-          id="filter4_f_2076_3350"
+          id={`filter4_f_${id}`}
           x="94.2738"
           y="-99.9421"
           width="280.735"
@@ -692,7 +697,7 @@ export const ProCardHighlight: React.FC<{ className: string }> = ({ className })
           <feGaussianBlur stdDeviation="22.25" result="effect1_foregroundBlur_2076_3350" />
         </filter>
         <filter
-          id="filter5_f_2076_3350"
+          id={`filter5_f_${id}`}
           x="68.9412"
           y="-176.546"
           width="443.867"
@@ -705,7 +710,7 @@ export const ProCardHighlight: React.FC<{ className: string }> = ({ className })
           <feGaussianBlur stdDeviation="37.5" result="effect1_foregroundBlur_2076_3350" />
         </filter>
         <filter
-          id="filter6_f_2076_3350"
+          id={`filter6_f_${id}`}
           x="165.37"
           y="-159.758"
           width="297.01"
@@ -718,7 +723,7 @@ export const ProCardHighlight: React.FC<{ className: string }> = ({ className })
           <feGaussianBlur stdDeviation="37.5" result="effect1_foregroundBlur_2076_3350" />
         </filter>
         <filter
-          id="filter7_f_2076_3350"
+          id={`filter7_f_${id}`}
           x="175.242"
           y="-147.44"
           width="273.641"
@@ -731,7 +736,7 @@ export const ProCardHighlight: React.FC<{ className: string }> = ({ className })
           <feGaussianBlur stdDeviation="37.5" result="effect1_foregroundBlur_2076_3350" />
         </filter>
         <linearGradient
-          id="paint0_linear_2076_3350"
+          id={`paint0_linear_${id}`}
           x1="16.3892"
           y1="0"
           x2="16.3892"
@@ -742,7 +747,7 @@ export const ProCardHighlight: React.FC<{ className: string }> = ({ className })
           <stop offset="1" stopColor="#FFD600" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint1_linear_2076_3350"
+          id={`paint1_linear_${id}`}
           x1="13.25"
           y1="0"
           x2="13.25"
@@ -753,7 +758,7 @@ export const ProCardHighlight: React.FC<{ className: string }> = ({ className })
           <stop offset="1" stopColor="#FFD600" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint2_linear_2076_3350"
+          id={`paint2_linear_${id}`}
           x1="11.1897"
           y1="0"
           x2="11.1897"
@@ -764,7 +769,7 @@ export const ProCardHighlight: React.FC<{ className: string }> = ({ className })
           <stop offset="1" stopColor="#FFD600" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint3_linear_2076_3350"
+          id={`paint3_linear_${id}`}
           x1="11.1897"
           y1="0"
           x2="11.1897"
@@ -775,7 +780,7 @@ export const ProCardHighlight: React.FC<{ className: string }> = ({ className })
           <stop offset="1" stopColor="#FFD600" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint4_linear_2076_3350"
+          id={`paint4_linear_${id}`}
           x1="11.125"
           y1="0"
           x2="11.125"
@@ -786,7 +791,7 @@ export const ProCardHighlight: React.FC<{ className: string }> = ({ className })
           <stop offset="1" stopColor="#FFD600" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint5_linear_2076_3350"
+          id={`paint5_linear_${id}`}
           x1="160.75"
           y1="0"
           x2="160.75"
@@ -797,7 +802,7 @@ export const ProCardHighlight: React.FC<{ className: string }> = ({ className })
           <stop offset="1" stopColor="#FFD600" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint6_linear_2076_3350"
+          id={`paint6_linear_${id}`}
           x1="80.25"
           y1="0"
           x2="80.25"
@@ -808,7 +813,7 @@ export const ProCardHighlight: React.FC<{ className: string }> = ({ className })
           <stop offset="1" stopColor="#FFD600" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint7_linear_2076_3350"
+          id={`paint7_linear_${id}`}
           x1="67.5"
           y1="0"
           x2="67.5"
@@ -824,6 +829,8 @@ export const ProCardHighlight: React.FC<{ className: string }> = ({ className })
 };
 
 export const EnterpriseCardHighlight: React.FC<{ className: string }> = ({ className }) => {
+  const id = useId();
+
   return (
     <svg
       className={className}
@@ -834,98 +841,98 @@ export const EnterpriseCardHighlight: React.FC<{ className: string }> = ({ class
       xmlns="http://www.w3.org/2000/svg"
     >
       <g opacity="0.4">
-        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter0_f_2076_3437)">
+        <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter0_f_${id})`}>
           <ellipse
             cx="16.3892"
             cy="146.673"
             rx="16.3892"
             ry="146.673"
-            transform="matrix(-0.966169 -0.257911 -0.257911 0.966169 357.14 -44.3058)"
-            fill="url(#paint0_linear_2076_3437)"
+            transform="matrix(-0.966169 -0.257911 -0.257911 0.966169 357.14 -44.3057)"
+            fill={`url(#paint0_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
-        <g style={{ mixBlendMode: "color-dodge" }} filter="url(#filter1_f_2076_3437)">
+        <g style={{ mixBlendMode: "color-dodge" }} filter={`url(#filter1_f_${id})`}>
           <ellipse
             cx="13.25"
             cy="146.625"
             rx="13.25"
             ry="146.625"
-            transform="matrix(-0.866025 -0.5 -0.5 0.866025 347.709 -62.7412)"
-            fill="url(#paint1_linear_2076_3437)"
+            transform="matrix(-0.866025 -0.5 -0.5 0.866025 347.709 -62.7411)"
+            fill={`url(#paint1_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
-        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter2_f_2076_3437)">
+        <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter2_f_${id})`}>
           <ellipse
             cx="11.1897"
             cy="190.642"
             rx="11.1897"
             ry="190.642"
             transform="matrix(-0.707107 -0.707107 -0.707107 0.707107 343.057 -64.2233)"
-            fill="url(#paint2_linear_2076_3437)"
+            fill={`url(#paint2_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
-        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter3_f_2076_3437)">
+        <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter3_f_${id})`}>
           <ellipse
             cx="11.1897"
             cy="90.3336"
             rx="11.1897"
             ry="90.3336"
             transform="matrix(-0.707107 -0.707107 -0.707107 0.707107 343.057 -64.2235)"
-            fill="url(#paint3_linear_2076_3437)"
+            fill={`url(#paint3_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
-        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter4_f_2076_3437)">
+        <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter4_f_${id})`}>
           <ellipse
             cx="11.125"
             cy="190.75"
             rx="11.125"
             ry="190.75"
             transform="matrix(-0.866025 -0.5 -0.5 0.866025 339.651 -49.7842)"
-            fill="url(#paint4_linear_2076_3437)"
+            fill={`url(#paint4_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
-        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter5_f_2076_3437)">
+        <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter5_f_${id})`}>
           <ellipse
             cx="160.75"
             cy="93.75"
             rx="160.75"
             ry="93.75"
             transform="matrix(-0.866025 -0.5 -0.5 0.866025 476.963 11.8842)"
-            fill="url(#paint5_linear_2076_3437)"
+            fill={`url(#paint5_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
-        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter6_f_2076_3437)">
+        <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter6_f_${id})`}>
           <ellipse
             cx="80.25"
             cy="47.75"
             rx="80.25"
             ry="47.75"
             transform="matrix(-0.866025 -0.5 -0.5 0.866025 407.248 -28.366)"
-            fill="url(#paint6_linear_2076_3437)"
+            fill={`url(#paint6_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
-        <g style={{ mixBlendMode: "lighten" }} filter="url(#filter7_f_2076_3437)">
+        <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter7_f_${id})`}>
           <ellipse
             cx="67.5"
             cy="40.125"
             rx="67.5"
             ry="40.125"
-            transform="matrix(-0.866025 -0.5 -0.5 0.866025 390.581 -24.9983)"
-            fill="url(#paint7_linear_2076_3437)"
+            transform="matrix(-0.866025 -0.5 -0.5 0.866025 390.581 -24.9982)"
+            fill={`url(#paint7_linear_${id})`}
             fillOpacity="0.5"
           />
         </g>
       </g>
       <defs>
         <filter
-          id="filter0_f_2076_3437"
+          id={`filter0_f_${id}`}
           x="217.957"
           y="-93.097"
           width="171.039"
@@ -938,7 +945,7 @@ export const EnterpriseCardHighlight: React.FC<{ className: string }> = ({ class
           <feGaussianBlur stdDeviation="22.25" result="effect1_foregroundBlur_2076_3437" />
         </filter>
         <filter
-          id="filter1_f_2076_3437"
+          id={`filter1_f_${id}`}
           x="144.206"
           y="-114.042"
           width="237.432"
@@ -951,7 +958,7 @@ export const EnterpriseCardHighlight: React.FC<{ className: string }> = ({ class
           <feGaussianBlur stdDeviation="22.25" result="effect1_foregroundBlur_2076_3437" />
         </filter>
         <filter
-          id="filter2_f_2076_3437"
+          id={`filter2_f_${id}`}
           x="20.8005"
           y="-116.872"
           width="359.08"
@@ -964,7 +971,7 @@ export const EnterpriseCardHighlight: React.FC<{ className: string }> = ({ class
           <feGaussianBlur stdDeviation="22.25" result="effect1_foregroundBlur_2076_3437" />
         </filter>
         <filter
-          id="filter3_f_2076_3437"
+          id={`filter3_f_${id}`}
           x="162.399"
           y="-117.131"
           width="217.741"
@@ -977,7 +984,7 @@ export const EnterpriseCardHighlight: React.FC<{ className: string }> = ({ class
           <feGaussianBlur stdDeviation="22.25" result="effect1_foregroundBlur_2076_3437" />
         </filter>
         <filter
-          id="filter4_f_2076_3437"
+          id={`filter4_f_${id}`}
           x="94.2737"
           y="-99.9421"
           width="280.735"
@@ -990,7 +997,7 @@ export const EnterpriseCardHighlight: React.FC<{ className: string }> = ({ class
           <feGaussianBlur stdDeviation="22.25" result="effect1_foregroundBlur_2076_3437" />
         </filter>
         <filter
-          id="filter5_f_2076_3437"
+          id={`filter5_f_${id}`}
           x="68.9412"
           y="-176.546"
           width="443.867"
@@ -1003,7 +1010,7 @@ export const EnterpriseCardHighlight: React.FC<{ className: string }> = ({ class
           <feGaussianBlur stdDeviation="37.5" result="effect1_foregroundBlur_2076_3437" />
         </filter>
         <filter
-          id="filter6_f_2076_3437"
+          id={`filter6_f_${id}`}
           x="165.37"
           y="-159.758"
           width="297.01"
@@ -1016,7 +1023,7 @@ export const EnterpriseCardHighlight: React.FC<{ className: string }> = ({ class
           <feGaussianBlur stdDeviation="37.5" result="effect1_foregroundBlur_2076_3437" />
         </filter>
         <filter
-          id="filter7_f_2076_3437"
+          id={`filter7_f_${id}`}
           x="175.242"
           y="-147.441"
           width="273.641"
@@ -1029,7 +1036,7 @@ export const EnterpriseCardHighlight: React.FC<{ className: string }> = ({ class
           <feGaussianBlur stdDeviation="37.5" result="effect1_foregroundBlur_2076_3437" />
         </filter>
         <linearGradient
-          id="paint0_linear_2076_3437"
+          id={`paint0_linear_${id}`}
           x1="16.3892"
           y1="0"
           x2="16.3892"
@@ -1040,7 +1047,7 @@ export const EnterpriseCardHighlight: React.FC<{ className: string }> = ({ class
           <stop offset="1" stopColor="#6E56CF" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint1_linear_2076_3437"
+          id={`paint1_linear_${id}`}
           x1="13.25"
           y1="0"
           x2="13.25"
@@ -1051,7 +1058,7 @@ export const EnterpriseCardHighlight: React.FC<{ className: string }> = ({ class
           <stop offset="1" stopColor="#6E56CF" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint2_linear_2076_3437"
+          id={`paint2_linear_${id}`}
           x1="11.1897"
           y1="0"
           x2="11.1897"
@@ -1062,7 +1069,7 @@ export const EnterpriseCardHighlight: React.FC<{ className: string }> = ({ class
           <stop offset="1" stopColor="#6E56CF" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint3_linear_2076_3437"
+          id={`paint3_linear_${id}`}
           x1="11.1897"
           y1="0"
           x2="11.1897"
@@ -1073,7 +1080,7 @@ export const EnterpriseCardHighlight: React.FC<{ className: string }> = ({ class
           <stop offset="1" stopColor="#6E56CF" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint4_linear_2076_3437"
+          id={`paint4_linear_${id}`}
           x1="11.125"
           y1="0"
           x2="11.125"
@@ -1084,7 +1091,7 @@ export const EnterpriseCardHighlight: React.FC<{ className: string }> = ({ class
           <stop offset="1" stopColor="#6E56CF" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint5_linear_2076_3437"
+          id={`paint5_linear_${id}`}
           x1="160.75"
           y1="0"
           x2="160.75"
@@ -1095,7 +1102,7 @@ export const EnterpriseCardHighlight: React.FC<{ className: string }> = ({ class
           <stop offset="1" stopColor="#6E56CF" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint6_linear_2076_3437"
+          id={`paint6_linear_${id}`}
           x1="80.25"
           y1="0"
           x2="80.25"
@@ -1106,7 +1113,7 @@ export const EnterpriseCardHighlight: React.FC<{ className: string }> = ({ class
           <stop offset="1" stopColor="#6E56CF" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint7_linear_2076_3437"
+          id={`paint7_linear_${id}`}
           x1="67.5"
           y1="0"
           x2="67.5"

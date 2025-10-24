@@ -1,4 +1,4 @@
-"use client";
+"use cache";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { UnkeyLogo } from "./footer-svgs";
@@ -104,7 +104,7 @@ const Column: React.FC<{
   );
 };
 
-export function Footer() {
+export async function Footer() {
   return (
     <div className="border-t border-white/20 blog-footer-radial-gradient">
       <footer className="container relative grid grid-cols-2 gap-8 pt-8 mx-auto overflow-hidden lg:gap-16 sm:grid-cols-3 xl:grid-cols-5 sm:pt-12 md:pt-16 lg:pt-24 xl:pt-32">

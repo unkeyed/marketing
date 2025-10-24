@@ -1,6 +1,9 @@
+"use cache";
+
 import { BookText, ChevronRight, LockKeyhole, MicIcon, SquarePlay } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -36,8 +39,6 @@ const pageConfig = {
     "A week of new features that redefine API Management, allowing you to create performant and scalable APIs with ease.",
   ogImage: "https://unkey.com/assets/accelerate/og.png",
 };
-
-export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: {
@@ -85,6 +86,7 @@ type AccelerateLaunchDay = {
   IconComponent: React.ComponentType<any>;
   IllustrationComponent: React.ComponentType<any>;
 };
+
 const DAYS: AccelerateLaunchDay[] = [
   {
     dateTime: "2024-06-24",
@@ -110,7 +112,6 @@ const DAYS: AccelerateLaunchDay[] = [
     dateTime: "2024-06-26",
     dayAndMonth: "26 Jun",
     weekday: "Wed",
-
     title: "Semantic Cache",
     description: "Cheaper and faster LLM completion",
     blog: "/blog/semantic-caching",
@@ -152,13 +153,27 @@ const DAYS: AccelerateLaunchDay[] = [
 const WEEKDAYS_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MAX_DAYS = 6;
 
-export default function AcceleratePage() {
+async function getDayNumber() {
   const startDate = new Date("2024-06-24T07:00:00-07:00");
   const msSinceStart = new Date().getTime() - startDate.getTime();
   const daysSinceStart = msSinceStart / (1000 * 60 * 60 * 24);
 
-  // IMPORTANT: needs to be capped between 0 and MAX
-  const dayNumber = Math.min(MAX_DAYS, Math.max(Math.ceil(daysSinceStart), 0));
+  // IMPORTANT: needs to be capped between 0 and MAX_DAYS
+  return Math.min(MAX_DAYS, Math.max(Math.ceil(daysSinceStart), 0));
+}
+
+function AcceleratePageFallback() {
+  return (
+    <div className="flex flex-col">
+      <div className="isolate container flex flex-col items-center mt-[64.5px] font-mono uppercase text-white/30 text-base">
+        <div className="animate-pulse">Loading...</div>
+      </div>
+    </div>
+  );
+}
+
+async function AcceleratePageContent() {
+  const dayNumber = await getDayNumber();
 
   return (
     <div className="flex flex-col">
@@ -354,5 +369,13 @@ export default function AcceleratePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default async function AcceleratePage() {
+  return (
+    <Suspense fallback={<AcceleratePageFallback />}>
+      <AcceleratePageContent />
+    </Suspense>
   );
 }

@@ -20,10 +20,10 @@ export function FilterableCommand(props: {
 }) {
   const [open, setOpen] = React.useState(false);
   const router = useRouter();
-  const commandRef = React.useRef<HTMLDivElement>(null);
+  const commandRef = React.useRef<HTMLDivElement | null>(null);
 
   return (
-    <Command className={cn("h-auto [&>div]:border-b-0", props.className)} ref={commandRef}>
+    <Command className={cn("h-auto [&>div]:border-b-0", props.className)} ref={commandRef as any}>
       <CommandInput
         placeholder={props.placeholder}
         onFocus={() => setOpen(true)}

@@ -20,14 +20,13 @@ type Props = {
   }>;
 };
 
-export const revalidate = 3600; // 1 hour
-
 export async function generateStaticParams() {
   return Object.keys(templates).map((slug) => ({
     slug,
   }));
 }
 export default async function Templates(props: Props) {
+  "use cache";
   const params = await props.params;
   const template = templates[params.slug];
   if (!template) {
@@ -174,6 +173,7 @@ export default async function Templates(props: Props) {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  "use cache";
   // read route params
   const resolvedParams = await params;
   const template = templates[resolvedParams.slug];

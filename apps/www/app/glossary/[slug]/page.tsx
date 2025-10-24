@@ -162,7 +162,7 @@ const GlossaryTermWrapper = async ({
             </div>
             <div className="sm:mx-6 mt-12">
               <FAQ
-                items={term.faq}
+                items={term.faq.filter((item: any) => item.question && item.answer)}
                 title={`Questions & Answers about ${term.term}`}
                 description={`We answer common questions about ${term.term}.`}
                 epigraph="FAQ"

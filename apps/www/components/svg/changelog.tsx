@@ -1,6 +1,11 @@
+"use client";
+
 import { cn } from "@/lib/utils";
+import { useId } from "react";
 
 export function ChangelogLight({ className }: { className?: string }) {
+  const id = useId();
+
   return (
     <svg
       className={cn("absolute -top-96 left-0 right-0 -z-10 overflow-x-hidden ", className)}
@@ -8,92 +13,92 @@ export function ChangelogLight({ className }: { className?: string }) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g style={{ mixBlendMode: "lighten" }} filter="url(#filter0_f_6033_132)">
+      <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter0_f_${id})`}>
         <ellipse
           cx="369.193"
           cy="53.7926"
           rx="32.7783"
           ry="293.346"
           transform="rotate(15.0538 369.193 53.7926)"
-          fill="url(#paint0_linear_6033_132)"
+          fill={`url(#paint0_linear_${id})`}
           fillOpacity="0.5"
         />
       </g>
-      <g style={{ mixBlendMode: "darken" }} filter="url(#filter1_f_6033_132)">
+      <g style={{ mixBlendMode: "darken" }} filter={`url(#filter1_f_${id})`}>
         <ellipse
           cx="475"
           cy="32.7505"
           rx="26.5"
           ry="293.25"
-          fill="url(#paint1_linear_6033_132)"
+          fill={`url(#paint1_linear_${id})`}
           fillOpacity="0.5"
         />
       </g>
-      <g style={{ mixBlendMode: "lighten" }} filter="url(#filter2_f_6033_132)">
+      <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter2_f_${id})`}>
         <ellipse
           cx="578.34"
           cy="104.085"
           rx="22.3794"
           ry="381.284"
           transform="rotate(-15 578.34 104.085)"
-          fill="url(#paint2_linear_6033_132)"
+          fill={`url(#paint2_linear_${id})`}
           fillOpacity="0.5"
         />
       </g>
-      <g style={{ mixBlendMode: "lighten" }} filter="url(#filter3_f_6033_132)">
+      <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter3_f_${id})`}>
         <ellipse
           cx="526.416"
           cy="-89.6963"
           rx="22.3794"
           ry="180.667"
           transform="rotate(-15 526.416 -89.6963)"
-          fill="url(#paint3_linear_6033_132)"
+          fill={`url(#paint3_linear_${id})`}
           fillOpacity="0.5"
         />
       </g>
-      <g style={{ mixBlendMode: "lighten" }} filter="url(#filter4_f_6033_132)">
+      <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter4_f_${id})`}>
         <ellipse
           cx="471.75"
           cy="151.501"
           rx="22.25"
           ry="381.5"
-          fill="url(#paint4_linear_6033_132)"
+          fill={`url(#paint4_linear_${id})`}
           fillOpacity="0.5"
         />
       </g>
-      <g style={{ mixBlendMode: "lighten" }} filter="url(#filter5_f_6033_132)">
+      <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter5_f_${id})`}>
         <ellipse
           cx="471.5"
           cy="-72.9993"
           rx="321.5"
           ry="187.5"
-          fill="url(#paint5_linear_6033_132)"
+          fill={`url(#paint5_linear_${id})`}
           fillOpacity="0.5"
         />
       </g>
-      <g style={{ mixBlendMode: "lighten" }} filter="url(#filter6_f_6033_132)">
+      <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter6_f_${id})`}>
         <ellipse
           cx="471.5"
           cy="-164.999"
           rx="160.5"
           ry="95.5"
-          fill="url(#paint6_linear_6033_132)"
+          fill={`url(#paint6_linear_${id})`}
           fillOpacity="0.5"
         />
       </g>
-      <g style={{ mixBlendMode: "lighten" }} filter="url(#filter7_f_6033_132)">
+      <g style={{ mixBlendMode: "lighten" }} filter={`url(#filter7_f_${id})`}>
         <ellipse
           cx="471.5"
           cy="-157.749"
           rx="135"
           ry="80.25"
-          fill="url(#paint7_linear_6033_132)"
+          fill={`url(#paint7_linear_${id})`}
           fillOpacity="0.5"
         />
       </g>
       <defs>
         <filter
-          id="filter0_f_6033_132"
+          id={`filter0_f_${id}`}
           x="197.668"
           y="-318.616"
           width="343.05"
@@ -103,10 +108,10 @@ export function ChangelogLight({ className }: { className?: string }) {
         >
           <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feGaussianBlur stdDeviation="44.5" result="effect1_foregroundBlur_6033_132" />
+          <feGaussianBlur stdDeviation="44.5" result={`effect1_foregroundBlur_${id}`} />
         </filter>
         <filter
-          id="filter1_f_6033_132"
+          id={`filter1_f_${id}`}
           x="359.5"
           y="-349.499"
           width="231"
@@ -116,10 +121,10 @@ export function ChangelogLight({ className }: { className?: string }) {
         >
           <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feGaussianBlur stdDeviation="44.5" result="effect1_foregroundBlur_6033_132" />
+          <feGaussianBlur stdDeviation="44.5" result={`effect1_foregroundBlur_${id}`} />
         </filter>
         <filter
-          id="filter2_f_6033_132"
+          id={`filter2_f_${id}`}
           x="388.295"
           y="-353.254"
           width="380.089"
@@ -129,10 +134,10 @@ export function ChangelogLight({ className }: { className?: string }) {
         >
           <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feGaussianBlur stdDeviation="44.5" result="effect1_foregroundBlur_6033_132" />
+          <feGaussianBlur stdDeviation="44.5" result={`effect1_foregroundBlur_${id}`} />
         </filter>
         <filter
-          id="filter3_f_6033_132"
+          id={`filter3_f_${id}`}
           x="385.889"
           y="-353.306"
           width="281.055"
@@ -142,10 +147,10 @@ export function ChangelogLight({ className }: { className?: string }) {
         >
           <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feGaussianBlur stdDeviation="44.5" result="effect1_foregroundBlur_6033_132" />
+          <feGaussianBlur stdDeviation="44.5" result={`effect1_foregroundBlur_${id}`} />
         </filter>
         <filter
-          id="filter4_f_6033_132"
+          id={`filter4_f_${id}`}
           x="360.5"
           y="-318.999"
           width="222.5"
@@ -155,10 +160,10 @@ export function ChangelogLight({ className }: { className?: string }) {
         >
           <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feGaussianBlur stdDeviation="44.5" result="effect1_foregroundBlur_6033_132" />
+          <feGaussianBlur stdDeviation="44.5" result={`effect1_foregroundBlur_${id}`} />
         </filter>
         <filter
-          id="filter5_f_6033_132"
+          id={`filter5_f_${id}`}
           x="-0.000152588"
           y="-410.499"
           width="943"
@@ -168,10 +173,10 @@ export function ChangelogLight({ className }: { className?: string }) {
         >
           <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feGaussianBlur stdDeviation="75" result="effect1_foregroundBlur_6033_132" />
+          <feGaussianBlur stdDeviation="75" result={`effect1_foregroundBlur_${id}`} />
         </filter>
         <filter
-          id="filter6_f_6033_132"
+          id={`filter6_f_${id}`}
           x="161"
           y="-410.499"
           width="621"
@@ -181,10 +186,10 @@ export function ChangelogLight({ className }: { className?: string }) {
         >
           <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feGaussianBlur stdDeviation="75" result="effect1_foregroundBlur_6033_132" />
+          <feGaussianBlur stdDeviation="75" result={`effect1_foregroundBlur_${id}`} />
         </filter>
         <filter
-          id="filter7_f_6033_132"
+          id={`filter7_f_${id}`}
           x="186.5"
           y="-387.999"
           width="570"
@@ -194,10 +199,10 @@ export function ChangelogLight({ className }: { className?: string }) {
         >
           <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feGaussianBlur stdDeviation="75" result="effect1_foregroundBlur_6033_132" />
+          <feGaussianBlur stdDeviation="75" result={`effect1_foregroundBlur_${id}`} />
         </filter>
         <linearGradient
-          id="paint0_linear_6033_132"
+          id={`paint0_linear_${id}`}
           x1="369.193"
           y1="-239.553"
           x2="369.193"
@@ -208,7 +213,7 @@ export function ChangelogLight({ className }: { className?: string }) {
           <stop offset="1" stopColor="white" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint1_linear_6033_132"
+          id={`paint1_linear_${id}`}
           x1="475"
           y1="-260.499"
           x2="475"
@@ -219,7 +224,7 @@ export function ChangelogLight({ className }: { className?: string }) {
           <stop offset="1" stopColor="white" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint2_linear_6033_132"
+          id={`paint2_linear_${id}`}
           x1="578.34"
           y1="-277.199"
           x2="578.34"
@@ -230,7 +235,7 @@ export function ChangelogLight({ className }: { className?: string }) {
           <stop offset="1" stopColor="white" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint3_linear_6033_132"
+          id={`paint3_linear_${id}`}
           x1="526.416"
           y1="-270.364"
           x2="526.416"
@@ -241,7 +246,7 @@ export function ChangelogLight({ className }: { className?: string }) {
           <stop offset="1" stopColor="white" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint4_linear_6033_132"
+          id={`paint4_linear_${id}`}
           x1="471.75"
           y1="-229.999"
           x2="471.75"
@@ -252,7 +257,7 @@ export function ChangelogLight({ className }: { className?: string }) {
           <stop offset="1" stopColor="white" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint5_linear_6033_132"
+          id={`paint5_linear_${id}`}
           x1="471.5"
           y1="-260.499"
           x2="471.5"
@@ -263,7 +268,7 @@ export function ChangelogLight({ className }: { className?: string }) {
           <stop offset="1" stopColor="white" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint6_linear_6033_132"
+          id={`paint6_linear_${id}`}
           x1="471.5"
           y1="-260.499"
           x2="471.5"
@@ -274,7 +279,7 @@ export function ChangelogLight({ className }: { className?: string }) {
           <stop offset="1" stopColor="white" stopOpacity="0" />
         </linearGradient>
         <linearGradient
-          id="paint7_linear_6033_132"
+          id={`paint7_linear_${id}`}
           x1="471.5"
           y1="-237.999"
           x2="471.5"
