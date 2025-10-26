@@ -1,0 +1,35 @@
+---
+title: August Product Update
+date: 2025-08-30
+tags: ["product"]
+---
+
+In August 2025, our team has rolled out a series of improvements aimed at enhancing user experience and application performance. From new UI features for project management to important bug fixes that ensure smoother functionality, we’ve been busy! Key highlights include the launch of a new workspace slug, refined database schemas for demos, and improved error handling. We’re thrilled for you to explore these changes and are committed to making Unkey even better!
+
+## Features
+- **Enhanced Project Management**: A fresh new UI for managing projects and deployments has been introduced, making it easier to navigate and utilize [#3797](https://github.com/unkeyed/unkey/pull/3797).
+- **New Workspace Slug**: We've implemented a new workspace slug feature that streamlines workspace identification and management [#3849](https://github.com/unkeyed/unkey/pull/3849).
+- **Improved Gateway Functionality**: The gateway routes now utilize VM addresses for more efficient routing [#3878](https://github.com/unkeyed/unkey/pull/3878).
+- **Deployment-Centric API**: We've added a new deployment-centric API along with a Get Deployment endpoint [#3878](https://github.com/unkeyed/unkey/pull/3878).
+
+## Bug Fixes
+- **Sidebar Improvements**: The "load more" functionality has been fixed in the sidebar, allowing users to load additional projects smoothly [#3833](https://github.com/unkeyed/unkey/pull/3833).
+- **Pentest Remediation**: Addressed vulnerabilities found during a penetration test, ensuring user roles and invites are securely managed [#3885](https://github.com/unkeyed/unkey/pull/3885).
+- **Curl Example Update**: Updated the curl example to utilize the V2 endpoint [#3832](https://github.com/unkeyed/unkey/pull/3832).
+- **Key Redaction**: Improved key redaction to ensure all keys are properly handled and redacted [#3860](https://github.com/unkeyed/unkey/pull/3860).
+- **Scrollability Fix**: Fixed an issue where the workspace creation wizard was locked on smaller screens, now allowing scrollability [#3843](https://github.com/unkeyed/unkey/pull/3843).
+- **Workspace ID Query Fix**: Resolved slow queries by ensuring that the workspace ID is correctly queried [#3836](https://github.com/unkeyed/unkey/pull/3836).
+
+## Performance
+- **Database Schema Enhancements**: We’ve made database schema updates that enhance performance and efficiency for our demo environments [#3878](https://github.com/unkeyed/unkey/pull/3878).
+- **Redis Usage Limiting**: Transitioned to a Redis-based usage limiter for improved latency and tracking [#3800](https://github.com/unkeyed/unkey/pull/3800).
+
+## Documentation
+- **Updated Docs**: Documentation has been refreshed to reflect changes in API structures and endpoint versions, ensuring clarity for all users [#3747](https://github.com/unkeyed/unkey/pull/3747) and [#3712](https://github.com/unkeyed/unkey/pull/3712).
+- **RFC for Let's Encrypt**: Introduced an RFC outlining the architecture for issuing TLS certificates for custom domains [#3754](https://github.com/unkeyed/unkey/pull/3754).
+
+## CI Improvements
+- **Enhanced CI/CD Pipelines**: Optimized CI workflows, including the removal of outdated steps, to streamline our continuous integration processes [#3709](https://github.com/unkeyed/unkey/pull/3709).
+- **Upgrade Scripts**: Added utility scripts for environment migrations and improved configuration management [#3748](https://github.com/unkeyed/unkey/pull/3748).
+
+We hope these updates enhance your experience with Unkey. As always, your feedback is invaluable to us!
