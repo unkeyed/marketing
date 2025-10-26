@@ -1,0 +1,40 @@
+---
+title: September Product Update
+date: 2025-09-30
+tags: ["product"]
+---
+
+
+## Summary
+September was a busy month for us! We rolled out a slew of new features aimed at Unkey deploy and fixes to enhance user experience and system performance. Key highlights include the introduction of slug routing for workspace scoped dashboard. Plus, we tackled several bugs that were affecting performance and usability. Overall, this month’s updates make the platform more robust and user-friendly, paving the way for future enhancements!
+
+## Features
+- **New Authentication System**: We implemented a simple API key authentication for both CLI and dashboard communication with the control service. [#4010](https://github.com/unkeyed/unkey/pull/4010)
+- **Slug Routing**: The dashboard now supports workspace-scoped navigation, enhancing user experience. [#4009](https://github.com/unkeyed/unkey/pull/4009)
+- **Gateway Logs**: Added Gateway Logs to the projects section, providing better insights into deployment activities. [#3993](https://github.com/unkeyed/unkey/pull/3993)
+- **Dynamic Data for Demo API**: We added dynamic data to the demo API to improve the demo experience. [#4002](https://github.com/unkeyed/unkey/pull/4002)
+- **Improved Rate Limits Management**: Users can now manage rate limits within the workspace context. [#3782](https://github.com/unkeyed/unkey/pull/3782)
+
+## Bug Fixes
+- **Fixed Logdrain Crashes**: Addressed issues with logdrain that were causing crashes due to changes in the logpush format. [#4025](https://github.com/unkeyed/unkey/pull/4025)
+- **Resolved Timeouts**: Added timeout handling to prevent unnecessary 500 errors. [#4022](https://github.com/unkeyed/unkey/pull/4022)
+- **Corrected Logging Line Locations**: Ensured that logging lines are accurately displayed. [#3889](https://github.com/unkeyed/unkey/pull/3889)
+- **Fixed UI Inconsistencies**: Resolved various UI issues, particularly in rollback dialogs. [#3979](https://github.com/unkeyed/unkey/pull/3979)
+
+## Performance Improvements
+- **Enhanced Domain Rollbacks**: Improved the rollback functionality for domain management, ensuring that users can revert to previous states more seamlessly. [#3999](https://github.com/unkeyed/unkey/pull/3999)
+- **Optimized Clickhouse Image**: Updated the ClickHouse Docker image to improve functionality and performance. [#4033](https://github.com/unkeyed/unkey/pull/4033)
+
+## Refactoring and Chores
+- **Domain Refetching**: Refactored the system to allow for domain refetching on live deployment changes. [#4032](https://github.com/unkeyed/unkey/pull/4032)
+- **Removed Trials**: Simplified the subscription system by removing the trial period. [#3988](https://github.com/unkeyed/unkey/pull/3988)
+- **Updated Environment Variable Management**: Cleaned up the environment variable section in project overviews for better future support. [#3946](https://github.com/unkeyed/unkey/pull/3946)
+
+## Documentation
+- **Updated API Documentation Link**: Corrected the link to the API documentation in the welcome email to ensure users access the latest resources. [#3937](https://github.com/unkeyed/unkey/pull/3937)
+
+## Miscellaneous
+- **Improved UI for Project Details**: A new UI for project details includes active deployment logs and an enhanced environment section. [#3853](https://github.com/unkeyed/unkey/pull/3853)
+- **Refined User Experience**: Various UI updates, including better button labels and handling of pointer events in components. [#3880](https://github.com/unkeyed/unkey/pull/3880)
+
+Stay tuned for more updates as we continue to refine and enhance your experience with our platform!

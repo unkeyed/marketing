@@ -1,0 +1,48 @@
+---
+title: July Product Update
+date: 2025-06-30
+tags: ["product"]
+---
+
+July was an action-packed month for Unkey, with a whopping 172 pull requests merged. Key highlights include significant improvements in API error handling, UI enhancements for permission management, and a streamlined deployment process. We also focused on performance tweaks, especially with our database interactions and CI workflows. With thorough documentation updates, our users can better navigate the new features and fixes. Dive in to see the highlights of what we achieved this month.
+
+## Features
+- **Enhanced API Functionality**
+  [feat: v2/keys.deleteKey](https://github.com/unkeyed/unkey/pull/3445) - Introduced a new endpoint for deleting keys, expanding our API capabilities.
+
+  [feat: onboarding](https://github.com/unkeyed/unkey/pull/3446) - Launched the first part of our new onboarding UI, making it easier for users to get started.
+
+  [feat: v2/keys.updateCredits](https://github.com/unkeyed/unkey/pull/3443) - Added an endpoint to update credits, improving user experience.
+
+- **UI Improvements**
+  [feat: onboarding key creation](https://github.com/unkeyed/unkey/pull/3459) - Introduced a new step in the onboarding process for key creation.
+
+  [feat: Initial implementation of Unkey Deploy](https://github.com/unkeyed/unkey/pull/3488) - Launched core services for our deployment platform.
+
+## Bug Fixes
+- **Critical Bug Fixes**
+  [fix: calendar bug](https://github.com/unkeyed/unkey/pull/3478) - Resolved an issue with date selection in the calendar UI, enhancing user experience.
+
+  [fix: merge issues](https://github.com/unkeyed/unkey/pull/3422) - Fixed various merge conflicts that were causing issues in the codebase.
+
+  [fix: non null assertion linter issues](https://github.com/unkeyed/unkey/pull/3397) - Addressed linter issues to improve code quality.
+
+## Performance
+- **Optimized Performance**
+  [perf: create root key being slow](https://github.com/unkeyed/unkey/pull/3554) - Enhanced the performance of root key creation, reducing wait times.
+
+  [perf: use namespace_id as index](https://github.com/unkeyed/unkey/pull/3526) - Improved database query performance by optimizing index usage.
+
+## Documentation
+- **Documentation Updates**
+  [fix: documentation manual ratelimit example missing fields](https://github.com/unkeyed/unkey/pull/3530) - Updated documentation to ensure all fields are clearly defined.
+
+  [chore: reorganise engineering docs and add runbooks](https://github.com/unkeyed/unkey/pull/3460) - Streamlined the documentation structure for better accessibility.
+
+## Chores
+- **Maintenance and Refactoring**
+  [chore: remove unused dependencies](https://github.com/unkeyed/unkey/pull/3517) - Cleaned up the codebase by removing unnecessary dependencies.
+
+  [chore: use makefiles](https://github.com/unkeyed/unkey/pull/3453) - Transitioned from Taskfiles to Makefiles for better build automation consistency.
+
+  [chore: delete unnecessary tests](https://github.com/unkeyed/unkey/pull/3473) - Removed obsolete tests to maintain a cleaner codebase.

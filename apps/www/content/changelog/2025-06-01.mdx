@@ -1,0 +1,49 @@
+---
+title: June Product Update
+date: 2025-06-30
+tags: ["product"]
+---
+
+## Major Enhancements and Fixes in June 2025
+
+This month has been all about enhancements and refactoring! We've moved several components into the UI for better organization and streamlined workflows. The introduction of new features like optional permission slugs and encryption during key creation adds flexibility. Bug fixes have improved the overall stability of the application, addressing issues like Stripe integration and spacing inconsistencies. Our ongoing commitment to improving the user experience shines through this month's updates!
+
+## Features
+- **New Enhancements**
+  - [**feat: root keys table actions - Merge after #3369**](https://github.com/unkeyed/unkey/pull/3375): Added table actions for root keys.
+  - [**feat: root keys filters - Merge after #3332**](https://github.com/unkeyed/unkey/pull/3369): Introduced filters and LLM search for the root keys table.
+  - [**feat: add db search to externalId**](https://github.com/unkeyed/unkey/pull/3315): Enhanced externalId creation with database search functionality.
+  - [**feat: rbac permissions**](https://github.com/unkeyed/unkey/pull/3310): Refactored the `/authorization/permissions` page.
+  - [**feat: rbac roles**](https://github.com/unkeyed/unkey/pull/3297): Replaced the old roles page with a new enhanced version.
+  - [**feat: add ratelimit and validation to llm search**](https://github.com/unkeyed/unkey/pull/3311): Implemented stricter ratelimits and input checks for LLM.
+
+## Bug Fixes
+- **Critical Fixes**
+  - [**fix: align margin for info icon and description text**](https://github.com/unkeyed/unkey/pull/3386): Adjusted margins for a better visual layout.
+  - [**fix: make GH actions run on non-draft only**](https://github.com/unkeyed/unkey/pull/3393): Ensured GitHub Actions only run for non-draft PRs.
+  - [**fix: correct semantic logic for delete protection setting text**](https://github.com/unkeyed/unkey/pull/3307): Improved the clarity of delete protection messages.
+  - [**fix: missing underline**](https://github.com/unkeyed/unkey/pull/3329): Restored underlines for anchor tags affected by Tailwind's Preflight.
+  - [**fix: List keys return enabled [merge after 3328]**](https://github.com/unkeyed/unkey/pull/3385): Fixed logic to ensure enabled status is returned correctly.
+
+## Refactoring
+- **Code Improvements**
+  - [**refactor: replace rsc with trpc**](https://github.com/unkeyed/unkey/pull/3394): Removed RSC from `/keys` and `/apis`, improving code structure.
+  - [**refactor: remove rsc from apis**](https://github.com/unkeyed/unkey/pull/3392): Streamlined API calls by removing redundancy.
+  - [**refactor: ui package style inconsistencies**](https://github.com/unkeyed/unkey/pull/3265): Fixed inconsistencies in UI components, making them more reusable.
+
+## Chores
+- **Organizational Tasks**
+  - [**chore: move control cloud to ui**](https://github.com/unkeyed/unkey/pull/3398): Organized UI components for better management.
+  - [**chore: comment out key creation vault encr**](https://github.com/unkeyed/unkey/pull/3402): Temporarily disabled key creation encryption due to timeout issues.
+  - [**chore: moved visual button to ui**](https://github.com/unkeyed/unkey/pull/3306): Enhanced UI structure by moving components around.
+
+## Documentation
+- **Updates and Maintenance**
+  - [**chore: Remove getVerifications from docs**](https://github.com/unkeyed/unkey/pull/3302): Updated SDK documentation, removing outdated endpoints.
+
+## Dependencies
+- **Updates**
+  - [**chore(deps): bump @clickhouse/client-web from 1.6.0 to 1.11.1**](https://github.com/unkeyed/unkey/pull/3182): Updated the ClickHouse client library for improved performance.
+  - [**chore(deps): bump base-x from 4.0.0 to 4.0.1**](https://github.com/unkeyed/unkey/pull/3211): Updated base-x for better compatibility.
+
+Thanks for your continued support and contributions! Let's keep building together!
