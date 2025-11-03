@@ -63,7 +63,7 @@ export function Navigation() {
           <MobileLinks className="lg:hidden" />
           <DesktopLinks className="hidden lg:flex" />
         </div>
-        <div className="hidden sm:flex">
+        <div className="hidden sm:flex whitespace-nowrap">
           <Link href="https://app.unkey.com/auth/sign-up">
             <SecondaryButton
               label="Create Account"
