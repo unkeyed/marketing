@@ -14,7 +14,7 @@ takeaways:
       - Performance
     description: Health-Check Endpoints are used in APIs to monitor service availability and performance. They provide a standard way to check the operational status of an API and its dependencies. These endpoints are crucial for maintaining service reliability, especially in distributed systems and microservices architectures.
   bestPractices:
-    - The health check endpoint should return a standard HTTP status code, typically 200 for healthy and 500 for unhealthy.
+    - The health check endpoint should return a standard HTTP status code, typically 200 for healthy and **503** for unhealthy.
     - It should check the status of all critical dependencies of the API, such as database connections or external services.
     - Health checks should be performed regularly and automatically, ideally every few minutes, to ensure timely detection of issues.
   historicalContext:
