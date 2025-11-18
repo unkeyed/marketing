@@ -79,7 +79,8 @@ app.get('/health', (req, res) => {
     timestamp: Date.now()
   };
   
-  res.send(healthData);
+  res.status(200).json(healthData);
+});
 });
 
 app.listen(3000, () => {
