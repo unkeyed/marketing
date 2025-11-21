@@ -4,8 +4,8 @@ import {
   DrawerContent,
   DrawerFooter,
   DrawerHeader,
-  DrawerTrigger,
   DrawerTitle,
+  DrawerTrigger,
 } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 import { useConsentManager } from "@c15t/nextjs";
@@ -99,7 +99,6 @@ function MobileLinks({ className }: { className?: string }) {
   return (
     <div className={className}>
       <Drawer open={isOpen} onOpenChange={setIsOpen}>
-
         <DrawerTrigger asChild>
           <button
             type="button"
@@ -144,7 +143,12 @@ function MobileLinks({ className }: { className?: string }) {
                 />
               </li>
               <li>
-                <MobileNavLink onClick={() => setIsOpen(false)} href="https://unkey.com/docs/introduction" label="Docs" external />
+                <MobileNavLink
+                  onClick={() => setIsOpen(false)}
+                  href="https://unkey.com/docs/introduction"
+                  label="Docs"
+                  external
+                />
               </li>
               <li>
                 <MobileNavLink
