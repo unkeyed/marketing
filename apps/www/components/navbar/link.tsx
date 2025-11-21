@@ -23,6 +23,7 @@ export const DesktopNavLink: React.FC<Props> = ({ href, label, external }) => {
 export function MobileNavLink({
   href,
   label,
+  external,
   onClick,
 }: { href: string; label: string; external?: boolean; onClick: () => void }) {
   const segment = useSelectedLayoutSegment();
@@ -39,7 +40,11 @@ export function MobileNavLink({
       )}
       onClick={() => {
         onClick();
-        router.push(href);
+        if (external) {
+          window.open(href, "_blank", "noopener,noreferrer");
+        } else {
+          router.push(href);
+        }
       }}
     >
       {label}
