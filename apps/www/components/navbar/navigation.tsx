@@ -5,6 +5,7 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTrigger,
+  DrawerTitle,
 } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 import { useConsentManager } from "@c15t/nextjs";
@@ -98,6 +99,7 @@ function MobileLinks({ className }: { className?: string }) {
   return (
     <div className={className}>
       <Drawer open={isOpen} onOpenChange={setIsOpen}>
+
         <DrawerTrigger asChild>
           <button
             type="button"
@@ -109,6 +111,7 @@ function MobileLinks({ className }: { className?: string }) {
           </button>
         </DrawerTrigger>
         <DrawerContent className="bg-black/90 z-[110]">
+          <DrawerTitle className="sr-only">Menu</DrawerTitle>
           <DrawerHeader className="flex justify-center">
             <Logo />
           </DrawerHeader>
@@ -141,7 +144,7 @@ function MobileLinks({ className }: { className?: string }) {
                 />
               </li>
               <li>
-                <MobileNavLink onClick={() => setIsOpen(false)} href="/docs" label="Docs" />
+                <MobileNavLink onClick={() => setIsOpen(false)} href="https://unkey.com/docs/introduction" label="Docs" external />
               </li>
               <li>
                 <MobileNavLink
@@ -200,7 +203,7 @@ const DesktopLinks: React.FC<{ className: string }> = ({ className }) => (
       <DesktopNavLink href="/templates" label="Templates" />
     </li>
     <li>
-      <DesktopNavLink href="/docs/introduction" label="Docs" external />
+      <DesktopNavLink href="https://unkey.com/docs/introduction" label="Docs" external />
     </li>
     <li>
       <DesktopNavLink href="https://go.unkey.com/discord" label="Discord" external />
