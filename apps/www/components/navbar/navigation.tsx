@@ -200,7 +200,7 @@ const DesktopLinks: React.FC<{ className: string }> = ({ className }) => (
       <DesktopNavLink href="/templates" label="Templates" />
     </li>
     <li>
-      <DesktopNavLink href="/docs/introduction" label="Docs" external/>
+      <DesktopNavLink href="/docs/introduction" label="Docs" external />
     </li>
     <li>
       <DesktopNavLink href="https://go.unkey.com/discord" label="Discord" external />
