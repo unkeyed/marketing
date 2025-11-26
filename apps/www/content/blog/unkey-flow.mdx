@@ -222,7 +222,7 @@ We use invariants throughout the engine. If dimensions are missing, if a node re
 invariant(nodeDim, `Missing dimensions for node ${node.id}`);
 ```
 
-This is extremely useful technique to catch things during development. We follow this idealogy everywhere in our codebase. Even our Go codebase follows that philosophy.
+This is extremely useful technique to catch things during development. We follow this ideology everywhere in our codebase. Even our Go codebase follows that philosophy.
 
 ### Depth-First Traversal
 
@@ -472,7 +472,7 @@ The entire team understands how it works. When we need to change something, we j
 
 We hardcode node dimensions because we know our node types ahead of time. A general-purpose library would need to render nodes off-screen, measure them, then feed those dimensions to the engine. Too much complexity for our use case.
 
-The routing logic is baked in for our specific tree structure. If someone wanted to use this for an org chart or file system tree, they'd need to modify the engine. We need this specifially for our deploy network tab.
+The routing logic is baked in for our specific tree structure. If someone wanted to use this for an org chart or file system tree, they'd need to modify the engine. We need this specifically for our deploy network tab.
 
 ## Should You Roll Your Own?
 
