@@ -9,7 +9,7 @@ tags: ["engineering"]
 
 ## Motivation behind rolling our own flow editor
 
-When we started building the network tab for our deployment platform, we wanted users to understand their API architecture at a glance: how traffic flows from the internet through regions to gateways, where bottlenecks occur, and which nodes are healthy or failing.
+When we started building the network tab for our deployment platform, we wanted users to understand their API architecture at a glance: how traffic flows from the internet through gateways to instances, where bottlenecks occur, and which nodes are healthy or failing.
 
 We wanted to ship this quickly with minimal effort, but existing libraries like React Flow aren't easy to configure. They offer fine-grained control over everything, but you still have to learn the ins and outs. Not just the person implementing it, but the entire team maintaining it needs to understand the framework. That's a deal breaker for us.
 
@@ -139,14 +139,14 @@ Before we move forward, let's look at an example data:
             "label": "us-east-1",
             "direction": "vertical",
             "metadata": {
-                "type": "region",
+                "type": "gateway",
             },
             "children": [
                 {
                     "id": "us-east-1-gw-p9yq-1",
                     "label": "gw-p9yq",
                     "metadata": {
-                        "type": "gateway",
+                        "type": "instance",
                     }
                 }
             ]
@@ -156,14 +156,14 @@ Before we move forward, let's look at an example data:
             "label": "eu-central-1",
             "direction": "vertical",
             "metadata": {
-                "type": "region",
+                "type": "gateway",
             },
             "children": [
                 {
                     "id": "eu-central-1-gw-2944-1",
                     "label": "gw-2944",
                     "metadata": {
-                        "type": "gateway",
+                        "type": "instance",
                     }
                 }
             ]
@@ -172,7 +172,7 @@ Before we move forward, let's look at an example data:
 }
 ```
 
-The main challenge here is that we can have **N** number of regions and **N** number of gateways connected to them. We have to ensure there's no overlap and their directions are respected.
+The main challenge here is that we can have **N** number of gateways connected to internet and **M** number of instances connected to gateways. We have to ensure there's no overlap and their directions are respected.
 
 What the `TreeLayout` component does is:
 
@@ -202,7 +202,7 @@ Here's a key design decision: each node controls how its children layout. The tr
 }
 ```
 
-This is what lets regions spread horizontally from the internet while gateways stack vertically under each region. Without this, you'd need separate layout passes or complex conditional logic. Instead, the engine just asks each node "how do your children layout?" and handles it recursively.
+This is what lets gateways spread horizontally from the internet while instances stack vertically under each gateway. Without this, you'd need separate layout passes or complex conditional logic. Instead, the engine just asks each node "how do your children layout?" and handles it recursively.
 
 ### Configuration Tunability
 
@@ -261,10 +261,10 @@ Each level needs enough space for its widest subtree plus spacing. We calculate 
 Here's an example:
 
 - `gw-1`, `gw-2`: width = 282 (base case, leaf nodes)
-- `us-east-1` subtree: width = 282 + 25 + 282 = 589 (two gateways + spacing)
+- `us-east-1` subtree: width = 282 + 25 + 282 = 589 (two instances+ spacing)
 - `gw-3`: width = 282 (single child)
 - `eu-central-1` subtree: width = 282 (no spacing needed)
-- `INTERNET` subtree: width = 589 + 25 + 282 = 896 (both regions + spacing)
+- `INTERNET` subtree: width = 589 + 25 + 282 = 896 (both gateways+ spacing)
 
 ### Horizontal Stacking
 
@@ -316,7 +316,7 @@ For nodes stacked vertically (when the parent has `direction="horizontal"`), we 
 childY = parentY + parentHeight/2 + spacing + childHeight/2
 ```
 
-Let's visualize this with INTERNET → regions:
+Let's visualize this with INTERNET → gateways:
 
 ```
 ┌─────────┐
@@ -469,7 +469,7 @@ For animation, we use SVG's `stroke-dasharray` and animate `stroke-dashoffset`. 
 
 ## What We Shipped
 
-It handles our network tab perfectly, regions spreading horizontally, gateways stacking vertically, smooth animated connections showing traffic flow.
+It handles our network tab perfectly, gateways spreading horizontally, instances stacking vertically, smooth animated connections showing traffic flow.
 The entire team understands how it works. When we need to change something, we just change it.
 
 ## Trade-offs We Made
