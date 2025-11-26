@@ -1,8 +1,8 @@
 ---
 date: 2025-11-25
-title: "Why and how we rolled our own flow editor"
+title: "Building a flow editor"
 image: "/images/blog-images/ai-logs/og-image.png"
-description: "Why and how we hand rolled our own flow editor for our upcoming network tab for upcoming Unkey deploy"
+description: "Building a flow editor for our upcoming network tab for upcoming Unkey deploy"
 author: oz
 tags: ["engineering"]
 ---
@@ -435,9 +435,11 @@ And that's it. The engine spits out positioned nodes and connection paths.
 
 Once we have the waypoint paths, we need to actually draw them. First, let us show you how the raw waypoints look and you'll understand why we built something better.
 
-<Image
+<ImageZoom
   src="/images/blog-images/unkey-flow/raw-waypoints.png"
   alt="raw-waypoints"
+  width="1920"
+  height="1080"
 />
 
 See the red dots? Each one is a waypoint calculated by the layout engine.
@@ -458,9 +460,11 @@ For animation, we use SVG's `stroke-dasharray` and animate `stroke-dashoffset`. 
 
 ```
 
-<Image
+<ImageZoom
   src="/images/blog-images/unkey-flow/animated-and-styled-waypoints.png"
   alt="styled-waypoints"
+  width="1920"
+  height="1080"
 />
 
 ## What We Shipped
