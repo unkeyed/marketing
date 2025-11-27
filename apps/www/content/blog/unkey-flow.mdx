@@ -135,16 +135,16 @@ Before we move forward, let's look at an example data:
     },
     "children": [
         {
-            "id": "us-east-1",
-            "label": "us-east-1",
-            "direction": "vertical",
+            "id": "us-east-1-gw-p9yq",
+            "label": "gw-p9yq",
+            "direction": "horizontal",
             "metadata": {
                 "type": "gateway",
             },
             "children": [
                 {
-                    "id": "us-east-1-gw-p9yq-1",
-                    "label": "gw-p9yq",
+                    "id": "us-east-1-gw-p9yq-inst-1",
+                    "label": "instance-1",
                     "metadata": {
                         "type": "instance",
                     }
@@ -152,16 +152,16 @@ Before we move forward, let's look at an example data:
             ]
         },
         {
-            "id": "eu-central-1",
-            "label": "eu-central-1",
-            "direction": "vertical",
+            "id": "eu-central-1-gw-2944",
+            "label": "gw-2944",
+            "direction": "horizontal",
             "metadata": {
                 "type": "gateway",
             },
             "children": [
                 {
-                    "id": "eu-central-1-gw-2944-1",
-                    "label": "gw-2944",
+                    "id": "eu-central-1-gw-2944-inst-1",
+                    "label": "instance-1",
                     "metadata": {
                         "type": "instance",
                     }
@@ -172,7 +172,7 @@ Before we move forward, let's look at an example data:
 }
 ```
 
-The main challenge here is that we can have **N** number of gateways connected to internet and **M** number of instances connected to gateways. We have to ensure there's no overlap and their directions are respected.
+The main challenge here is that we can have **N** number of gateways connected to internet and **M** number of instances connected to each gateway. We have to ensure there's no overlap and their directions are respected.
 
 What the `TreeLayout` component does is:
 
@@ -197,12 +197,12 @@ Here's a key design decision: each node controls how its children layout. The tr
 ```typescript
 {
   id: "us-east-1",
-  direction: "vertical",  // My children spread horizontally
+  direction: "horizontal",  // My children spread horizontally (side-by-side)
   children: [...]
 }
 ```
 
-This is what lets gateways spread horizontally from the internet while instances stack vertically under each gateway. Without this, you'd need separate layout passes or complex conditional logic. Instead, the engine just asks each node "how do your children layout?" and handles it recursively.
+This is what lets the internet node spread gateways horizontally while each gateway spreads its instances horizontally. Without this, you'd need separate layout passes or complex conditional logic. Instead, the engine just asks each node "how do your children layout?" and handles it recursively.
 
 ### Configuration Tunability
 
@@ -210,7 +210,7 @@ The engine exposes several tuning parameters:
 
 - `horizontalIndent` / `verticalOffset`: Fine-tune child positioning relative to parent
 - `subtreeOverlap`: Controls how much subtrees can overlap (0-1 range). Lower values pack things tighter, higher values give more breathing room
-- `horizontalSiblingSpacing`: Multiplier for vertical spacing between siblings in horizontal layouts
+- `verticalSiblingSpacing`: Multiplier for vertical spacing between siblings in vertical layouts
 
 We ship sensible defaults, but if you need precise control over layout density or alignment, people can easily configure it through props.
 
@@ -232,11 +232,11 @@ Once the engine has everything it needs, `buildNodeLayout()` walks the tree dept
                   INTERNET
           +-----------+-----------+
           |                       |
-     us-east-1              eu-central-1
+        gw-1                    gw-2
           |                       |
-      +------+                    |
-      |      |                    |
-    gw-1  gw-2                  gw-3
+      +------+                +------+
+      |      |                |      |
+   inst-1 inst-2           inst-3 inst-4
 ```
 
 We end up with:
@@ -244,11 +244,12 @@ We end up with:
 ```shell
 [
   level 0: INTERNET
-  level 1: us-east-1
-  level 2: gw-1
-  level 2: gw-2
-  level 1: eu-central-1
-  level 2: gw-3
+  level 1: gw-1
+  level 2: inst-1
+  level 2: inst-2
+  level 1: gw-2
+  level 2: inst-3
+  level 2: inst-4
 ]
 ```
 
@@ -260,11 +261,10 @@ Each level needs enough space for its widest subtree plus spacing. We calculate 
 
 Here's an example:
 
-- `gw-1`, `gw-2`: width = 282 (base case, leaf nodes)
-- `us-east-1` subtree: width = 282 + 25 + 282 = 589 (two instances+ spacing)
-- `gw-3`: width = 282 (single child)
-- `eu-central-1` subtree: width = 282 (no spacing needed)
-- `INTERNET` subtree: width = 589 + 25 + 282 = 896 (both gateways+ spacing)
+- `inst-1`, `inst-2`, `inst-3`, `inst-4`: width = 282 (base case, leaf nodes)
+- `gw-1` subtree: width = 282 + 25 + 282 = 589 (two instances + spacing)
+- `gw-2` subtree: width = 282 + 25 + 282 = 589 (two instances + spacing)
+- `INTERNET` subtree: width = 589 + 25 + 589 = 1203 (both gateways + spacing)
 
 ### Horizontal Stacking
 
@@ -272,10 +272,10 @@ Now that we know the subtree widths, we can calculate actual X positions. The go
 
 If there's only one child, it centers directly under the parent. Simple.
 
-For multiple children, we need to distribute them evenly. Let's say the parent is at X=0 and we have two children that need a total width of 589.
+For multiple children, we need to distribute them evenly. Let's say the parent is at X=0 and we have two instances that need a total width of 589.
 
 ```
-                    us-east-1 (X=0)
+                    gw-1 (X=0)
                         │
         ┌───────────────┴───────────────┐
         │       total width = 589       │
@@ -284,7 +284,7 @@ For multiple children, we need to distribute them evenly. Let's say the parent i
     (start)                             (end)
         │                               │
         ├──────────┐         ┌──────────┤
-        │  gw-1    │         │  gw-2    │
+        │  inst-1  │         │  inst-2  │
         │ (w=282)  │ spacing │ (w=282)  │
         │          │  (25)   │          │
         └──────────┘         └──────────┘
@@ -295,22 +295,22 @@ For multiple children, we need to distribute them evenly. Let's say the parent i
 
 ```
 Calculation breakdown:
-us-east-1 at X=0
-Children: [gw-1(282), gw-2(282)]
+gw-1 at X=0
+Children: [inst-1(282), inst-2(282)]
 spacing = 25
 
 Total width: 282 + 25 + 282 = 589
 Start position: 0 - 589/2 = -294.5
 
-gw-1 center: -294.5 + 282/2 = -153.5
-gw-2 center: -294.5 + 282 + 25 + 282/2 = 153.5
+inst-1 center: -294.5 + 282/2 = -153.5
+inst-2 center: -294.5 + 282 + 25 + 282/2 = 153.5
 ```
 
-When a node has `direction="vertical"`, its children spread horizontally at the same Y level, creating this left-to-right arrangement.
+When a node has `direction="horizontal"`, its children spread horizontally at the same Y level, creating this left-to-right arrangement.
 
 ### Vertical Positioning
 
-For nodes stacked vertically (when the parent has `direction="horizontal"`), we use:
+For nodes stacked vertically (when the parent has `direction="vertical"`), we use:
 
 ```
 childY = parentY + parentHeight/2 + spacing + childHeight/2
@@ -330,14 +330,14 @@ Let's visualize this with INTERNET → gateways:
      │ +50 (half of child height, reach center)
      ▼
 ┌─────────┐
-│us-east-1│  y=135, height=100
+│  gw-1   │  y=135, height=100
 │ (center)│
 └─────────┘
 ```
 
 Calculation: `0 + 10 + 75 + 50 = 135`
 
-All siblings at the same level share the same Y coordinate since they spread horizontally. So `eu-central-1` also sits at y=135, just at a different X position.
+All siblings at the same level share the same Y coordinate since they spread horizontally. So `gw-2` also sits at y=135, just at a different X position.
 
 We could optimize this by calculating Y once per level instead of per-node, but for typical tree sizes the performance gain isn't worth the added complexity.
 
@@ -345,21 +345,21 @@ For vertical stacking within a group
 
 ```
 ┌─────────┐
-│us-east-1│  y=135, height=100
+│  gw-1   │  y=135, height=100
 └────┬────┘
      │ +50 (half height, reach bottom)
      │ +75 (spacing)
-     │ +50 (half of gw-1, reach center)
+     │ +50 (half of inst-1, reach center)
      ▼
 ┌─────────┐
-│  gw-1   │  y=310, height=100
+│ inst-1  │  y=310, height=100
 └────┬────┘
      │ +50 (half height, reach bottom)
      │ +75 (spacing)
-     │ +50 (half of gw-2, reach center)
+     │ +50 (half of inst-2, reach center)
      ▼
 ┌─────────┐
-│  gw-2   │  y=485, height=100
+│ inst-2  │  y=485, height=100
 └─────────┘
 ```
 
@@ -367,8 +367,8 @@ Calculation:
 
 ```
 startY = 135 + 50 + 75 = 260
-gw-1 center: 260 + 50 = 310
-gw-2 center: 310 + 50 + 75 + 50 = 485
+inst-1 center: 260 + 50 = 310
+inst-2 center: 310 + 50 + 75 + 50 = 485
 ```
 
 ### Connection Lines
@@ -377,28 +377,7 @@ Straight lines between nodes would overlap and look messy. Instead, we route con
 
 Connection lines attach to node edges, not centers. We calculate each node's left, right, top, and bottom edges from its center position and dimensions. This gives us exact attachment points for clean connections.
 
-For **horizontal layouts**, we use a trunk-and-branch pattern:
-
-```
-Parent ─┬─ Child1
-        ├─ Child2
-        └─ Child3
-```
-
-This creates a 3-point path:
-
-```typescript
-trunkX = parentEdges.left - trunkOffset;
-[
-  { x: trunkX, y: parentY }, // Move to trunk
-  { x: trunkX, y: childY }, // Down trunk to child's Y
-  { x: childEdges.left, y: childY }, // Branch to child
-];
-```
-
-All siblings share the same `trunkX`, creating that unified tree look.
-
-For **vertical layouts**, we use a Z-shape:
+For **horizontal layouts** (children spreading side-by-side), we use a Z-shaped path:
 
 ```
 Parent
@@ -428,6 +407,27 @@ midY = parentEdges.bottom + (childEdges.top - parentEdges.bottom) * 0.5;
   { x: childX, y: childEdges.top },
 ];
 ```
+
+For **vertical layouts** (children stacking top-to-bottom), we use a trunk-and-branch pattern:
+
+```
+Parent ─┬─ Child1
+        ├─ Child2
+        └─ Child3
+```
+
+This creates a 3-point path:
+
+```typescript
+trunkX = parentEdges.left - trunkOffset;
+[
+  { x: trunkX, y: parentY }, // Move to trunk
+  { x: trunkX, y: childY }, // Down trunk to child's Y
+  { x: childEdges.left, y: childY }, // Branch to child
+];
+```
+
+All siblings share the same `trunkX`, creating that unified tree look.
 
 And that's it. The engine spits out positioned nodes and connection paths.
 
@@ -469,7 +469,7 @@ For animation, we use SVG's `stroke-dasharray` and animate `stroke-dashoffset`. 
 
 ## What We Shipped
 
-It handles our network tab perfectly, gateways spreading horizontally, instances stacking vertically, smooth animated connections showing traffic flow.
+It handles our network tab perfectly: gateways spreading horizontally from the internet, instances spreading horizontally from gateways, smooth animated connections showing traffic flow.
 The entire team understands how it works. When we need to change something, we just change it.
 
 ## Trade-offs We Made
@@ -482,4 +482,4 @@ The routing logic is baked in for our specific tree structure. If someone wanted
 
 Probably not. React Flow is excellent if you need the full feature set and don't mind the learning curve.
 
-But if you know exactly what you need, go ahead. We shipped this faily quick with zero dependencies, and the entire team understands how it works.
+But if you know exactly what you need, go ahead. We shipped this fairly quick with zero dependencies, and the entire team understands how it works.
