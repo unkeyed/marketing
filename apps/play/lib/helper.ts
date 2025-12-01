@@ -4,7 +4,6 @@ import {
   CreateKeyCommand,
   DeleteKeyCommand,
   GetKeyCommand,
-  GetVerificationsCommand,
   UpdateKeyCommand,
   VerifyKeyCommand,
 } from "./unkey";
@@ -36,7 +35,7 @@ export async function getDataFromString(curlString: string) {
     case urls.getkey:
       return await GetKeyCommand(params?.keyId ?? "");
     case urls.verifyKey:
-      return await VerifyKeyCommand(data.key, data.apiId);
+      return await VerifyKeyCommand(data.key);
     case urls.updateKey:
       return await UpdateKeyCommand(
         data.keyId ?? undefined,
@@ -45,8 +44,6 @@ export async function getDataFromString(curlString: string) {
         data.expires ? Number.parseInt(data.expires) : undefined,
         data.enabled ?? undefined,
       );
-    case urls.getVerifications:
-      return await GetVerificationsCommand(params?.keyId ?? "");
     case urls.deleteKey:
       return await DeleteKeyCommand(data.keyId);
     default:
