@@ -165,7 +165,7 @@ export function getStepsData() {
     },
   ];
   const step8CurlCommand = `curl --request GET
---url https://api.unkey.dev/v1/keys.getVerifications?keyId=<keyId>
+--url https://api.unkey.dev/v2/keys.getVerifications?keyId=<keyId>
 --header 'Authorization: Bearer <token>'`;
   steps.push({
     header: step8Header,

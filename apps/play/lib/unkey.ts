@@ -8,27 +8,26 @@ export async function CreateKeyCommand(apiId: string) {
     return { error: "Root Key Not Found" };
   }
   const unkey = new Unkey({ rootKey: rootKey });
-  const { result, error } = await unkey.keys.create({
+  const { data, meta } = await unkey.keys.createKey({
     apiId: apiId,
     byteLength: 16,
     enabled: true,
   });
-  const response = { result, error };
+  const response = { data, meta };
 
   return response;
 }
 
 //Verify Key
-export async function VerifyKeyCommand(key: string, apiId: string) {
+export async function VerifyKeyCommand(key: string) {
   if (!rootKey) {
     return { error: "Root Key Not Found" };
   }
   const unkey = new Unkey({ rootKey: rootKey });
-  const { result, error } = await unkey.keys.verify({
-    apiId: apiId,
+  const { data, meta } = await unkey.keys.verifyKey({
     key: key,
   });
-  const response = { result, error };
+  const response = { data, meta };
 
   return response;
 }
@@ -38,8 +37,10 @@ export async function GetKeyCommand(keyId: string) {
     return { error: "Root Key Not Found" };
   }
   const unkey = new Unkey({ rootKey: rootKey });
-  const { result, error } = await unkey.keys.get({ keyId: keyId });
-  const response = { result, error };
+  const { data, meta } = await unkey.keys.getKey({
+    keyId: keyId,
+  });
+  const response = { data, meta };
 
   return response;
 }
@@ -47,7 +48,7 @@ export async function GetKeyCommand(keyId: string) {
 // Update Key
 export async function UpdateKeyCommand(
   keyId: string,
-  ownerId: string | undefined,
+  externalId: string | undefined,
   metaData: Record<string, string> | undefined,
   expires: number | undefined,
   enabled: boolean | undefined,
@@ -56,27 +57,15 @@ export async function UpdateKeyCommand(
     return { error: "Root Key Not Found" };
   }
   const unkey = new Unkey({ rootKey: rootKey });
-  const { result, error } = await unkey.keys.update({
+  const { data, meta } = await unkey.keys.updateKey({
     keyId: keyId,
-    ownerId: ownerId ?? undefined,
+    externalId: externalId ?? undefined,
     meta: metaData ?? undefined,
     expires: expires ?? undefined,
     enabled: enabled ?? undefined,
   });
 
-  const response = { result, error };
-
-  return response;
-}
-
-// Get Verifications
-export async function GetVerificationsCommand(keyId: string) {
-  if (!rootKey) {
-    return { error: "Root Key Not Found" };
-  }
-  const unkey = new Unkey({ rootKey: rootKey });
-  const { result, error } = await unkey.keys.getVerifications({ keyId: keyId });
-  const response = { result, error };
+  const response = { data, meta };
 
   return response;
 }
@@ -86,8 +75,10 @@ export async function DeleteKeyCommand(keyId: string) {
     return { error: "Root Key Not Found" };
   }
   const unkey = new Unkey({ rootKey: rootKey });
-  const { result, error } = await unkey.keys.delete({ keyId: keyId });
-  const response = { result, error };
+  const { data, meta } = await unkey.keys.deleteKey({
+    keyId: keyId,
+  });
+  const response = { data, meta };
 
   return response;
 }
