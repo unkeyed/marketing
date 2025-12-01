@@ -2,15 +2,7 @@
 import { PrimaryButton, SecondaryButton } from "@/components/button";
 import { SectionTitle } from "@/components/section";
 import type { LangIconProps } from "@/components/svg/lang-icons";
-import {
-  CurlIcon,
-  ElixirIcon,
-  GoIcon,
-  JavaIcon,
-  PythonIcon,
-  RustIcon,
-  TSIcon,
-} from "@/components/svg/lang-icons";
+import { CurlIcon, GoIcon, PythonIcon, TSIcon } from "@/components/svg/lang-icons";
 import { CodeEditor } from "@/components/ui/code-editor";
 import { CopyCodeSnippetButton } from "@/components/ui/copy-code-button";
 import { MeteorLines } from "@/components/ui/meteorLines";
@@ -68,12 +60,13 @@ const editorTheme = {
   ],
 } satisfies PrismTheme;
 
-const typescriptCodeBlock = `import { verifyKey } from '@unkey/api';
+const typescriptCodeBlock = `import { Unkey } from "@unkey/api";
+  const unkey = new Unkey({
+    rootKey: process.env["UNKEY_ROOT_KEY"] ?? "",
+  });
+  const result = await unkey.keys.verifyKey({
+      key: "sk_1234abcdef"
 
-const { result, error } = await verifyKey({
-  apiId: "api_123",
-  key: "xyz_123"
-})
 
 if ( error ) {
   // handle network error
@@ -104,53 +97,29 @@ const nuxtCodeBlock = `export default defineEventHandler(async (event) => {
   };
 });`;
 
-const pythonCodeBlock = `import asyncio
-import os
-import unkey
-
-async def main() -> None:
-  client = unkey.Client(api_key=os.environ["API_KEY"])
-  await client.start()
-
-  result = await client.keys.verify_key("prefix_abc123")
-
- if result.is_ok:
-   print(data.valid)
- else:
-   print(result.unwrap_err())`;
-
-const pythonFastAPICodeBlock = `import os
-from typing import Any, Dict, Optional
-
-import fastapi  # pip install fastapi
-import unkey  # pip install unkey.py
-import uvicorn  # pip install uvicorn
-
-app = fastapi.FastAPI()
+const pythonCreateKeyBlock = `from unkey.py import Unkey, models
 
 
-def key_extractor(*args: Any, **kwargs: Any) -> Optional[str]:
-    if isinstance(auth := kwargs.get("authorization"), str):
-        return auth.split(" ")[-1]
+with Unkey(
+    root_key="<UNKEY_ROOT_KEY>",
+) as unkey:
 
-    return None
+    res = unkey.keys.create_key(api_id="api_1234abcd")
 
+    # Handle response
+    print(res)`;
 
-@app.get("/protected")
-@unkey.protected(os.environ["UNKEY_API_ID"], key_extractor)
-async def protected_route(
-    *,
-    authorization: str = fastapi.Header(None),
-    unkey_verification: Any = None,
-) -> Dict[str, Optional[str]]:
-    assert isinstance(unkey_verification, unkey.ApiKeyVerification)
-    assert unkey_verification.valid
-    print(unkey_verification.owner_id)
-    return {"message": "protected!"}
+const pythonVerifyKeyBlock = `from unkey.py import Unkey
 
 
-if __name__ == "__main__":
-    uvicorn.run(app)
+with Unkey(
+    root_key="<UNKEY_ROOT_KEY>",
+) as unkey:
+
+    res = unkey.keys.verify_key(key="sk_1234abcdef")
+
+    # Handle response
+    print(res)
 `;
 
 const honoCodeBlock = `import { Hono } from "hono"
@@ -190,191 +159,103 @@ async function handler(request) {
 
 const goVerifyKeyCodeBlock = `package main
 
-import(
-	unkeygo "github.com/unkeyed/unkey-go"
+  import(
 	"context"
-	"github.com/unkeyed/unkey-go/models/components"
+	"os"
+	unkey "github.com/unkeyed/sdks/api/go/v2"
+	"github.com/unkeyed/sdks/api/go/v2/models/components"
 	"log"
-)
+  )
 
-func main() {
-    s := unkeygo.New(
-        unkeygo.WithSecurity("<YOUR_BEARER_TOKEN_HERE>"),
-    )
+  func main() {
+      ctx := context.Background()
 
-    ctx := context.Background()
-    res, err := s.Keys.VerifyKey(ctx, components.V1KeysVerifyKeyRequest{
-        APIID: unkeygo.String("api_1234"),
-        Key: "sk_1234",
-        Ratelimits: []components.Ratelimits{
-            components.Ratelimits{
-                Name: "tokens",
-                Limit: unkeygo.Int64(500),
-                Duration: unkeygo.Int64(3600000),
-            },
-            components.Ratelimits{
-                Name: "tokens",
-                Limit: unkeygo.Int64(20000),
-                Duration: unkeygo.Int64(86400000),
-            },
-        },
-    })
-    if err != nil {
-        log.Fatal(err)
-    }
-    if res.V1KeysVerifyKeyResponse != nil {
-        // handle response
-    }
-}`;
+      s := unkey.New(
+          unkey.WithSecurity(os.Getenv("UNKEY_ROOT_KEY")),
+      )
+
+      res, err := s.Keys.VerifyKey(ctx, components.V2KeysVerifyKeyRequestBody{
+          Key: "sk_1234abcdef",
+      })
+      if err != nil {
+          log.Fatal(err)
+      }
+      if res.V2KeysVerifyKeyResponseBody != nil {
+          // handle response
+      }
+  }`;
 
 const goCreateKeyCodeBlock = `package main
 
 import(
-	unkeygo "github.com/unkeyed/unkey-go"
 	"context"
-	"github.com/unkeyed/unkey-go/models/operations"
+	"os"
+	unkey "github.com/unkeyed/sdks/api/go/v2"
+	"github.com/unkeyed/sdks/api/go/v2/models/components"
 	"log"
 )
 
 func main() {
-    s := unkeygo.New(
-        unkeygo.WithSecurity("<YOUR_BEARER_TOKEN_HERE>"),
+    ctx := context.Background()
+
+    s := unkey.New(
+        unkey.WithSecurity(os.Getenv("UNKEY_ROOT_KEY")),
     )
 
-    ctx := context.Background()
-    res, err := s.Keys.CreateKey(ctx, operations.CreateKeyRequestBody{
-        APIID: "api_123",
-        Name: unkeygo.String("my key"),
-        ExternalID: unkeygo.String("team_123"),
-        Meta: map[string]any{
-            "billingTier": "PRO",
-            "trialEnds": "2023-06-16T17:16:37.161Z",
-        },
-        Roles: []string{
-            "admin",
-            "finance",
-        },
-        Permissions: []string{
-            "domains.create_record",
-            "say_hello",
-        },
-        Expires: unkeygo.Int64(1623869797161),
-        Remaining: unkeygo.Int64(1000),
-        Refill: &operations.Refill{
-            Interval: operations.IntervalDaily,
-            Amount: 100,
-        },
-        Ratelimit: &operations.Ratelimit{
-            Type: operations.TypeFast.ToPointer(),
-            Limit: 10,
-            Duration: unkeygo.Int64(60000),
-        },
-        Enabled: unkeygo.Bool(false),
+    res, err := s.Keys.CreateKey(ctx, components.V2KeysCreateKeyRequestBody{
+        APIID: "api_1234abcd",
     })
     if err != nil {
         log.Fatal(err)
     }
-    if res.Object != nil {
+    if res.V2KeysCreateKeyResponseBody != nil {
         // handle response
     }
 }
-
 `;
 
 const curlVerifyCodeBlock = `curl --request POST \\
-  --url https://api.unkey.dev/v1/keys.verifyKey \\
+  --url https://api.unkey.com/v2/keys.verifyKey \\
+  --header 'Authorization: Bearer <UNKEY_ROOT_KEY>' \\
   --header 'Content-Type: application/json' \\
   --data '{
-    "apiId": "api_1234",
-    "key": "sk_1234",
-  }'`;
+      "key": "sk_1234abcdef"
+    }'`;
 
 const curlCreateKeyCodeBlock = `curl --request POST \\
-  --url https://api.unkey.dev/v1/keys.createKey \\
+  --url https://api.unkey.com/v2/keys.createKey \\
   --header 'Authorization: Bearer <UNKEY_ROOT_KEY>' \\
   --header 'Content-Type: application/json' \\
   --data '{
     "apiId": "api_123",
-    "ownerId": "user_123",
+    "externalId": "user_1234abcd",
     "expires": ${Date.now() + 7 * 24 * 60 * 60 * 1000},
-    "ratelimit": {
-      "type": "fast",
-      "limit": 10,
-      "duration": 60_000
-    },
+    "ratelimits": [
+        {
+          "name": "requests",
+          "limit": 100,
+          "duration": 60000,
+          "autoApply": true
+        },
+        {
+          "name": "heavy_operations",
+          "limit": 10,
+          "duration": 3600000,
+          "autoApply": false
+        }
+      ]
   }'`;
 
-const curlRatelimitCodeBlock = `curl --request POST \
-  --url https://api.unkey.dev/v1/ratelimits.limit \
-  --header 'Authorization: Bearer <token>' \
-  --header 'Content-Type: application/json' \
+const curlRatelimitCodeBlock = `curl --request POST \\
+  --url https://api.unkey.com/v2/ratelimit.limit \\
+  --header 'Authorization: Bearer <token>' \\
+  --header 'Content-Type: application/json' \\
   --data '{
-    "namespace": "email.outbound",
-    "identifier": "user_123",
-    "limit": 10,
     "duration": 60000,
-    "async": true
+    "identifier": "user_abc123",
+    "limit": 100,
+    "namespace": "api.requests"
 }'`;
-
-const elixirCodeBlock = `UnkeyElixirSdk.verify_key("xyz_AS5HDkXXPot2MMoPHD8jnL")
-# returns
-%{"valid" => true,
-  "ownerId" => "chronark",
-  "meta" => %{
-    "hello" => "world"
-  }}`;
-
-const rustCodeBlock = `use unkey::models::{VerifyKeyRequest, Wrapped};
-use unkey::Client;
-
-async fn verify_key() {
-    let api_key = env::var("UNKEY_API_KEY").expect("Environment variable UNKEY_API_KEY not found");
-    let c = Client::new(&api_key);
-    let req = VerifyKeyRequest::new("test_req", "api_458vdYdbwut5LWABzXZP3Z8jPVas");
-
-    match c.verify_key(req).await {
-        Wrapped::Ok(res) => println!("{res:?}"),
-        Wrapped::Err(err) => eprintln!("{err:?}"),
-    }
-}`;
-
-const javaVerifyKeyCodeBlock = `package com.example.myapp;
-import com.unkey.unkeysdk.dto.KeyVerifyRequest;
-import com.unkey.unkeysdk.dto.KeyVerifyResponse;
-
-@RestController
-public class APIController {
-
-    private static IKeyService keyService = new KeyService();
-
-    @PostMapping("/verify")
-    public KeyVerifyResponse verifyKey(
-        @RequestBody KeyVerifyRequest keyVerifyRequest) {
-        // Delegate the creation of the key to the KeyService from the SDK
-        return keyService.verifyKey(keyVerifyRequest);
-    }
-}`;
-
-const javaCreateKeyCodeBlock = `package com.example.myapp;
-
-import com.unkey.unkeysdk.dto.KeyCreateResponse;
-import com.unkey.unkeysdk.dto.KeyCreateRequest;
-
-@RestController
-public class APIController {
-
-    private static IKeyService keyService = new KeyService();
-
-    @PostMapping("/createKey")
-    public KeyCreateResponse createKey(
-            @RequestBody KeyCreateRequest keyCreateRequest,
-            @RequestHeader("Authorization") String authToken) {
-        // Delegate the creation of the key to the KeyService from the SDK
-        return keyService.createKey(keyCreateRequest, authToken);
-    }
-}
-
-`;
 
 type Framework = {
   name: string;
@@ -418,15 +299,15 @@ const languagesList = {
   ],
   Python: [
     {
-      name: "Python",
+      name: "Create Key",
       Icon: PythonIcon,
-      codeBlock: pythonCodeBlock,
+      codeBlock: pythonCreateKeyBlock,
       editorLanguage: "python",
     },
     {
-      name: "FastAPI",
+      name: "Verify Key",
       Icon: PythonIcon,
-      codeBlock: pythonFastAPICodeBlock,
+      codeBlock: pythonVerifyKeyBlock,
       editorLanguage: "python",
     },
   ],
@@ -442,36 +323,6 @@ const languagesList = {
       Icon: GoIcon,
       codeBlock: goCreateKeyCodeBlock,
       editorLanguage: "go",
-    },
-  ],
-  Java: [
-    {
-      name: "Verify key",
-      Icon: JavaIcon,
-      codeBlock: javaVerifyKeyCodeBlock,
-      editorLanguage: "tsx",
-    },
-    {
-      name: "Create key",
-      Icon: JavaIcon,
-      codeBlock: javaCreateKeyCodeBlock,
-      editorLanguage: "tsx",
-    },
-  ],
-  Elixir: [
-    {
-      name: "Verify key",
-      Icon: ElixirIcon,
-      codeBlock: elixirCodeBlock,
-      editorLanguage: "tsx",
-    },
-  ],
-  Rust: [
-    {
-      name: "Verify key",
-      Icon: RustIcon,
-      codeBlock: rustCodeBlock,
-      editorLanguage: "rust",
     },
   ],
   Curl: [
@@ -498,25 +349,10 @@ const languagesList = {
   [key: string]: Framework[];
 };
 
-// const TabsContent = React.forwardRef<
-//   React.ElementRef<typeof TabsPrimitive.Content>,
-//   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
-// >(({ className, ...props }, ref) => (
-//   <TabsPrimitive.Content
-//     ref={ref}
-//     className={cn(
-//       "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-//       className,
-//     )}
-//     {...props}
-//   />
-// ));
-// TabsContent.displayName = TabsPrimitive.Content.displayName;
-
 type Props = {
   className?: string;
 };
-type Language = "Typescript" | "Python" | "Rust" | "Golang" | "Curl" | "Elixir" | "Java";
+type Language = "Typescript" | "Python" | "Golang" | "Curl";
 type LanguagesList = {
   name: Language;
   Icon: React.FC<LangIconProps>;
@@ -524,11 +360,8 @@ type LanguagesList = {
 const languages = [
   { name: "Typescript", Icon: TSIcon },
   { name: "Python", Icon: PythonIcon },
-  { name: "Rust", Icon: RustIcon },
   { name: "Golang", Icon: GoIcon },
   { name: "Curl", Icon: CurlIcon },
-  { name: "Elixir", Icon: ElixirIcon },
-  { name: "Java", Icon: JavaIcon },
 ] as LanguagesList[];
 
 // TODO extract this automatically from our languages array

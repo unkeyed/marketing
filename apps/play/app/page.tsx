@@ -187,6 +187,7 @@ export default function Page() {
           },
         },
       },
+
       "keys.deleteKey": {
         method: "POST",
         route: "keys.deleteKey",
@@ -622,7 +623,7 @@ export default function Page() {
 
               <div className="mt-2.5">
                 <code
-                  className="block bg-transparent rounded-md border border-input px-3 py-2 shadow-sm resize-none font-mono min-h-max text-xs lg:text-sm p-3 text-[#686868] overflow-scroll"
+                  className="block bg-transparent rounded-md border border-input px-3 py-2 shadow-sm resize-none font-mono min-h-max text-xs lg:text-sm p-3 text-[#686868] "
                   dangerouslySetInnerHTML={{
                     __html:
                       (previousStep !== undefined
@@ -659,20 +660,12 @@ export default function Page() {
                   href="https://www.unkey.com/docs/libraries/ts/ratelimit#unkeyratelimit"
                   target="_blank"
                 >
-                  rate limiting at the edge
+                  low latency global rate limiting
                 </Link>
                 ,{" "}
                 <Link
                   className="underline"
-                  href="https://www.unkey.com/docs/libraries/ts/ratelimit#unkeyratelimit"
-                  target="_blank"
-                >
-                  custom library integrations
-                </Link>
-                ,{" "}
-                <Link
-                  className="underline"
-                  href="https://www.unkey.com/docs/libraries/ts/sdk/overview"
+                  href="https://www.unkey.com/docs/libraries/ts/api"
                   target="_blank"
                 >
                   a TypeScript SDK
@@ -680,14 +673,14 @@ export default function Page() {
                 ,{" "}
                 <Link
                   className="underline"
-                  href="https://www.unkey.com/docs/libraries/go/overview"
+                  href="https://www.unkey.com/docs/libraries/go/api"
                   target="_blank"
                 >
                   a Golang SDK
                 </Link>
                 ,{" "}
                 <Link className="underline" href="https://www.unkey.com/pricing" target="_blank">
-                  a free tier to boost your start
+                  a free tier to get you started
                 </Link>{" "}
                 and{" "}
                 <Link
@@ -796,10 +789,6 @@ export default function Page() {
   );
 }
 
-// function Container({ className, ...props }: React.HTMLProps<HTMLDivElement>) {
-//   return <div className="w-full max-w-[640px]" {...props} />;
-// }
-
 function SVGLogoUnkey() {
   return (
     <svg width="59" height="18" viewBox="0 0 59 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -824,14 +813,3 @@ const Code = React.forwardRef<HTMLSpanElement, React.HTMLProps<HTMLElement>>(
     );
   },
 );
-
-// const Heading = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLElement>>(
-//   ({ children, className, ...props }, ref) => {
-//     return (
-//       <strong ref={ref} className={cn("text-lg lg:text-xl block mb-1", className)} {...props}>
-//         {children}
-//         <br />
-//       </strong>
-//     );
-//   },
-// );
