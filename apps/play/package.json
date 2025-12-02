@@ -18,7 +18,7 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.0",
     "@radix-ui/react-toast": "^1.2.1",
-    "@unkey/api": "^0.19.5",
+    "@unkey/api": "^2.1.4",
     "@vercel/analytics": "^1.5.0",
     "@xterm/xterm": "^5.5.0",
     "class-variance-authority": "^0.7.0",
