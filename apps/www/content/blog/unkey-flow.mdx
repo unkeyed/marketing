@@ -1,13 +1,11 @@
 ---
 date: 2025-11-25
 title: "Building a flow editor"
-image: "/images/blog-images/ai-logs/og-image.png"
-description: "Building a flow editor for our upcoming network tab for upcoming Unkey deploy"
+image: "/images/blog-images/ai-logs/og-image.jpg"
+description: "Building a flow editor for our network tab"
 author: oz
 tags: ["engineering"]
 ---
-
-## Motivation behind rolling our own flow editor
 
 When we started building the network tab for our deployment platform, we wanted users to understand their API architecture at a glance: how traffic flows from the internet through gateways to instances, where bottlenecks occur, and which nodes are healthy or failing.
 
@@ -30,17 +28,17 @@ So the decision was simple, we had to roll our own flow logic and components.
 What we needed was:
 
 - Animated grid like background
-- Canvas-like structure for placing stuff freely anywhere, both for nodes and overlay items (we needed to show details for selected nodes)
-- An engine that takes in a tree-like structure and outputs positions for each node without overlap, and tells the UI which nodes to connect
-- Simple way to style our nodes without diving into the underlying code
+- Canvas-like structure for placing elements freely anywhere, for both nodes and overlay items (to show details for selected nodes)
+- An engine that takes a tree-like structure and outputs non-overlapping positions for each node, then tells the UI which nodes to connect
+- Simple way to style nodes without diving into the underlying code
 
-Our main goal was to design an isolated piece of code that doesn't require much maintenance and allows people to freely build on top of it.
+Our main goal was to design an isolated piece of code that requires minimal maintenance and allows people to freely build on top of it.
 
-We also had to decide between SVG and Canvas. Since we needed an easier way to control the DOM, we went with SVG, we didn't have anything performance-heavy anyway.
+We also had to decide between SVG and Canvas. Since we needed an easier way to control the DOM, we went with SVG, as we didn't have any performance-heavy requirements
 
 ## Design of our infinite canvas
 
-This is where we put all the canvas logic, don't let the name deceive you, it's still SVG. Still allows us to panning, zooming, and displaying our dotty background.
+This is where we put all the canvas logic don't let the name deceive you, it's still SVG. It allows us to pan, zoom, and display our dotty background.
 
 The API looks like this:
 
@@ -55,9 +53,9 @@ type InfiniteCanvasProps = {
 };
 ```
 
-Since this accepts `children`, we can compose this however we want as long as it's proper SVG. The canvas also has constraints like `maxZoom`, `minZoom`, etc.
+Since this accepts `children`, we can compose it however we want as long as it's proper SVG. The canvas also has constraints like `maxZoom`, `minZoom`, etc.
 
-For every operation in the canvas, we use this state:
+For every canvas operation, we use this state:
 
 ```ts
 type CanvasState = {
@@ -76,7 +74,7 @@ We pass this to the `g` SVG element. So technically, we don't zoom, we just make
 
 ### Panning Logic
 
-For moving, we save the gap between mouse and origin at click, then maintain that exact gap by calculating `newOrigin = currentMouse - savedGap` on every mouse move.
+For moving we save the gap between mouse and origin at click, then maintain that exact gap by calculating `newOrigin = currentMouse - savedGap` on every mouse move.
 
 Here's what happens under the hood:
 
@@ -97,7 +95,7 @@ This keeps the canvas **glued** to your cursor at the exact spot you grabbed it.
 
 ### Zooming
 
-For zooming, we disable the native browser zoom. Otherwise, our canvas can't scale properly because the browser zooms before we actually scale stuff.
+For zooming we disable the native browser zoom. Otherwise, our canvas can't scale properly because the browser zooms before we actually scale stuff.
 
 ### Grid Background
 
