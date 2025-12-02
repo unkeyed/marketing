@@ -1,5 +1,5 @@
 ---
-date: 2025-11-25
+date: 2025-12-02
 title: "Building a flow editor"
 image: "/images/blog-images/unkey-flow/og-image.jpg"
 description: "Bringing our network tab to life with zero dependencies"
@@ -27,7 +27,7 @@ So the decision was simple, we had to roll our own flow logic and components.
 
 What we needed was:
 
-- Animated grid like background
+- Animated grid-like background
 - Canvas-like structure for placing elements freely anywhere, for both nodes and overlay items (to show details for selected nodes)
 - An engine that takes a tree-like structure and outputs non-overlapping positions for each node, then tells the UI which nodes to connect
 - Simple way to style nodes without diving into the underlying code
@@ -200,7 +200,7 @@ Here's a key design decision: each node controls how its children layout. The tr
 }
 ```
 
-This is what lets the internet node spread gateways horizontally while each gateway spreads its instances horizontally. Without this, you'd need separate layout passes or complex conditional logic. Instead, the engine just asks each node "how do your children layout?" and handles it recursively.
+This is what lets the internet node spread gateways horizontally while each gateway spreads its instances horizontally. Without this, you'd need separate layout passes or complex conditional logic. Instead, the engine asks each node 'how do your children layout?' and recurses.
 
 ### Configuration Tunability
 
@@ -474,7 +474,7 @@ The entire team understands how it works. When we need to change something, we j
 
 We hardcode node dimensions because we know our node types ahead of time. A general-purpose library would need to render nodes off-screen, measure them, then feed those dimensions to the engine. Too much complexity for our use case.
 
-The routing logic is baked in for our specific tree structure. If someone wanted to use this for an org chart or file system tree, they'd need to modify the engine. We need this specifically for our deploy network tab.
+The routing logic is baked in for our specific tree structure. If someone wanted to use this for an org chart or file system tree, they'd need to modify the engine. This is designed specifically for our deploy network.
 
 ## Should You Roll Your Own?
 
