@@ -4,6 +4,7 @@ import {
   DrawerContent,
   DrawerFooter,
   DrawerHeader,
+  DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
@@ -63,7 +64,7 @@ export function Navigation() {
           <MobileLinks className="lg:hidden" />
           <DesktopLinks className="hidden lg:flex" />
         </div>
-        <div className="hidden sm:flex">
+        <div className="hidden sm:flex whitespace-nowrap">
           <Link href="https://app.unkey.com/auth/sign-up">
             <SecondaryButton
               label="Create Account"
@@ -109,6 +110,7 @@ function MobileLinks({ className }: { className?: string }) {
           </button>
         </DrawerTrigger>
         <DrawerContent className="bg-black/90 z-[110]">
+          <DrawerTitle className="sr-only">Menu</DrawerTitle>
           <DrawerHeader className="flex justify-center">
             <Logo />
           </DrawerHeader>
@@ -141,7 +143,12 @@ function MobileLinks({ className }: { className?: string }) {
                 />
               </li>
               <li>
-                <MobileNavLink onClick={() => setIsOpen(false)} href="/docs" label="Docs" />
+                <MobileNavLink
+                  onClick={() => setIsOpen(false)}
+                  href="https://unkey.com/docs/introduction"
+                  label="Docs"
+                  external
+                />
               </li>
               <li>
                 <MobileNavLink
@@ -200,7 +207,7 @@ const DesktopLinks: React.FC<{ className: string }> = ({ className }) => (
       <DesktopNavLink href="/templates" label="Templates" />
     </li>
     <li>
-      <DesktopNavLink href="/docs" label="Docs" />
+      <DesktopNavLink href="https://unkey.com/docs/introduction" label="Docs" external />
     </li>
     <li>
       <DesktopNavLink href="https://go.unkey.com/discord" label="Discord" external />
