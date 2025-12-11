@@ -1,0 +1,349 @@
+---
+date: 2025-12-11
+title: How to ratelimit public pages
+description: Learn how to use Unkey to ratelimit public pages, like newsletter sign up forms or login attempts.
+author: james
+image: "/images/blog-images/covers/ratelimit-public.jpg"
+tags: ["tutorials"]
+---
+
+Consider a typical authentication form. Without protection, someone could:
+
+- Submit thousands of fake email addresses, polluting your database
+- Attempt to guess valid email addresses through enumeration
+- Overload your server with excessive requests
+- Abuse authentication endpoints by trying random email/password combinations
+
+Traditional rate limiting based on IP addresses has limitations. Users can bypass IP-based restrictions using VPNs, proxy servers, or botnets. This is where device fingerprinting shines.
+
+## Device Fingerprinting: A Better Approach
+
+Device fingerprinting creates a unique identifier for each device based on browser characteristics, hardware information, and other attributes. Unlike IP addresses, fingerprints are much harder to spoof and provide a more reliable way to identify individual devices.
+
+The [thumbmark.js](https://github.com/thumbmarkjs/thumbmarkjs) library generates comprehensive fingerprints using:
+
+- Browser characteristics (user agent, platform, language)
+- Screen resolution and color depth
+- Hardware information (CPU cores, memory)
+- Canvas and WebGL rendering signatures
+- Audio context fingerprinting
+- Installed fonts and plugins
+
+This creates a robust identifier that persists across sessions and IP changes.
+
+## Implementing Rate Limiting with Unkey
+
+Let's walk through a complete implementation using Next.js, Unkey for rate limiting, and thumbmark.js for device fingerprinting. You can see the full example in the [unkey-fingerprint](https://github.com/perkinsjr/unkey-fingerprint) repository.
+
+### Step 1: Setting Up Unkey
+
+First, create an Unkey account and generate a root key with rate limiting permissions:
+
+```bash
+# Add to your .env.local
+UNKEY_ROOT_KEY=your_unkey_root_key_here
+```
+
+### Step 2: Client-Side Fingerprinting
+
+Install the required dependencies:
+
+```bash
+npm install @thumbmarkjs/thumbmarkjs @unkey/ratelimit
+```
+
+Create a React component that generates the device fingerprint:
+
+```tsx
+"use client";
+
+import { useState, useEffect } from "react";
+import { getThumbmark } from "@thumbmarkjs/thumbmarkjs";
+import type { thumbmarkResponse } from "@/lib/fingerprint-validation";
+
+export default function WaitlistPage() {
+  const [fingerprintData, setFingerprintData] =
+    useState<thumbmarkResponse | null>(null);
+
+  useEffect(() => {
+    // Generate device fingerprint when component mounts
+    const generateFingerprint = async () => {
+      try {
+        const result = await getThumbmark();
+        setFingerprintData(result);
+      } catch (error) {
+        console.error("Error generating fingerprint:", error);
+      }
+    };
+
+    generateFingerprint();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!fingerprintData) {
+      // Handle case where fingerprint isn't ready
+      return;
+    }
+
+    const response = await fetch("/api/waitlist", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email,
+        fingerprintData,
+      }),
+    });
+
+    // Handle response...
+  };
+
+  // Rest of your component...
+}
+```
+
+### Step 3: Server-Side Validation
+
+Create a robust validation system for fingerprint data:
+
+```typescript
+// lib/fingerprint-validation.ts
+export interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+}
+
+export function validateFingerprint(
+  fingerprintData: unknown,
+): ValidationResult {
+  const errors: string[] = [];
+
+  if (!fingerprintData || typeof fingerprintData !== "object") {
+    errors.push("Invalid fingerprint data format");
+    return { isValid: false, errors };
+  }
+
+  const data = fingerprintData as Record<string, unknown>;
+
+  // Check required fields
+  if (!data.components || !data.thumbmark) {
+    errors.push("Missing required fingerprint components");
+    return { isValid: false, errors };
+  }
+
+  // Validate structure and realism
+  const components = data.components as Record<string, any>;
+
+  if (!validateFingerprintStructure(components)) {
+    errors.push("Invalid fingerprint structure");
+  }
+
+  if (!validateFingerprintRealism(components)) {
+    errors.push("Fingerprint appears to be fake or unrealistic");
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+```
+
+### Step 4: API Endpoint with Rate Limiting
+
+Create the API endpoint that combines fingerprint validation with Unkey rate limiting:
+
+```typescript
+// app/api/waitlist/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import { validateFingerprint } from "@/lib/fingerprint-validation";
+import { Ratelimit } from "@unkey/ratelimit";
+
+const limiter = new Ratelimit({
+  rootKey: process.env.UNKEY_ROOT_KEY!,
+  duration: 3600000, // 1 hour
+  limit: 3, // 3 requests per hour
+  async: false,
+  namespace: "waitlist",
+});
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { email, fingerprintData } = body;
+
+    // Validate required fields
+    if (!email || !fingerprintData) {
+      return NextResponse.json(
+        {
+          error: "Email and device fingerprint are required",
+          success: false,
+        },
+        { status: 400 },
+      );
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        {
+          error: "Invalid email format",
+          success: false,
+        },
+        { status: 400 },
+      );
+    }
+
+    // Validate fingerprint data
+    const validation = validateFingerprint(fingerprintData);
+    if (!validation.isValid) {
+      return NextResponse.json(
+        {
+          error: "Invalid or suspicious device fingerprint",
+          success: false,
+        },
+        { status: 400 },
+      );
+    }
+
+    // Check rate limit using Unkey with the validated fingerprint
+    const { success, limit, remaining, reset } = await limiter.limit(
+      fingerprintData.thumbmark,
+    );
+
+    if (!success) {
+      const resetTime = new Date(Date.now() + reset);
+      return NextResponse.json(
+        {
+          error: "Rate limit exceeded. Please try again later.",
+          success: false,
+          rateLimited: true,
+          resetTime: resetTime.toISOString(),
+          remaining,
+          limit,
+        },
+        { status: 429 },
+      );
+    }
+
+    // Process the request (e.g., save to database)
+    console.log("New signup:", {
+      email,
+      fingerprint: fingerprintData.thumbmark,
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: "Successfully added to waitlist!",
+      remaining,
+      limit,
+    });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: "Internal server error",
+        success: false,
+      },
+      { status: 500 },
+    );
+  }
+}
+```
+
+## Security Best Practices
+
+When implementing fingerprint-based rate limiting, follow these security practices:
+
+### 1. Comprehensive Fingerprint Validation
+
+Never trust client-provided fingerprint data. Validate:
+
+- **Structure**: Ensure all required components are present
+- **Data Types**: Verify each component has the correct type
+- **Realism**: Check for obviously fake values (unreasonable screen resolutions, invalid user agents)
+- **Hash Integrity**: Validate that the fingerprint hash matches the components
+
+### 2. Fallback Mechanisms
+
+Implement proper fallback handling for when Unkey is unavailable:
+
+```typescript
+const fallback = (identifier: string) => ({
+  success: false,
+  limit: 0,
+  reset: 0,
+  remaining: 0,
+});
+
+const limiter = new Ratelimit({
+  // ... other config
+  timeout: {
+    ms: 3000,
+    fallback,
+  },
+  onError: (err, identifier) => {
+    console.error(`${identifier} - ${err.message}`);
+    return fallback(identifier);
+  },
+});
+```
+
+### 3. User Experience
+
+Provide clear feedback about rate limits when a user exceeds their limit, in this repo example we just show a simple message:
+
+```tsx
+{
+  rateLimitInfo && (
+    <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+      <div className="flex items-center space-x-2 text-sm text-blue-600">
+        <Clock className="h-4 w-4" />
+        <span>
+          {rateLimitInfo.remaining} of {rateLimitInfo.limit} requests remaining
+          this hour
+        </span>
+      </div>
+    </div>
+  );
+}
+```
+
+## Advanced Considerations
+
+### Handling Legitimate Users
+
+Sometimes legitimate users might trigger rate limits (family sharing devices, public computers). Consider:
+
+- Providing a way for users to request limit increases
+- Implementing progressive rate limiting (stricter limits for new users)
+- Adding CAPTCHA challenges for suspicious activity
+
+### Privacy Implications
+
+Device fingerprinting raises privacy concerns. Be transparent about:
+
+- What data you're collecting
+- How you're using it
+- How users can opt out if needed
+
+### Monitoring and Analytics
+
+Track rate limiting effectiveness:
+
+```typescript
+// Log rate limit violations for monitoring
+if (!success) {
+  console.warn(`Rate limit exceeded: ${fingerprintData.thumbmark}`);
+  // Send to monitoring service
+}
+```
+
+## Conclusion
+
+Device fingerprinting combined with Unkey's rate limiting provides a robust solution for protecting public endpoints. This approach is more reliable than IP-based restrictions and offers better protection against automated abuse.
+
+The complete example demonstrates how to implement this pattern securely, with proper validation, error handling, and user experience considerations. By following these practices, you can protect your public endpoints while maintaining a smooth experience for legitimate users.
+
+For the full implementation, check out the [unkey-fingerprint](https://github.com/perkinsjr/unkey-fingerprint) repository on GitHub.
