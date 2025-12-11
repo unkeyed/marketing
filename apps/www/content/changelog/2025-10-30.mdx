@@ -1,0 +1,44 @@
+---
+title: October Product Update
+date: 2025-10-31
+tags: ["product"]
+---
+
+October was another fantastic month for the Unkey team, with 47 pull requests merged, enhancing features, squashing bugs, and improving the user experience. We also demo'd our new Unkey deploy platform at All Things Open, this has been in the works for a while, and we cannot wait to share more details, and get it into your hands.
+
+Below are the pull requests merged during this month:
+
+### Features & Enhancements
+- **Context Aware DoWithResult Enhances Robustness** [#4137](https://github.com/unkeyed/unkey/pull/4137) - Introduces context-sensitive methods for improved responsiveness in operations. (Author: @ogzhanolguncu)
+- **Unkey Builds for Better Image Building** [#4098](https://github.com/unkeyed/unkey/pull/4098) - Facilitates local and isolated image builds, enhancing the deployment process. (Author: @ogzhanolguncu)
+- **Optimization of API Key Handling** [#4056](https://github.com/unkeyed/unkey/pull/4056) - Streamlines CLI interactions by intelligently inferring workspace IDs. (Author: @mcstepp)
+- **UI Enhancements for Intuitive User Experience** [#4060](https://github.com/unkeyed/unkey/pull/4060) - Improves user interface elements and keyboard shortcuts. (Author: @ogzhanolguncu)
+
+### Bug Fixes
+- **Rate Limit Key Enhancement for Accuracy** [#4200](https://github.com/unkeyed/unkey/pull/4200) - Revamps the key format in `DurableRateLimiter` to reduce errors. (Author: @chronark)
+- **Proper IP Whitelist Validations** [#4063](https://github.com/unkeyed/unkey/pull/4063)  - Optimizes IP whitelist handling by enhancing string conversion processes. (Author: @Akhileshait)
+- **Resolved Identity Deletion Error** [#4103](https://github.com/unkeyed/unkey/pull/4103) - Fixes server error during the deletion of identities. (Author: @Flo4604)
+- **Addressed Navigation and State Management in Onboarding** [#4085](https://github.com/unkeyed/unkey/pull/4085) - Reworks the onboarding wizard to prevent duplicate slugs. (Author: @chronark)
+
+### Performance Improvements
+- **Optimized Rate Limit Counting for Efficiency** [#4080](https://github.com/unkeyed/unkey/pull/4080) - Implements atomic processing for rate limits to prevent incorrect counter adjustments. (Author: @chronark)
+
+### Documentation
+- **Updated Broken Link in CONTRIBUTING.md** [#4122](https://github.com/unkeyed/unkey/pull/4122) - Fixes a critical 404 error affecting documentation navigation. (Author: @d02ev)
+
+### Internal Changes
+- **From Keyring to Keyspace: Renaming for Clarity** [#4126](https://github.com/unkeyed/unkey/pull/4126) - Renames several core components to better reflect their functions. (Author: @mcstepp)
+- **Container Version Updates Streamline Deployments** [#4146](https://github.com/unkeyed/unkey/pull/4146) - Standardizes container versions across the board for consistency. (Author: @imeyer)
+- **GHA Workflows Transitioned to More Reliable Runners** [#4138](https://github.com/unkeyed/unkey/pull/4138) - Migrates GitHub Actions to depot.dev for enhanced operation. (Author: @imeyer)
+- **Enhanced Seeder Function Usability** [#4110](https://github.com/unkeyed/unkey/pull/4110) - Refactors test seeder functions for improved type safety and reduced database calls. (Author: @mcstepp)
+
+### Testing
+- **Comprehensive Testing for IP Whitelist Functionality** [#4069](https://github.com/unkeyed/unkey/pull/4069) - Augments IP whitelist testing to ensure accurate verification and functionality. (Author: @chronark)
+
+### Infrastructure
+- **Migration of Runners to Depot.Dev** [#4138](https://github.com/unkeyed/unkey/pull/4138) - Shifts infrastructure to leverage new runner technology in deployments. (Author: @imeyer)
+- **Infrastructure Overhaul via Removing Obsolete Components** [#4061](https://github.com/unkeyed/unkey/pull/4061) - Cleans out deprecated components to streamline operations. (Author: @chronark)
+- **Deployment Application Enhancements** [#4051](https://github.com/unkeyed/unkey/pull/4051) - Focuses on refining deployment processes to elevate operational efficiency. (Author: @ogzhanolguncu)
+
+### Security
+*No security-specific changes were made*
