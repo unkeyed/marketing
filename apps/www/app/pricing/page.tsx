@@ -2,10 +2,7 @@
 import { CTA } from "@/components/cta";
 import { Particles } from "@/components/particles";
 import { ShinyCardGroup } from "@/components/shiny-card";
-import {
-  TopLeftShiningLight,
-  TopRightShiningLight,
-} from "@/components/svg/background-shiny";
+import { TopLeftShiningLight, TopRightShiningLight } from "@/components/svg/background-shiny";
 import { Check, Stars } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -26,13 +23,7 @@ import {
   ProCardHighlight,
   Separator,
 } from "./components";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select";
 
 const buckets: Array<{ price: string; requests: number }> = [
   {
@@ -125,33 +116,17 @@ export default function PricingPage() {
               </li>
 
               <li>
-                <Bullet
-                  Icon={Check}
-                  label="150k valid requests / month"
-                  color={Color.White}
-                />
+                <Bullet Icon={Check} label="150k valid requests / month" color={Color.White} />
               </li>
               <li>
                 {" "}
-                <Bullet
-                  Icon={Check}
-                  label="7-day logs retention"
-                  color={Color.White}
-                />
+                <Bullet Icon={Check} label="7-day logs retention" color={Color.White} />
               </li>
               <li>
-                <Bullet
-                  Icon={Check}
-                  label="30-day audit log retention"
-                  color={Color.White}
-                />
+                <Bullet Icon={Check} label="30-day audit log retention" color={Color.White} />
               </li>
               <li>
-                <Bullet
-                  Icon={Check}
-                  label="Unlimited APIs"
-                  color={Color.White}
-                />
+                <Bullet Icon={Check} label="Unlimited APIs" color={Color.White} />
               </li>
               <li>
                 <div className="h-6" />
@@ -160,19 +135,16 @@ export default function PricingPage() {
           </PricingCardContent>
           <PricingCardFooter>
             <div className="flex flex-col gap-2">
-              <p className="text-sm font-bold text-white">
-                What counts as valid?{" "}
+              <p className="text-sm font-bold text-white">What counts as valid? </p>
+              <p className="text-xs text-white/60">
+                A valid request is a key verification or a ratelimit operation that result in
+                proividng access to your service. Requests may be invalid due to exceeding limits,
+                keys being expired or disabled, or other factors. To protect your business from
+                abuse, we do not charge for invalid requests.
               </p>
               <p className="text-xs text-white/60">
-                A valid request is a key verification or a ratelimit operation
-                that result in proividng access to your service. Requests may be
-                invalid due to exceeding limits, keys being expired or disabled,
-                or other factors. To protect your business from abuse, we do not
-                charge for invalid requests.
-              </p>
-              <p className="text-xs text-white/60">
-                Only key verification and ratelimiting requests are billable.
-                All regular API requests are always free.
+                Only key verification and ratelimiting requests are billable. All regular API
+                requests are always free.
               </p>
             </div>
           </PricingCardFooter>
@@ -190,16 +162,11 @@ export default function PricingPage() {
 
           <PricingCardContent>
             <div className="flex items-center justify-between">
-              <Cost
-                dollar={buckets[selectedBucketIndex].price}
-                className="w-full"
-              />
+              <Cost dollar={buckets[selectedBucketIndex].price} className="w-full" />
 
               <Select
                 value={selectedBucketIndex.toString()}
-                onValueChange={(v) =>
-                  setSelectedBucketIndex(Number.parseInt(v))
-                }
+                onValueChange={(v) => setSelectedBucketIndex(Number.parseInt(v))}
               >
                 <SelectTrigger className="max-w-40">
                   <SelectValue />
@@ -226,45 +193,26 @@ export default function PricingPage() {
                 />
               </li>
               <li>
-                <Bullet
-                  Icon={Check}
-                  label="30-day logs retention"
-                  color={Color.Yellow}
-                />
+                <Bullet Icon={Check} label="30-day logs retention" color={Color.Yellow} />
               </li>
               <li>
-                <Bullet
-                  Icon={Check}
-                  label="90-day audit log retention"
-                  color={Color.Yellow}
-                />
+                <Bullet Icon={Check} label="90-day audit log retention" color={Color.Yellow} />
               </li>
               <li>
-                <Bullet
-                  Icon={Check}
-                  label="Unlimited APIs"
-                  color={Color.Yellow}
-                />
+                <Bullet Icon={Check} label="Unlimited APIs" color={Color.Yellow} />
               </li>
               <li>
-                <Bullet
-                  Icon={Check}
-                  label="Workspaces with team members"
-                  color={Color.Yellow}
-                />
+                <Bullet Icon={Check} label="Workspaces with team members" color={Color.Yellow} />
               </li>
             </Bullets>
           </PricingCardContent>
           <PricingCardFooter>
             <div className="flex flex-col gap-2">
-              <p className="text-sm font-bold text-white">
-                What happens when I go over my plan?{" "}
-              </p>
+              <p className="text-sm font-bold text-white">What happens when I go over my plan? </p>
               <p className="text-xs text-white/60">
-                We want you to succeed, and not be afraid of surprise charges.
-                If you unexpectedly go over the limits of your plan, we won't
-                shut you down automatically, nor will we charge you extra. If
-                your usage is consistently exceeding the limits, you should
+                We want you to succeed, and not be afraid of surprise charges. If you unexpectedly
+                go over the limits of your plan, we won't shut you down automatically, nor will we
+                charge you extra. If your usage is consistently exceeding the limits, you should
                 upgrade to the next higher plan.
               </p>
             </div>
@@ -288,9 +236,7 @@ export default function PricingPage() {
                   <div className="w-full p-px rounded-lg h-10 bg-gradient-to-r from-[#02DEFC] via-[#0239FC] to-[#7002FC] overflow-hidden">
                     <div className="bg-black rounded-[7px] h-full bg-opacity-95 hover:bg-opacity-25 duration-1000">
                       <div className="flex items-center justify-center w-full h-full bg-gradient-to-tr from-[#02DEFC]/20 via-[#0239FC]/20 to-[#7002FC]/20  rounded-[7px]">
-                        <span className="text-sm font-semibold text-white">
-                          Contact Us
-                        </span>
+                        <span className="text-sm font-semibold text-white">Contact Us</span>
                       </div>
                     </div>
                   </div>
@@ -309,25 +255,13 @@ export default function PricingPage() {
               />
               <Bullets>
                 <li>
-                  <Bullet
-                    Icon={Check}
-                    label="Custom Quotas"
-                    color={Color.Purple}
-                  />
+                  <Bullet Icon={Check} label="Custom Quotas" color={Color.Purple} />
                 </li>
                 <li>
-                  <Bullet
-                    Icon={Check}
-                    label="IP Whitelisting"
-                    color={Color.Purple}
-                  />
+                  <Bullet Icon={Check} label="IP Whitelisting" color={Color.Purple} />
                 </li>
                 <li>
-                  <Bullet
-                    Icon={Check}
-                    label="Dedicated Support"
-                    color={Color.Purple}
-                  />
+                  <Bullet Icon={Check} label="Dedicated Support" color={Color.Purple} />
                 </li>
                 <li>
                   <Bullet

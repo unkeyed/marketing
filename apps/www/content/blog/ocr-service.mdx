@@ -208,7 +208,7 @@ To verify the key, we've made a middleware in the `middleware.ts` file.
 
 As shown in the above code block, the key is created in the `/signup` route in `index.ts`.
 
-Its params are explained in detail in the official [docs](https://unkey.com/docs/api-reference/keys/create)
+Its params are explained in detail in the official [docs](https://www.unkey.com/docs/api-reference/v2/keys/create-api-key)
 
 Following is a description of the params used in this example:
 
@@ -226,7 +226,7 @@ Following is a description of the params used in this example:
 
 - `rateLimit`: Keys can be rate limited by certain parameters. This is extremely beneficial as it prevents abuse of our API. The rate limit is enforced on the edge, so it's extremely fast and efficient. The rate limit params we've used in this example are:
 
-  - `type`: Type of the rate limit. Read more: [Rate Limiting](https://unkey.com/docs/features/ratelimiting)
+  - `type`: Type of the rate limit. Read more: [Rate Limiting](https://www.unkey.com/docs/ratelimiting)
 
   - `limit`: The number of requests allowed in the given time
 
