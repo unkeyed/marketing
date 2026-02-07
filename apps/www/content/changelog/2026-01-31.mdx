@@ -1,0 +1,47 @@
+---
+title: January Product Update
+date: 2026-01-31
+tags: ["product"]
+---
+
+January was a busy month for the Unkey team. We shipped 47 pull requests across the codebase - from the core API to the dashboard you use every day. We fixed bugs, shipped new features, and shipped a few things we're pretty excited about.
+
+We upgraded the dashboard to Next.js 16 and Zod v4, which significantly improves performance across each page and you should notice this next time you visit.
+
+The identities page now allows you to manage identities just as easily as the API. You can create, update, and delete identities directly from the dashboard. We also removed it from a beta state, making it fully functional and accessible to all users.
+
+![identities](/images/changelog/2026-01-01/identities.png)
+
+Finally we introduced a new members page, which allows you to invite as many members as you need, versus the previous modal which was limited to a single member.
+
+![Members Page](/images/changelog/2026-01-01/memberships.png)
+
+Below are the pull requests merged during this month:
+
+### Features & Enhancements
+- **Enhanced Identity Details Page** [#4611](https://github.com/unkeyed/unkey/pull/4611) - Introduces a comprehensive identity details page for better visibility into identity configurations.
+- **New Deployment APIs** [#4604](https://github.com/unkeyed/unkey/pull/4604), [#4583](https://github.com/unkeyed/unkey/pull/4583) - Adds getDeployment and CreateDeployment to streamline deployment management.
+- **Upload URL Generation** [#4601](https://github.com/unkeyed/unkey/pull/4601) - Introduces generateUploadUrl to simplify file upload workflows.
+- **Vault as a Service** [#4555](https://github.com/unkeyed/unkey/pull/4555) - Implements vault as a service for improved secrets management and security.
+- **Sentinel Secrets Management** [#4619](https://github.com/unkeyed/unkey/pull/4619) - Adds support for sentinel secrets to enhance security controls.
+- **Dashboard Invitation Management** [#4817](https://github.com/unkeyed/unkey/pull/4817) - Restricts invitation management to admins for better access control.
+- **Redesigned Team Settings** [#4783](https://github.com/unkeyed/unkey/pull/4783) - Redesigns team settings with tabs and invite form for improved user experience.
+- **Enhanced Log Details** [#4774](https://github.com/unkeyed/unkey/pull/4774), [#4793](https://github.com/unkeyed/unkey/pull/4793) - Redesigns log details with v2 improvements and deployment navigation enhancements.
+- **Dashboard Alphabetical Sorting** [#4597](https://github.com/unkeyed/unkey/pull/4597) - Sorts log details alphabetically by key for easier navigation.
+- **Sentry Integration Controls** [#4592](https://github.com/unkeyed/unkey/pull/4592), [#4584](https://github.com/unkeyed/unkey/pull/4584) - Adds Sentry initialization controls and structured logging with error filtering.
+- **Middleware Error Decoupling** [#4763](https://github.com/unkeyed/unkey/pull/4763) - Refactors middleware error handling for improved reliability and maintainability.
+- **Authorization Schema Updates** [#4816](https://github.com/unkeyed/unkey/pull/4816) - Updates authorization schema validation limits for better consistency.
+- **Virtualization Hook Updates** [#4819](https://github.com/unkeyed/unkey/pull/4819) - Updates virtualization hook usage for improved dashboard performance.
+
+### Bug Fixes
+- **IP Logging Fix in API** [#4829](https://github.com/unkeyed/unkey/pull/4829) - Fixes IP logging in the API for accurate request tracking.
+- **Roles Null Handling** [#4833](https://github.com/unkeyed/unkey/pull/4833) - Handles null updated_at_m in roles to prevent errors.
+
+### Performance Improvements
+- **Optimized Key Count Queries** [#4762](https://github.com/unkeyed/unkey/pull/4762) - Optimizes API key count queries with proper COUNT aggregation for better performance.
+- **ClickHouse Query Improvements** [#4609](https://github.com/unkeyed/unkey/pull/4609) - Adds configurable request timeout and fixes query issues in ClickHouse integration.
+
+### Documentation
+- **Documentation Navigation Guide** [#4838](https://github.com/unkeyed/unkey/pull/4838) - Updates "where is stuff?" documentation for better navigation.
+- **API Documentation Fixes** [#4733](https://github.com/unkeyed/unkey/pull/4733), [#4732](https://github.com/unkeyed/unkey/pull/4732), [#4731](https://github.com/unkeyed/unkey/pull/4731), [#4729](https://github.com/unkeyed/unkey/pull/4729), [#4728](https://github.com/unkeyed/unkey/pull/4728) - Fixes various documentation drift issues across multiple packages.
+- **Doc Comments for Core Packages** [#4711](https://github.com/unkeyed/unkey/pull/4711), [#4710](https://github.com/unkeyed/unkey/pull/4710), [#4709](https://github.com/unkeyed/unkey/pull/4709), [#4715](https://github.com/unkeyed/unkey/pull/4715), [#4714](https://github.com/unkeyed/unkey/pull/4714), [#4713](https://github.com/unkeyed/unkey/pull/4713), [#4712](https://github.com/unkeyed/unkey/pull/4712) - Adds comprehensive doc comments to pkg/fault, internal/services/usagelimiter, cmd/, pkg/vault, pkg/system_errors, pkg/circuitbreaker, and pkg/proto exports.
