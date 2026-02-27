@@ -1,0 +1,389 @@
+---
+date: 2026-02-27
+title: "Databases are slow, memory is king"
+image: "/images/blog-images/covers/caching.jpeg"
+description: "Talking to a database is slow, don't do it if you don't have to."
+author: andreas
+tags: ["engineering"]
+---
+
+7 months ago, I wrote about [leaving serverless behind](https://www.unkey.com/blog/serverless-exit), so let's look at how things are today. This post is not a guideline, there are many ways to do it, but here's how we're building our API for low latency. These days we're sustaining throughput around 10,000 requests per second with p99 service latency below 1 millisecond.
+
+I don't want to claim anything that is misleading, so let me be clear about what we're measuring here. I define `service latency` as the time from when our API receives a request to when it sends a response, excluding network time or TLS. This is the time spent inside our API handler, including any serialisation, validation, database calls or cache lookups.
+
+TLDR it comes down to two design choices:
+
+1. Using aggressively tuned in-memory caches with stale-while-revalidate (SWR) and smart eviction and prewarming.
+2. Co-locating read traffic with PlanetScale read regions for when the cache is empty.
+
+- `[TODO]` Insert p50, p95, p99 over selected production window.
+- `[TODO]` Insert cache hit rate per hot cache.
+
+The most latency sensitive path in our API is `/v2/keys.verifyKey`. The route accepts a managed API key and needs to verify its validity, permissions, ratelimits and more.
+
+A request to this route looks like this:
+
+```bash
+curl -X POST "https://api.unkey.dev/v2/keys.verify" \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer unkey_xxxx" \
+     -d '{
+           "key": "sk_live_1234567890abcdef",
+           "ratelimits": [...]
+           "permissions": "dns.create_record AND dns.update_record"
+        }'
+```
+
+Notice how there are 2 distinct keys in the request: the `Authorization` header and the `key` field in the body. The former is a `root key` that identifies the caller, to ensure you cannot verify keys from other tenants. While the latter is provided by the end user, that the caller wants to authorize.
+
+In an unoptimized implementation, that would involve multiple round trips to the database, which adds up quickly. Some of these can be combined into a single query, but not all of them. We're still left with one query for the root key and one for the user key.
+
+## Making it faster
+
+The maybe obvious answer is to just cache these, and that's what we do. API keys themselves are a great candidate for caching, because they are read much more often than they are updated. However invalidation becomes a concern, especially for a critical path like this. If we cache too aggressively, we might end up authorizing revoked keys for longer than we're comfortable with. Furthermore, ratelimits are very dynamic, we need to track the usage of a key in real time to enforce them correctly across many api nodes.
+
+So let's take a step back and fix the low hanging fruits first.
+
+### Database read replicas
+
+The biggest impact on the tail latency is the round trip time to the database. Even if you do in-memory caching, you will still have cache misses, and those need to be as fast as possible. Going halfway across the globe to your database adds hundreds of milliseconds per request. Imagine doing multiple reuqests in series...
+
+Fortunately many database providers these days offer read-replicas in multiple regions. We're using PlanetScale and the replication lag so far has been sub second, which is good enough for our use case.
+Our current setup is to have read-replicas in key locations to serve the majority of our traffic with low latency. We have a primary in us-east-1 and read replicas in ap-southeast-2, ap-northeast-1, us-west-2, ap-south-1 and eu-central-1.
+
+Here are our real-world read latency measured from our API nodes (in each region) to planetscale.
+
+<ImageZoom
+  src="/images/blog-images/caching/ps_read_p90.png"
+  alt="planetsacle p90 read latency"
+  width="1920"
+  height="1080"
+/>
+
+It's pretty fast already, and we don't have to worry about stale data from the replicas, because they replicate very quickly. (Anecdotally, I have never seen it lag more than 1 second.)
+
+The downside is that we're paying for our data storage multiple times now, but that's well worth it. Our datasize is low and our read to write ratio is very high.
+
+### Caching
+
+The next optimisation is to cache the results of these database queries in memory. It's fast, it's easy and it's a nightmare to get right. Caching is a double-edged sword, it can make things faster but it can also make things worse if you don't do it right.
+
+In the simplest case, we would cache the key's configuration by its hash. So as a request comes in, we hash the raw key and then look it up in the cache. If it's a hit, we can return the cached configuration immediately. If it's a miss, we need to go to the database, fetch the configuration, and then populate the cache for future requests.
+But this is where the problems begin. How long do you keep the cache entry? If you keep it for too long, you might end up authorizing revoked keys. If you keep it for too short, you might end up with a high miss rate and gained nothing.
+
+### Stale-while-revalidate (SWR)
+
+To help with this, we use a caching strategy called stale-while-revalidate (SWR). The idea is that when a cache entry becomes too old, we can still return it to the caller, but we trigger a background refresh to get a fresh value from the origin. This way we can keep the cache hit rate high while still ensuring that we don't serve outdated data.
+
+As an example, let's say a key is cached at `t=0` with `Fresh=10s` and `Stale=60s`:
+
+```text
+API request
+  |
+  v
+Check cache age
+  |
+  +-- age <= 10s (fresh)
+  |      -> return cached value
+  |
+  +-- 10s < age <= 60s (stale)
+  |      -> return stale value now
+  |      -> revalidate in background (DB)
+  |
+  +-- age > 60s (expired)
+         -> fetch from DB
+         -> update cache
+         -> return fresh value
+```
+
+Requests for frequently used keys return from memory and the worst case is that we serve data that is 60s old.
+
+### Negative caching
+
+Caching the absence of a record is just as important as caching its presence. If we only cache hits, then every request for a missing key would go to the database. While the latency here doesn't really matter much, it's important that make this as cheap as possible for us. Common negative caches for us are often the result of a revoked key, where existing apps might still be trying to use it.
+
+We just use a special cache entry to indicate that the record is not found, and then we can return a 404 immediately without hitting the database again for a while.
+
+## Move expensive parsing off the request hot loop
+
+During cache population, we transform the raw data into a more convenient format for the handler. For example, we parse the IP whitelist into a map for O(1) lookups, so that we don't have to do that on every request. We store IP allow lists as comma separated strings in the database, but we want to use them as maps in the handler. So we do that transformation once during cache population, and then we can just use the parsed map for every request.
+
+```go
+// internal/services/keys/get.go
+key, hit, err := s.keyCache.SWR(ctx, sha256Hash, func(ctx context.Context) (db.CachedKeyData, error) {
+	row, err := db.WithRetryContext(ctx, func() (db.FindKeyForVerificationRow, error) {
+		return db.Query.FindKeyForVerification(ctx, s.db.RO(), sha256Hash)
+	})
+
+  parsedIPWhitelist := make(map[string]struct{})
+
+	ips := strings.Split(row.IpWhitelist.String, ",")
+  for _, ip := range ips {
+  	trimmed := strings.TrimSpace(ip)
+   	if trimmed != "" {
+    	parsedIPWhitelist[trimmed] = struct{}{}
+    }
+  }
+  return db.CachedKeyData{
+  	FindKeyForVerificationRow: row,
+   	ParsedIPWhitelist:         parsedIPWhitelist,
+  }, nil
+}, caches.DefaultFindFirstOp)
+```
+
+Small transformations like this look minor in isolation, but at thousands of requests per second they add up.
+
+## Ratelimiting
+
+Rate limiting sounds like a solved problem. Count requests, reject when the count exceeds a threshold. But when your API runs across multiple nodes or even regions, the problem gets interesting fast.
+
+The naive approach forces every request through a single coordination point like Redis, adding a network round trip to every API call. For a service where latency matters, that's unacceptable. We wanted something better: **sub-millisecond decisions on the hot path, with distributed consistency where it matters.**
+
+### Why Not Just Use Redis?
+
+The simplest distributed rate limiter is a Redis `INCR` with a `TTL`. Every request increments a key, and if the value exceeds the limit, you reject. It's correct, it's simple, and it adds 1-2ms of latency to every single request.
+
+For most applications running in a single region, that's fine. But it's not possible across regions. And even in a single region, Redis becomes a single point of failure. If it goes down or gets slow, you have to make a decision, either every API call in the system blocks or fails or you open the floodgates.
+
+We wanted a design where:
+
+1. The **common case** (traffic well below or above the limit) is decided locally in microseconds, with zero network calls.
+2. The **edge case** (traffic near the limit) pays the cost of a Redis round trip, but only when accuracy actually matters.
+3. Redis going down only degrades accuracy slightly, not availability.
+
+### The Sliding Window Algorithm
+
+Before we get into distribution, let's talk about the core algorithm. We use a **sliding window** instead. The idea is simple: maintain two counters (the current window and the previous window) and blend them based on how far into the current window we are.
+
+```
+effectiveCount = current.counter + previous.counter × (1 - elapsed)
+```
+
+Where `elapsed` is the fraction of the current window that has passed. If we're 40% into the current minute, we count 100% of this minute's requests plus 60% of last minute's. The previous window's influence decays linearly until it drops off entirely at the boundary.
+
+This means a client who used 80 of 100 requests in the previous window and is 30% into the current one effectively has `current + 80 × 0.7 = current + 56` counted against them. They have 44 tokens available, not a fresh 100.
+
+The sliding window never resets abruptly, eliminating the burst-at-boundary problem while requiring only two integers of state per rate limit.
+
+```
+     Previous Window     Current Window
+     ┌───────────────┐┌───────────────┐
+     │  counter = 80 ││  counter = 10 │
+     └───────────────┘└───────────────┘
+                           ▲
+                           │ elapsed = 0.3 (30% into current window)
+                           │
+
+     effective = 10 + 80 × (1 - 0.3) = 66
+     remaining = 100 - 66 = 34
+```
+
+### Time as a Shared Coordinate System
+
+The foundation of our distributed design is a surprisingly simple idea: **if every node agrees on how to slice time into windows, they can make independent decisions without talking to each other.**
+
+Every rate limit has a duration, say 60 seconds. We divide the Unix timestamp (in milliseconds) by this duration to produce a **sequence number**:
+
+```go
+func calculateSequence(t time.Time, duration time.Duration) int64 {
+    return t.UnixMilli() / duration.Milliseconds()
+}
+```
+
+At 12:30:00 UTC with a 60-second window, the sequence is `time / 60000`. At 12:30:45, it's the same number. At 12:31:00, it increments by one. Every node in the cluster—regardless of when it last communicated with any other node—computes the same sequence number for the same moment in time.
+
+No coordination needed. Wall clock alignment gives us a shared frame of reference. (NTP keeps our nodes synchronized to within a few milliseconds, which is more than sufficient for rate limit windows measured in seconds up to months.)
+
+### Buckets: The Unit of State
+
+Each unique combination of (`name`, `identifier`, `limit`, `duration`) maps to a bucket. For example allowing `user_123` to use up to 10M inference tokens per minute would look like this: `("inference-tokens", "user_123", 10000000, 60000)`. A bucket is an in-memory struct holding a map of sequence numbers to windows, protected by its own mutex. This per-bucket locking is critical. A request rate-limiting `user-123` never contends with a request rate-limiting `user-456`, even though both flow through the same service.
+
+When a request arrives, we look up (or create) its bucket, lock it, retrieve the current and previous windows, run the sliding window calculation, and return a decision. The entire critical section is a few arithmetic operations on local memory.
+
+### Asynchronous Convergence
+
+Each node makes rate limit decisions instantly against local counters, but those counters need to eventually converge with the global state in Redis. This happens through a **replay buffer**.
+
+Every successful rate limit check pushes the request into the buffer. Background goroutines continuously drain it, and for each request, they increment a shared counter in Redis:
+If the counter in redis is higher than our local counter, because the same ratelimit has been requested on other nodes, we increment our local counter to merge the global state into our local state.
+
+```go
+func (s *service) syncWithOrigin(ctx context.Context, req RatelimitRequest) error {
+
+    w := getCurrentWindow(req.Time)
+
+    newCounter, err := s.redis.Increment(
+        ctx,
+        fmt.Sprintf("%s:%d", req.Identifier, w.sequence)
+        req.Duration * 3, // TTL
+    )
+    if err != nil {
+        return err
+    }
+
+    // One-way ratchet: only update local if Redis is higher
+    if newCounter > w.counter {
+        w.counter = newCounter
+    }
+
+    return nil
+}
+```
+
+The critical detail is the **max-merge** on the response: when Redis returns the new global counter after the increment, we update the local counter _only if Redis is higher_. This is a one-way ratchet. Local state is always brought up to the global count, never down. It ensures nodes converge toward the true total without any risk of lost increments or double-counting.
+
+The TTL on each Redis key is set to 3× the window duration, giving ample time for the sliding window to reference the previous window before the key expires.
+
+```
+      Request
+        ┃ (sync)
+        ▼
+  ┌───────────┐··············►┌────────────┐···INCRBY····►┌───────┐
+  │  Local    │  (non-block)  │  Replay    │              │ Redis │
+  │  Bucket   │◄··············│  Buffer    │◄·············│       │
+  │  (in-mem) │  max-merge    │            │  new count   └───────┘
+  └───────────┘               └────────────┘
+        ┃ (sync)
+        ▼
+    Response
+```
+
+### The Tradeoff: Brief Over-Admission
+
+This architecture has an explicit tradeoff. During the brief interval between a local decision and its replay to Redis, two nodes can each independently approve a request that collectively exceeds the limit. If Node A and Node B both see 99/100 locally and each approve one more request, the true global count is 101.
+
+For most traffic patterns, where usage is well below the limit, this never matters. The replay catches up in milliseconds, and the next check on either node will see the corrected count.
+
+But right at the limit boundary, this slack could matter. That's where our strict mode comes in.
+
+### Strict Mode: Adaptive Consistency at the Boundary
+
+When any node detects that a request **exceeds** the limit, it sets a `strictUntil` timestamp on that bucket, one full window duration into the future:
+
+```go
+if exceeded {
+    b.strictUntil = req.Time.Add(req.Duration)
+}
+```
+
+When a node does not have an existing local state or when `strictUntil` is active, the node **bypasses local counters and queries Redis directly** before making a decision:
+
+```go
+goToOrigin := req.Time.UnixMilli() < b.strictUntil.UnixMilli()
+if goToOrigin || !currentWindowExisted {
+    currentWindow.counter = max(currentWindow.counter, s.counter.Get(ctx, key))
+}
+```
+
+This synchronous Redis check costs a network round trip (~1-2ms), but it only triggers after a previous denial, exactly when over-admission would be most harmful.
+
+The result is an **adaptive consistency model**:
+
+- **Below the limit**: Decisions are local, latency is microseconds. No Redis involved.
+- **At the limit**: The system automatically shifts to strong consistency via Redis. Accuracy is prioritized over speed.
+- **After the window rolls over**: `strictUntil` expires and the bucket returns to local-first mode.
+
+This means most requests pay zero coordination cost, while the critical edge cases get full accuracy.
+
+```
+  ┌────────────┐  request denied  ┌─────────────────┐  strictUntil expires  ┌────────────┐
+  │ Local-Only │─────────────────►│  Strict Mode    │──────────────────────►│ Local-Only │
+  │ (fast path)│                  │  (Redis check)  │                       │ (fast path)│
+  │ ~μs        │                  │  ~1-2ms         │                       │ ~μs        │
+  └────────────┘                  └─────────────────┘                       └────────────┘
+       │                                │
+       │ for every request:             │ for every request:
+       │ check local counters only      │ GET from Redis, then check
+       │ buffer to replay               │ buffer to replay
+```
+
+### Atomic Multi-Limit Checks
+
+Sometimes a single action needs to satisfy multiple rate limits simultaneously. An API key might have both a per-second limit and a per-day limit. If the per-day check passes but the per-second check fails, you don't want the per-day counter incremented. Only when all ratelimits are passed should a request be counted.
+
+The implementation acquires locks on all involved buckets, checks every limit, and only increments counters if every check passes. But locking multiple buckets introduces a deadlock risk: goroutine A locks bucket X then waits on Y, while goroutine B locks Y then waits on X.
+
+We prevent this by sorting all bucket keys lexicographically before acquiring any locks:
+
+```go
+sort.Slice(reqsWithKeys, func(i, j int) bool {
+    return reqsWithKeys[i].key.toString() < reqsWithKeys[j].key.toString()
+})
+
+for _, b := range uniqueBuckets {
+    b.mu.Lock()
+    defer b.mu.Unlock()
+}
+```
+
+Every goroutine acquires locks in the same global order, making circular wait impossible. This is a classic technique, but it's easy to forget when you're working with dynamic sets of locks.
+
+```
+  Without ordering (deadlock!):          With sorted ordering (safe):
+
+  Goroutine A    Goroutine B             Goroutine A    Goroutine B
+  ──────────     ──────────              ──────────     ──────────
+  Lock(X) ✓      Lock(Y) ✓               Lock(X) ✓     Lock(X) ⏳
+  Lock(Y) ⏳     Lock(X) ⏳              Lock(Y) ✓     Lock(X) ⏳
+     💀 DEADLOCK                         Lock(Z) ✓     Lock(X) ⏳
+                                         Unlock all    Lock(X) ✓
+                                                       Lock(Y) ✓
+                                                       Lock(Z) ✓
+                                                       Unlock all
+```
+
+If any limit check fails, we release all locks without incrementing anything.
+
+### Resilience: What Happens When Redis Goes Down
+
+The replay path to Redis is wrapped in a **circuit breaker**. After repeated failures, the circuit opens and stops attempting replays entirely. During this period, nodes continue making local-only decisions—accuracy degrades slightly (nodes can't see each other's increments), but availability is preserved.
+
+Redis timeouts are deliberately aggressive: 500ms read/write, 1s dial. We'd rather fail fast and fall back to local state than let a slow Redis response block the replay pipeline and cause backpressure.
+
+The replay buffer itself is bounded at 10,000 entries with a drop policy. If Redis is down long enough for the buffer to fill, new replay events are dropped rather than blocking the rate limit decision path. The rate limit check always returns instantly—it never waits on Redis.
+
+When Redis recovers, the circuit closes and convergence resumes automatically. The max-merge behavior means the local counters will reconcile with whatever global state Redis has, with no manual intervention needed.
+
+### Memory Management: The Janitor
+
+Without cleanup, the bucket map would grow forever as new identifiers appear. A background janitor runs every minute and does two things:
+
+1. **Evicts windows** older than 3× their duration. A 60-second window is deleted after 3 minutes—well past the point where the sliding window algorithm would reference it.
+2. **Removes empty buckets**. Once all of a bucket's windows are evicted, the bucket itself is deleted.
+
+This keeps memory proportional to the number of _active_ rate-limited identifiers, not the total number of identifiers ever seen.
+
+## Invalidation
+
+So far we've just been relying on time-based expiration, but that comes with the problem of limiting how long we can cache data for. If we want to cache for longer, we need a way to invalidate the cache when the underlying data changes. This is especially important for critical paths like key verification, where we don't want to risk authorizing revoked keys for too long.
+
+We have a proof of concept to use gossip for emitting cache invalidation events. If we can reliably tell each node to revalidate their cache, we could use much longer freshness and stale TTLs, increasing the cache hit rate even more but time will tell how well that goes.
+
+## Debugging
+
+The cache layer records timing entries with status labels (`fresh`, `stale`, `miss`), we can expose them via `X-Unkey-Timing` headers.
+
+```
+< x-unkey-timing: cache_swr{cache=verification_key_by_hash,status=stale}=3.961us
+< x-unkey-timing: cache_swr{cache=workspace_quota,status=fresh}=1.56us
+< x-unkey-timing: cache_swr{cache=verification_key_by_hash,status=stale}=2.44us
+```
+
+Here we can see we made 3 cache lookups, one for the root key, one for workspace quotas and one more for a user key.
+
+That gives us per-request visibility into:
+
+- Which cache answered.
+- Whether the answer was fresh, stale, or miss.
+- How much time the cache operation took.
+
+## Why this combination works
+
+The core idea is not one trick. It is a stack of decisions that reinforce each other:
+
+1. Route reads to local read replicas.
+2. Keep hot objects in process memory.
+3. Serve stale data briefly while revalidating in the background.
+4. Cache misses for absent records.
+5. Propagate invalidations asynchronously across nodes.
+6. Do as much as you can without network requests.
