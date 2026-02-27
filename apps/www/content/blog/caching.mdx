@@ -153,7 +153,7 @@ We wanted a design where:
 
 ### The Sliding Window Algorithm
 
-Before we get into distribution, let's talk about the core algorithm. We use a **sliding window** instead. The idea is simple: maintain two counters (the current window and the previous window) and blend them based on how far into the current window we are.
+Before we get into distribution, let's talk about the core algorithm. The idea is simple: maintain two counters (the current window and the previous window) and blend them based on how far into the current window we are.
 
 ```
 effectiveCount = current.counter + previous.counter × (1 - elapsed)
