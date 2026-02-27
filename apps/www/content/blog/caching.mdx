@@ -104,7 +104,7 @@ Caching the absence of a record is just as important as caching its presence. If
 
 We just use a special cache entry to indicate that the record is not found, and then we can return a 404 immediately without hitting the database again for a while.
 
-## Move expensive parsing off the request hot loop
+### Move expensive parsing off the request hot loop
 
 During cache population, we transform the raw data into a more convenient format for the handler. For example, we parse the IP whitelist into a map for O(1) lookups, so that we don't have to do that on every request. We store IP allow lists as comma separated strings in the database, but we want to use them as maps in the handler. So we do that transformation once during cache population, and then we can just use the parsed map for every request.
 
