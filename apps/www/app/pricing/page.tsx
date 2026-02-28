@@ -138,7 +138,7 @@ export default function PricingPage() {
               <p className="text-sm font-bold text-white">What counts as valid? </p>
               <p className="text-xs text-white/60">
                 A valid request is a key verification or a ratelimit operation that result in
-                proividng access to your service. Requests may be invalid due to exceeding limits,
+                providing access to your service. Requests may be invalid due to exceeding limits,
                 keys being expired or disabled, or other factors. To protect your business from
                 abuse, we do not charge for invalid requests.
               </p>
