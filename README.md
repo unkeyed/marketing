@@ -10,7 +10,7 @@ This repository is for the Unkey marketing materials and resources, it includes 
 
 ## How to contribute
 
-Follow our [contributing guide](https://engineering.unkey.com/contributing)
+Follow our [contributing guide](https://engineering.unkey.com/docs/contributing)
 
 ## Running locally
 
