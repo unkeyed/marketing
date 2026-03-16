@@ -1,6 +1,6 @@
 "use cache";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { FooterLink } from "./link";
 import { UnkeyLogo } from "./footer-svgs";
 import { Wordmark } from "./wordmark";
 
@@ -87,14 +87,7 @@ const Column: React.FC<{
       <ul className="flex flex-col gap-4 md:gap-6">
         {links.map((link) => (
           <li key={link.href}>
-            <Link
-              href={link.href}
-              target={link.external ? "_blank" : undefined}
-              rel={link.external ? "noopener noreferrer" : undefined}
-              className="text-sm font-normal transition hover:text-white/40 text-white/70"
-            >
-              {link.title}
-            </Link>
+            <FooterLink href={link.href} title={link.title} external={link.external} />
           </li>
         ))}
       </ul>

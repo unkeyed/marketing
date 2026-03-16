@@ -58,9 +58,9 @@ export function Navigation() {
     >
       <div className="container flex items-center justify-between">
         <div className="flex items-center justify-between w-full sm:w-auto sm:gap-12 lg:gap-20">
-          <Link href="/" aria-label="Home">
+          <a href="/" aria-label="Home">
             <Logo className="min-w-[50px]" />
-          </Link>
+          </a>
           <MobileLinks className="lg:hidden" />
           <DesktopLinks className="hidden lg:flex" />
         </div>
