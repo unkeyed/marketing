@@ -1,7 +1,7 @@
 "use cache";
 import { cn } from "@/lib/utils";
-import { FooterLink } from "./link";
 import { UnkeyLogo } from "./footer-svgs";
+import { FooterLink } from "./link";
 import { Wordmark } from "./wordmark";
 
 type NavLink = {
