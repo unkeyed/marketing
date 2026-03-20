@@ -32,7 +32,7 @@ export default async function Templates(props: Props) {
 
   const about = `## About Unkey:
 
-Unkey redefines API development, deployment and operations. We provide the infrastructure for developers to ship better code faster. As a rapidly growing startup, we're looking for passionate engineers who want to shape the future of developer infrastructure.
+  Unkey unifies your infrastructure. Deploy APIs instantly, route traffic through global gateways, and understand usage in one place. As a rapidly growing startup, we're looking for passionate engineers who want to shape the future of developer infrastructure.
 
 We are a fully remote and mostly asynchronous company, relying on everyone to take ownership of their work and to lead with action.
 
@@ -49,7 +49,7 @@ We are a fully remote and mostly asynchronous company, relying on everyone to ta
 
   const whyNot = `## Why we may not be a good fit
 
-We're a small, fast-moving startup, and this environment isn't for everyone. You might not enjoy working with us if:
+- We're a small, fast-moving startup, and this environment isn't for everyone. You might not enjoy working with us if:
 - You prefer well-defined structures and processes. We're building these as we go, and you'll need to be comfortable with ambiguity.
 - You're looking for extensive management oversight. We expect everyone to be self-directed and take ownership of their work. When you see something that needs fixing, we expect you to own it end-to-end and drive it to completion.
 - You want to focus solely on coding. Building a startup requires wearing multiple hats and contributing beyond your core role.
@@ -61,7 +61,7 @@ We believe in being transparent about our environment and expectations. The righ
     `;
 
   const apply = `## How to Apply:
-Send us an email at jobs@unkey.dev telling us why you're excited about developer tooling and infrastructure. We'd love to hear about:
+Send us an email at jobs@unkey.com telling us why you're excited about developer tooling and infrastructure. We'd love to hear about:
 - Your perspective on the current state of developer tools
 - Any personal pain points you've experienced that motivate you to work in this space
 - Relevant projects or systems you've built that align with our mission
