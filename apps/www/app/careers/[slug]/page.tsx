@@ -150,7 +150,7 @@ We value thoughtful, genuine responses over formal applications. The best candid
             <Link
               target="_blank"
               className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-center text-black transition-all duration-200 transform bg-white border border-white rounded-md hover:bg-black hover:text-white max-w-1/2"
-              href={`mailto:jobs@unkey.dev?subject=Application for ${career.title}`}
+              href={`mailto:jobs@unkey.com?subject=Application for ${career.title}`}
             >
               Apply
             </Link>
