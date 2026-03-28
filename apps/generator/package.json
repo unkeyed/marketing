@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "dotenv -e .env -- tsx watch src/server.ts",
     "build": "tsc",
-    "start": "dotenv -e .env -- node dist/server.js",
+    "start": "tsx src/server.ts",
     "db:push": "dotenv -e .env drizzle-kit push",
     "db:studio": "dotenv -e .env drizzle-kit studio --verbose",
     "db:generate": "dotenv -e .env drizzle-kit generate",
@@ -34,13 +34,13 @@
     "hono": "^4.7.0",
     "js-yaml": "^4.1.0",
     "pg": "^8.13.0",
+    "tsx": "^4.19.0",
     "zod": "^3.23.5"
   },
   "devDependencies": {
     "dotenv-cli": "^8.0.0",
     "@types/node": "^20.14.9",
     "drizzle-kit": "^0.30.0",
-    "tsx": "^4.19.0",
     "typescript": "^5.5.3"
   }
 }
