@@ -85,15 +85,22 @@ ${relatedKeywords.slice(0, 20).map((k) => k.keyword).join(", ")}`,
     // Review the content
     const reviewResult = await generateText({
       model: openai("gpt-4o-mini"),
-      system: `You are a senior technical editor. Review this blog post for:
+      system: `You are a senior technical editor. Your job is to return a polished version of the blog post you are given.
+
+Review for:
 1. Factual accuracy
 2. Technical correctness of code examples
 3. Logical flow between sections
 4. Engagement and readability for ${audienceLevel}-level developers
 5. No AI-sounding phrases or filler content
 
-If the content is good, return it with minor improvements. If there are issues, rewrite the problematic sections.`,
-      prompt: `Review and improve this blog post:\n\n${draftResult.text}`,
+CRITICAL RULES:
+- Output ONLY the final blog post content in markdown
+- Do NOT include any editorial notes, summaries of changes, preamble, or commentary
+- Do NOT start with phrases like "Here is the revised version" or "The blog post is well-structured"
+- Do NOT end with a list of changes you made
+- The output must be ready to publish as-is with zero editing`,
+      prompt: `Return the polished version of this blog post. Output nothing except the final markdown content:\n\n${draftResult.text}`,
     });
 
     // Strip any leading H1 if present
