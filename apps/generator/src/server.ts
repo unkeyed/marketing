@@ -2,6 +2,8 @@ import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { z } from "zod";
 import { generateGlossaryEntry, type CacheStrategy } from "./glossary/generate-glossary-entry";
+import { generateBlogPost } from "./blog/generate-blog-post";
+import { audienceLevels } from "./lib/types";
 
 const app = new Hono();
 
@@ -11,8 +13,8 @@ const generateRequestSchema = z.object({
 });
 
 // Health check
-app.get("/health", (c) => {
-  return c.json({ status: "ok", timestamp: new Date().toISOString() });
+app.all("/health", (c) => {
+  return c.json({ status: "ok" }, 200);
 });
 
 // Generate a glossary entry
@@ -69,6 +71,44 @@ app.post("/api/glossary/regenerate", async (c) => {
     });
   } catch (error) {
     console.error(`[API] Glossary regeneration failed for term: "${term}"`, error);
+    return c.json(
+      {
+        status: "error",
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
+      500,
+    );
+  }
+});
+
+// Blog post generation
+const blogRequestSchema = z.object({
+  keyTerms: z.array(z.string().min(1)).min(1, "at least one key term is required"),
+  audienceLevel: z.enum(audienceLevels).default("intermediate"),
+  onCacheHit: z.enum(["stale", "revalidate"]).optional().default("stale"),
+});
+
+app.post("/api/blog/generate", async (c) => {
+  const body = await c.req.json();
+  const parsed = blogRequestSchema.safeParse(body);
+
+  if (!parsed.success) {
+    return c.json({ error: "Invalid request", details: parsed.error.flatten() }, 400);
+  }
+
+  const { keyTerms, audienceLevel, onCacheHit } = parsed.data;
+
+  try {
+    console.info(`[API] Starting blog generation for terms: [${keyTerms.join(", ")}] (audience: ${audienceLevel}, cache: ${onCacheHit})`);
+    const result = await generateBlogPost({ keyTerms, audienceLevel, onCacheHit });
+    console.info(`[API] Blog generation completed for terms: [${keyTerms.join(", ")}]`);
+
+    return c.json({
+      status: "success",
+      data: result,
+    });
+  } catch (error) {
+    console.error(`[API] Blog generation failed for terms: [${keyTerms.join(", ")}]`, error);
     return c.json(
       {
         status: "error",

@@ -10,7 +10,8 @@ import { createPrStep } from "./publish/create-pr";
 import { keywordResearchStep } from "./research/keyword-research";
 import { technicalResearchStep } from "./research/technical-research";
 
-export type CacheStrategy = "revalidate" | "stale";
+import type { CacheStrategy } from "@/lib/types";
+export type { CacheStrategy } from "@/lib/types";
 
 /**
  * Generates a glossary entry for a given term. This is the main entry point of the glossary generation process.
