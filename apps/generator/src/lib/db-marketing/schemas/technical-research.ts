@@ -1,16 +1,6 @@
 import { type DomainCategory, domainCategories } from "@/lib/constants/domain-categories";
 import { relations } from "drizzle-orm";
-import {
-  index,
-  integer,
-  jsonb,
-  pgEnum,
-  pgTable,
-  serial,
-  text,
-  unique,
-  varchar,
-} from "drizzle-orm/pg-core";
+import { index, jsonb, pgEnum, pgTable, serial, text, unique, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { searchQueries } from "./searchQuery";

@@ -3,8 +3,8 @@ import { withRetry } from "@/lib/utils/retry";
 import { openai } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { z } from "zod";
-import type { CacheStrategy } from "../generate-glossary-entry";
 import type { EvalResult } from "../evaluate/evals";
+import type { CacheStrategy } from "../generate-glossary-entry";
 
 const technicalOutlineSchema = z.object({
   outline: z.array(
@@ -23,11 +23,17 @@ type TaskInput = {
   onCacheHit?: CacheStrategy;
 };
 
-export async function reviseTechnicalOutline({ term, outlineToRefine, reviewReport, technicalContext }: TaskInput) {
-  return withRetry(async () => {
-    console.info(`[task=revise_technical_outline] Starting technical revision for term: ${term}`);
+export async function reviseTechnicalOutline({
+  term,
+  outlineToRefine,
+  reviewReport,
+  technicalContext,
+}: TaskInput) {
+  return withRetry(
+    async () => {
+      console.info(`[task=revise_technical_outline] Starting technical revision for term: ${term}`);
 
-    const technicalRevisionSystem = `
+      const technicalRevisionSystem = `
 You are a **Senior Technical Architect & API Documentation Expert** with deep expertise in computer science fundamentals and API development.
 
 Task:
@@ -67,16 +73,16 @@ You must return a JSON object with an "outline" array. Each section in the outli
 You have the ability to add, modify, or merge sections in the outline as needed to create the most technically accurate and comprehensive structure.
 `;
 
-    const ratings =
-      typeof reviewReport.ratings === "string"
-        ? JSON.parse(reviewReport.ratings)
-        : reviewReport.ratings;
-    const recommendations =
-      typeof reviewReport.recommendations === "string"
-        ? JSON.parse(reviewReport.recommendations)
-        : reviewReport.recommendations;
+      const ratings =
+        typeof reviewReport.ratings === "string"
+          ? JSON.parse(reviewReport.ratings)
+          : reviewReport.ratings;
+      const recommendations =
+        typeof reviewReport.recommendations === "string"
+          ? JSON.parse(reviewReport.recommendations)
+          : reviewReport.recommendations;
 
-    const technicalRevisionPrompt = `
+      const technicalRevisionPrompt = `
 Review and refine the outline for the term "${term}".
 
 Current outline has ${outlineToRefine.length} sections:
@@ -119,77 +125,95 @@ Notes:
 - Aim for 6-10 sections total
 `;
 
-    const result = await generateObject({
-      model: openai("gpt-4o-mini"),
-      system: technicalRevisionSystem,
-      prompt: technicalRevisionPrompt,
-      schema: technicalOutlineSchema,
-      experimental_repairText: async (res) => {
-        console.warn("[revise_technical_outline] Schema mismatch, attempting repair");
+      const result = await generateObject({
+        model: openai("gpt-4o-mini"),
+        system: technicalRevisionSystem,
+        prompt: technicalRevisionPrompt,
+        schema: technicalOutlineSchema,
+        experimental_repairText: async (res) => {
+          console.warn("[revise_technical_outline] Schema mismatch, attempting repair");
 
-        try {
-          const trimmedText = res.text.trim();
-          const lastChars = trimmedText.slice(-20);
-          const hasProperEnding = trimmedText.endsWith("}]}") || trimmedText.endsWith("}]\n}");
-
-          if (!hasProperEnding) {
-            console.error("[revise_technical_outline] Response appears truncated");
-            console.error("Actual ending:", lastChars);
-            throw new Error(
-              "Response was truncated. The outline is incomplete. Try reducing the number of sections or description length.",
-            );
-          }
-
-          let parsed: any;
           try {
-            parsed = JSON.parse(res.text);
-          } catch (e) {
-            console.error("[revise_technical_outline] JSON parse failed despite proper ending");
-            throw new Error("Invalid JSON format. Please try again.");
+            const trimmedText = res.text.trim();
+            const lastChars = trimmedText.slice(-20);
+            const hasProperEnding = trimmedText.endsWith("}]}") || trimmedText.endsWith("}]\n}");
+
+            if (!hasProperEnding) {
+              console.error("[revise_technical_outline] Response appears truncated");
+              console.error("Actual ending:", lastChars);
+              throw new Error(
+                "Response was truncated. The outline is incomplete. Try reducing the number of sections or description length.",
+              );
+            }
+
+            let parsed: any;
+            try {
+              parsed = JSON.parse(res.text);
+            } catch (_e) {
+              console.error("[revise_technical_outline] JSON parse failed despite proper ending");
+              throw new Error("Invalid JSON format. Please try again.");
+            }
+
+            if (!parsed.outline) {
+              parsed = { outline: Array.isArray(parsed) ? parsed : [parsed] };
+            }
+
+            if (Array.isArray(parsed.outline)) {
+              parsed.outline = parsed.outline.map((section: any, index: number) => {
+                const fixed: any = { ...section };
+                if (!section.heading) {
+                  fixed.heading = `Section ${index + 1}`;
+                }
+                if (!section.description) {
+                  fixed.description = "Description pending.";
+                }
+                if (!section.order) {
+                  fixed.order = index + 1;
+                }
+                if (!section.citedSources) {
+                  fixed.citedSources = "https://developer.mozilla.org/";
+                }
+                if (!Array.isArray(section.contentTypes)) {
+                  fixed.contentTypes = [
+                    {
+                      type: "text",
+                      description: "Default content type",
+                      whyToUse: "Placeholder for missing content type",
+                    },
+                  ];
+                }
+                fixed.contentTypes = fixed.contentTypes.map((ct: any) => ({
+                  type: ct.type || "text",
+                  description: ct.description || "Content description",
+                  whyToUse: ct.whyToUse || "Reason for using this content type",
+                }));
+                return fixed;
+              });
+            }
+
+            const finalParseResult = technicalOutlineSchema.safeParse(parsed);
+            if (finalParseResult.success) {
+              return JSON.stringify(parsed);
+            }
+            throw new Error("Could not repair the response to match schema");
+          } catch (error) {
+            console.error("[revise_technical_outline] Repair failed:", error);
+            throw error;
           }
+        },
+        experimental_telemetry: {
+          functionId: "reviseTechnicalOutline",
+          recordInputs: true,
+          recordOutputs: true,
+        },
+      });
 
-          if (!parsed.outline) {
-            parsed = { outline: Array.isArray(parsed) ? parsed : [parsed] };
-          }
+      console.info(
+        `[task=revise_technical_outline] Completed technical revision for term: ${term}`,
+      );
 
-          if (Array.isArray(parsed.outline)) {
-            parsed.outline = parsed.outline.map((section: any, index: number) => {
-              const fixed: any = { ...section };
-              if (!section.heading) fixed.heading = `Section ${index + 1}`;
-              if (!section.description) fixed.description = "Description pending.";
-              if (!section.order) fixed.order = index + 1;
-              if (!section.citedSources) fixed.citedSources = "https://developer.mozilla.org/";
-              if (!Array.isArray(section.contentTypes)) {
-                fixed.contentTypes = [{ type: "text", description: "Default content type", whyToUse: "Placeholder for missing content type" }];
-              }
-              fixed.contentTypes = fixed.contentTypes.map((ct: any) => ({
-                type: ct.type || "text",
-                description: ct.description || "Content description",
-                whyToUse: ct.whyToUse || "Reason for using this content type",
-              }));
-              return fixed;
-            });
-          }
-
-          const finalParseResult = technicalOutlineSchema.safeParse(parsed);
-          if (finalParseResult.success) {
-            return JSON.stringify(parsed);
-          }
-          throw new Error("Could not repair the response to match schema");
-        } catch (error) {
-          console.error("[revise_technical_outline] Repair failed:", error);
-          throw error;
-        }
-      },
-      experimental_telemetry: {
-        functionId: "reviseTechnicalOutline",
-        recordInputs: true,
-        recordOutputs: true,
-      },
-    });
-
-    console.info(`[task=revise_technical_outline] Completed technical revision for term: ${term}`);
-
-    return result.object;
-  }, { maxAttempts: 5, label: "reviseTechnicalOutline" });
+      return result.object;
+    },
+    { maxAttempts: 5, label: "reviseTechnicalOutline" },
+  );
 }

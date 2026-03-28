@@ -1,12 +1,12 @@
 import { db } from "@/lib/db-marketing/client";
 import { entries } from "@/lib/db-marketing/schemas";
-import { tryCatch } from "@/lib/utils/try-catch";
+import type { CacheStrategy } from "@/lib/types";
 import { withRetry } from "@/lib/utils/retry";
+import { tryCatch } from "@/lib/utils/try-catch";
 import { Octokit } from "@octokit/rest";
 import { eq } from "drizzle-orm";
 import GithubSlugger from "github-slugger";
 import yaml from "js-yaml";
-import type { CacheStrategy } from "@/lib/types";
 
 export async function commitToBranchStep({
   input,
@@ -32,7 +32,9 @@ export async function commitToBranchStep({
         orderBy: (entries, { asc }) => [asc(entries.createdAt)],
       });
       if (existing?.githubPrUrl && onCacheHit === "stale") {
-        console.info(`[commit][term:${input}] Cache hit, returning branch: ${existing.githubPrUrl}`);
+        console.info(
+          `[commit][term:${input}] Cache hit, returning branch: ${existing.githubPrUrl}`,
+        );
         return {
           entry: {
             id: existing.id,
@@ -138,10 +140,7 @@ export async function commitToBranchStep({
           throw new Error(`Failed to update file in branch ${branch}`);
         }
 
-        await db
-          .update(entries)
-          .set({ githubPrUrl: branch })
-          .where(eq(entries.inputTerm, input));
+        await db.update(entries).set({ githubPrUrl: branch }).where(eq(entries.inputTerm, input));
 
         console.info(`[commit][term:${input}] Updated file in existing branch: ${branch}`);
         return {

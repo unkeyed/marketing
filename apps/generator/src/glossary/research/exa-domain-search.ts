@@ -54,16 +54,17 @@ export async function exaDomainSearch({
     category: domainCategory?.name,
     includeDomains: withoutScrapingOpts.includeDomains,
   });
-  const searchResultWithoutContent = await exa.searchAndContents(inputTerm, withoutScrapingOpts) as any;
+  const searchResultWithoutContent = (await exa.searchAndContents(
+    inputTerm,
+    withoutScrapingOpts,
+  )) as any;
   console.info(`Exa API costs for the "${domain}" domain search:
       Total: $${searchResultWithoutContent.costDollars?.total}
       Search: $${searchResultWithoutContent.costDollars?.search?.neural || searchResultWithoutContent.costDollars?.search?.keyword} (@$0.0025/request)
       `);
 
   if (!searchResultWithoutContent.results.length) {
-    throw new Error(
-      `No results found for "${inputTerm}" in "${domainCategory.name}" domain`,
-    );
+    throw new Error(`No results found for "${inputTerm}" in "${domainCategory.name}" domain`);
   }
 
   if (existingSearchResponse?.id) {

@@ -28,7 +28,11 @@ type EvalOptions = {
 
 export type EvalResult = NonNullable<Awaited<ReturnType<typeof getOrCreateRatings>>>;
 
-export async function getOrCreateRatings({ input, onCacheHit = "stale", ...options }: TaskInput & RatingOptions) {
+export async function getOrCreateRatings({
+  input,
+  onCacheHit = "stale",
+  ...options
+}: TaskInput & RatingOptions) {
   console.info(`Getting/Creating ${options.type} ratings for term: ${input}`);
 
   const entry = await db.query.entries.findFirst({
@@ -110,7 +114,11 @@ Guidelines:
   return ratingEval;
 }
 
-export async function getOrCreateRecommendations({ input, onCacheHit = "stale", ...options }: TaskInput & RatingOptions) {
+export async function getOrCreateRecommendations({
+  input,
+  onCacheHit = "stale",
+  ...options
+}: TaskInput & RatingOptions) {
   console.info(`Getting/Creating ${options.type} recommendations for term: ${input}`);
 
   const entry = await db.query.entries.findFirst({
@@ -131,11 +139,7 @@ export async function getOrCreateRecommendations({ input, onCacheHit = "stale", 
     );
   }
 
-  if (
-    existing?.recommendations &&
-    existing.recommendations?.length > 0 &&
-    onCacheHit === "stale"
-  ) {
+  if (existing?.recommendations && existing.recommendations?.length > 0 && onCacheHit === "stale") {
     return existing;
   }
 
@@ -183,192 +187,213 @@ Guidelines:
   return updated;
 }
 
-export async function performTechnicalEval({ input, onCacheHit = "stale", ...options }: TaskInput & EvalOptions) {
-  return withRetry(async () => {
-    console.info(`Starting technical evaluation for term: ${input}`);
+export async function performTechnicalEval({
+  input,
+  onCacheHit = "stale",
+  ...options
+}: TaskInput & EvalOptions) {
+  return withRetry(
+    async () => {
+      console.info(`Starting technical evaluation for term: ${input}`);
 
-    const entry = await db.query.entries.findFirst({
-      where: eq(entries.inputTerm, input),
-      orderBy: (entries, { desc }) => [desc(entries.createdAt)],
-    });
+      const entry = await db.query.entries.findFirst({
+        where: eq(entries.inputTerm, input),
+        orderBy: (entries, { desc }) => [desc(entries.createdAt)],
+      });
 
-    if (!entry) {
-      throw new Error(`Entry not found for term: ${input}`);
-    }
+      if (!entry) {
+        throw new Error(`Entry not found for term: ${input}`);
+      }
 
-    const existing = await db.query.evals.findFirst({
-      where: and(eq(evals.entryId, entry.id), eq(evals.type, "technical")),
-    });
+      const existing = await db.query.evals.findFirst({
+        where: and(eq(evals.entryId, entry.id), eq(evals.type, "technical")),
+      });
 
-    if (
-      existing?.recommendations &&
-      existing.recommendations?.length > 0 &&
-      onCacheHit === "stale"
-    ) {
-      console.info(`Found existing technical evaluation for term: ${input}`);
-      return existing;
-    }
+      if (
+        existing?.recommendations &&
+        existing.recommendations?.length > 0 &&
+        onCacheHit === "stale"
+      ) {
+        console.info(`Found existing technical evaluation for term: ${input}`);
+        return existing;
+      }
 
-    console.info(`Performing new technical evaluation for term: ${input}`);
+      console.info(`Performing new technical evaluation for term: ${input}`);
 
-    const ratingsResult = await getOrCreateRatings({
-      input,
-      type: "technical",
-      content: options.content,
-      onCacheHit,
-    });
+      const ratingsResult = await getOrCreateRatings({
+        input,
+        type: "technical",
+        content: options.content,
+        onCacheHit,
+      });
 
-    if (!ratingsResult?.id) {
-      throw new Error(`The ratings for technical task didn't return an eval id.`);
-    }
-    console.info(`Generated technical ratings for term: ${input}`);
+      if (!ratingsResult?.id) {
+        throw new Error(`The ratings for technical task didn't return an eval id.`);
+      }
+      console.info(`Generated technical ratings for term: ${input}`);
 
-    const recommendationsResult = await getOrCreateRecommendations({
-      input,
-      type: "technical",
-      content: options.content,
-      onCacheHit,
-    });
+      const recommendationsResult = await getOrCreateRecommendations({
+        input,
+        type: "technical",
+        content: options.content,
+        onCacheHit,
+      });
 
-    if (!recommendationsResult?.id) {
-      throw new Error("Failed to get recommendations");
-    }
-    console.info(`Generated technical recommendations for term: ${input}`);
+      if (!recommendationsResult?.id) {
+        throw new Error("Failed to get recommendations");
+      }
+      console.info(`Generated technical recommendations for term: ${input}`);
 
-    const newEval = await db.query.evals.findFirst({
-      where: eq(evals.id, ratingsResult.id),
-    });
-    if (!newEval?.id) {
-      throw new Error(
-        `There's a data integrity issue with the eval of type "technical" with id '${ratingsResult.id}'`,
-      );
-    }
+      const newEval = await db.query.evals.findFirst({
+        where: eq(evals.id, ratingsResult.id),
+      });
+      if (!newEval?.id) {
+        throw new Error(
+          `There's a data integrity issue with the eval of type "technical" with id '${ratingsResult.id}'`,
+        );
+      }
 
-    return newEval;
-  }, { maxAttempts: 5, label: "performTechnicalEval" });
+      return newEval;
+    },
+    { maxAttempts: 5, label: "performTechnicalEval" },
+  );
 }
 
-export async function performSEOEval({ input, onCacheHit = "stale", ...options }: TaskInput & EvalOptions) {
-  return withRetry(async () => {
-    console.info(`Starting SEO evaluation for term: ${input}`);
+export async function performSEOEval({
+  input,
+  onCacheHit = "stale",
+  ...options
+}: TaskInput & EvalOptions) {
+  return withRetry(
+    async () => {
+      console.info(`Starting SEO evaluation for term: ${input}`);
 
-    const entry = await db.query.entries.findFirst({
-      where: eq(entries.inputTerm, input),
-      orderBy: (entries, { desc }) => [desc(entries.createdAt)],
-    });
+      const entry = await db.query.entries.findFirst({
+        where: eq(entries.inputTerm, input),
+        orderBy: (entries, { desc }) => [desc(entries.createdAt)],
+      });
 
-    if (!entry) {
-      throw new Error(`Entry not found for term: ${input}`);
-    }
+      if (!entry) {
+        throw new Error(`Entry not found for term: ${input}`);
+      }
 
-    const existing = await db.query.evals.findFirst({
-      where: and(eq(evals.entryId, entry.id), eq(evals.type, "seo")),
-    });
+      const existing = await db.query.evals.findFirst({
+        where: and(eq(evals.entryId, entry.id), eq(evals.type, "seo")),
+      });
 
-    if (
-      existing?.recommendations &&
-      existing.recommendations?.length > 0 &&
-      onCacheHit === "stale"
-    ) {
-      console.info(`Cache hit. Found existing SEO evaluation for term '${input}'.`);
-      return existing;
-    }
+      if (
+        existing?.recommendations &&
+        existing.recommendations?.length > 0 &&
+        onCacheHit === "stale"
+      ) {
+        console.info(`Cache hit. Found existing SEO evaluation for term '${input}'.`);
+        return existing;
+      }
 
-    console.info(`Performing new SEO evaluation for term: ${input}`);
+      console.info(`Performing new SEO evaluation for term: ${input}`);
 
-    const ratingsResult = await getOrCreateRatings({
-      input,
-      type: "seo",
-      content: options.content,
-      onCacheHit,
-    });
+      const ratingsResult = await getOrCreateRatings({
+        input,
+        type: "seo",
+        content: options.content,
+        onCacheHit,
+      });
 
-    if (!ratingsResult?.id) {
-      throw new Error(`The ratings for SEO task didn't return an eval id.`);
-    }
-    console.info(`Generated SEO ratings for term: ${input}`);
+      if (!ratingsResult?.id) {
+        throw new Error(`The ratings for SEO task didn't return an eval id.`);
+      }
+      console.info(`Generated SEO ratings for term: ${input}`);
 
-    const recommendationsResult = await getOrCreateRecommendations({
-      input,
-      type: "seo",
-      content: options.content,
-      onCacheHit,
-    });
+      const recommendationsResult = await getOrCreateRecommendations({
+        input,
+        type: "seo",
+        content: options.content,
+        onCacheHit,
+      });
 
-    if (!recommendationsResult?.id) {
-      throw new Error(`The recommendations for SEO task didn't return an eval id.`);
-    }
-    const newEval = await db.query.evals.findFirst({
-      where: eq(evals.id, ratingsResult.id),
-    });
-    if (!newEval?.id) {
-      throw new Error(`There's a data integrity issue here, this shouldn't happen`);
-    }
-    return newEval;
-  }, { maxAttempts: 5, label: "performSEOEval" });
+      if (!recommendationsResult?.id) {
+        throw new Error(`The recommendations for SEO task didn't return an eval id.`);
+      }
+      const newEval = await db.query.evals.findFirst({
+        where: eq(evals.id, ratingsResult.id),
+      });
+      if (!newEval?.id) {
+        throw new Error(`There's a data integrity issue here, this shouldn't happen`);
+      }
+      return newEval;
+    },
+    { maxAttempts: 5, label: "performSEOEval" },
+  );
 }
 
-export async function performEditorialEval({ input, onCacheHit = "stale", ...options }: TaskInput & EvalOptions) {
-  return withRetry(async () => {
-    console.info(`[workflow=glossary] [task=editorial_eval] Starting for term: ${input}`);
+export async function performEditorialEval({
+  input,
+  onCacheHit = "stale",
+  ...options
+}: TaskInput & EvalOptions) {
+  return withRetry(
+    async () => {
+      console.info(`[workflow=glossary] [task=editorial_eval] Starting for term: ${input}`);
 
-    const entry = await db.query.entries.findFirst({
-      where: eq(entries.inputTerm, input),
-      orderBy: (entries, { desc }) => [desc(entries.createdAt)],
-    });
+      const entry = await db.query.entries.findFirst({
+        where: eq(entries.inputTerm, input),
+        orderBy: (entries, { desc }) => [desc(entries.createdAt)],
+      });
 
-    if (!entry) {
-      throw new Error(`Entry not found for term: ${input}`);
-    }
+      if (!entry) {
+        throw new Error(`Entry not found for term: ${input}`);
+      }
 
-    const existing = await db.query.evals.findFirst({
-      where: and(eq(evals.entryId, entry.id), eq(evals.type, "editorial")),
-    });
+      const existing = await db.query.evals.findFirst({
+        where: and(eq(evals.entryId, entry.id), eq(evals.type, "editorial")),
+      });
 
-    if (
-      existing?.recommendations &&
-      existing.recommendations?.length > 0 &&
-      onCacheHit === "stale"
-    ) {
-      console.info(`Cache hit. Found existing editorial evaluation for term: '${input}'.`);
-      return existing;
-    }
+      if (
+        existing?.recommendations &&
+        existing.recommendations?.length > 0 &&
+        onCacheHit === "stale"
+      ) {
+        console.info(`Cache hit. Found existing editorial evaluation for term: '${input}'.`);
+        return existing;
+      }
 
-    console.info(`Performing new editorial evaluation for term: ${input}`);
+      console.info(`Performing new editorial evaluation for term: ${input}`);
 
-    const ratingsResult = await getOrCreateRatings({
-      input,
-      type: "editorial",
-      content: options.content,
-      onCacheHit,
-    });
+      const ratingsResult = await getOrCreateRatings({
+        input,
+        type: "editorial",
+        content: options.content,
+        onCacheHit,
+      });
 
-    if (!ratingsResult?.id) {
-      throw new Error(`The ratings for editorial task didn't return an eval id.`);
-    }
-    console.info(`Generated editorial ratings for term: ${input}`);
+      if (!ratingsResult?.id) {
+        throw new Error(`The ratings for editorial task didn't return an eval id.`);
+      }
+      console.info(`Generated editorial ratings for term: ${input}`);
 
-    const recommendationsResult = await getOrCreateRecommendations({
-      input,
-      type: "editorial",
-      content: options.content,
-      onCacheHit,
-    });
+      const recommendationsResult = await getOrCreateRecommendations({
+        input,
+        type: "editorial",
+        content: options.content,
+        onCacheHit,
+      });
 
-    if (!recommendationsResult?.id) {
-      throw new Error(`The recommendations for editorial task didn't return an eval id.`);
-    }
-    console.info(`Generated editorial recommendations for term: ${input}`);
+      if (!recommendationsResult?.id) {
+        throw new Error(`The recommendations for editorial task didn't return an eval id.`);
+      }
+      console.info(`Generated editorial recommendations for term: ${input}`);
 
-    const newEval = await db.query.evals.findFirst({
-      where: eq(evals.id, ratingsResult.id),
-    });
-    if (!newEval?.id) {
-      throw new Error(
-        `There's a data integrity issue with the eval of type "editorial" with id '${ratingsResult.id}'`,
-      );
-    }
+      const newEval = await db.query.evals.findFirst({
+        where: eq(evals.id, ratingsResult.id),
+      });
+      if (!newEval?.id) {
+        throw new Error(
+          `There's a data integrity issue with the eval of type "editorial" with id '${ratingsResult.id}'`,
+        );
+      }
 
-    return newEval;
-  }, { maxAttempts: 5, label: "performEditorialEval" });
+      return newEval;
+    },
+    { maxAttempts: 5, label: "performEditorialEval" },
+  );
 }

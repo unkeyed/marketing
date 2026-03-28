@@ -26,10 +26,11 @@ type TaskInput = {
 };
 
 export async function reviseEditorialOutline({ term, outlineToRefine, reviewReport }: TaskInput) {
-  return withRetry(async () => {
-    console.info(`[task=revise_editorial_outline] Starting editorial revision for term: ${term}`);
+  return withRetry(
+    async () => {
+      console.info(`[task=revise_editorial_outline] Starting editorial revision for term: ${term}`);
 
-    const editorialRevisionSystem = `
+      const editorialRevisionSystem = `
 You are a **Senior Editor & Content Strategist** with extensive experience in creating engaging and accurate technical content for API development and computer science audiences.
 
 Task:
@@ -71,16 +72,16 @@ NOTE: Keywords are managed separately and not included in this revision.
 You have the ability to modify or merge sections in the outline as needed to create the most effective and editorially sound structure. However, preserve the keyword allocations from the SEO revision.
 `;
 
-    const ratings =
-      typeof reviewReport.ratings === "string"
-        ? JSON.parse(reviewReport.ratings)
-        : reviewReport.ratings;
-    const recommendations =
-      typeof reviewReport.recommendations === "string"
-        ? JSON.parse(reviewReport.recommendations)
-        : reviewReport.recommendations;
+      const ratings =
+        typeof reviewReport.ratings === "string"
+          ? JSON.parse(reviewReport.ratings)
+          : reviewReport.ratings;
+      const recommendations =
+        typeof reviewReport.recommendations === "string"
+          ? JSON.parse(reviewReport.recommendations)
+          : reviewReport.recommendations;
 
-    const editorialRevisionPrompt = `
+      const editorialRevisionPrompt = `
 Review and polish the outline for "${term}" from an editorial perspective.
 
 Current sections (${outlineToRefine.length} total):
@@ -106,75 +107,91 @@ Your focus should ONLY be on:
 BUT NEVER touch the keywords array - copy it exactly as is!
 `;
 
-    const result = await generateObject({
-      model: openai("gpt-4o-mini"),
-      system: editorialRevisionSystem,
-      prompt: editorialRevisionPrompt,
-      schema: editorialOutlineSchema,
-      experimental_repairText: async (res) => {
-        console.warn("[revise_editorial_outline] Schema mismatch, attempting repair");
+      const result = await generateObject({
+        model: openai("gpt-4o-mini"),
+        system: editorialRevisionSystem,
+        prompt: editorialRevisionPrompt,
+        schema: editorialOutlineSchema,
+        experimental_repairText: async (res) => {
+          console.warn("[revise_editorial_outline] Schema mismatch, attempting repair");
 
-        try {
-          const trimmedText = res.text.trim();
-          const hasProperEnding = trimmedText.endsWith("}]}") || trimmedText.endsWith("}]\n}");
-
-          if (!hasProperEnding) {
-            throw new Error("Response was truncated. Try reducing sections or using shorter descriptions.");
-          }
-
-          let parsed: any;
           try {
-            parsed = JSON.parse(res.text);
-          } catch (e) {
-            throw new Error("Invalid JSON format.");
+            const trimmedText = res.text.trim();
+            const hasProperEnding = trimmedText.endsWith("}]}") || trimmedText.endsWith("}]\n}");
+
+            if (!hasProperEnding) {
+              throw new Error(
+                "Response was truncated. Try reducing sections or using shorter descriptions.",
+              );
+            }
+
+            let parsed: any;
+            try {
+              parsed = JSON.parse(res.text);
+            } catch (_e) {
+              throw new Error("Invalid JSON format.");
+            }
+
+            if (!parsed.outline) {
+              parsed = { outline: Array.isArray(parsed) ? parsed : [parsed] };
+            }
+
+            if (Array.isArray(parsed.outline)) {
+              parsed.outline = parsed.outline.map((section: any, index: number) => {
+                const fixed: any = { ...section };
+                if (!section.heading) {
+                  fixed.heading = `Section ${index + 1}`;
+                }
+                if (!section.description) {
+                  fixed.description = "Description pending.";
+                }
+                if (!section.order) {
+                  fixed.order = index + 1;
+                }
+                if (!section.citedSources) {
+                  fixed.citedSources = "https://www.w3.org/TR/trace-context/";
+                }
+                if (!Array.isArray(section.keywords)) {
+                  fixed.keywords = [];
+                }
+                if (!Array.isArray(section.contentTypes)) {
+                  fixed.contentTypes = [
+                    { type: "text", description: "Default content", whyToUse: "Default reason" },
+                  ];
+                } else {
+                  fixed.contentTypes = section.contentTypes.map((ct: any) => ({
+                    type: ct.type || "text",
+                    description: ct.description || "Content description",
+                    whyToUse: ct.whyToUse || "Reason for content type",
+                  }));
+                }
+                return fixed;
+              });
+            }
+
+            const finalParseResult = editorialOutlineSchema.safeParse(parsed);
+            if (finalParseResult.success) {
+              return JSON.stringify(parsed);
+            }
+            throw new Error("Could not repair the response");
+          } catch (error) {
+            console.error("[revise_editorial_outline] Repair failed:", error);
+            throw error;
           }
+        },
+        experimental_telemetry: {
+          functionId: "reviseEditorialOutline",
+          recordInputs: true,
+          recordOutputs: true,
+        },
+      });
 
-          if (!parsed.outline) {
-            parsed = { outline: Array.isArray(parsed) ? parsed : [parsed] };
-          }
+      console.info(
+        `[task=revise_editorial_outline] Completed editorial revision for term: ${term}`,
+      );
 
-          if (Array.isArray(parsed.outline)) {
-            parsed.outline = parsed.outline.map((section: any, index: number) => {
-              const fixed: any = { ...section };
-              if (!section.heading) fixed.heading = `Section ${index + 1}`;
-              if (!section.description) fixed.description = "Description pending.";
-              if (!section.order) fixed.order = index + 1;
-              if (!section.citedSources) fixed.citedSources = "https://www.w3.org/TR/trace-context/";
-              if (!Array.isArray(section.keywords)) {
-                fixed.keywords = [];
-              }
-              if (!Array.isArray(section.contentTypes)) {
-                fixed.contentTypes = [{ type: "text", description: "Default content", whyToUse: "Default reason" }];
-              } else {
-                fixed.contentTypes = section.contentTypes.map((ct: any) => ({
-                  type: ct.type || "text",
-                  description: ct.description || "Content description",
-                  whyToUse: ct.whyToUse || "Reason for content type",
-                }));
-              }
-              return fixed;
-            });
-          }
-
-          const finalParseResult = editorialOutlineSchema.safeParse(parsed);
-          if (finalParseResult.success) {
-            return JSON.stringify(parsed);
-          }
-          throw new Error("Could not repair the response");
-        } catch (error) {
-          console.error("[revise_editorial_outline] Repair failed:", error);
-          throw error;
-        }
-      },
-      experimental_telemetry: {
-        functionId: "reviseEditorialOutline",
-        recordInputs: true,
-        recordOutputs: true,
-      },
-    });
-
-    console.info(`[task=revise_editorial_outline] Completed editorial revision for term: ${term}`);
-
-    return result.object;
-  }, { maxAttempts: 5, label: "reviseEditorialOutline" });
+      return result.object;
+    },
+    { maxAttempts: 5, label: "reviseEditorialOutline" },
+  );
 }

@@ -1,8 +1,8 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { z } from "zod";
-import { generateGlossaryEntry, type CacheStrategy } from "./glossary/generate-glossary-entry";
 import { generateBlogPost } from "./blog/generate-blog-post";
+import { generateGlossaryEntry } from "./glossary/generate-glossary-entry";
 import { audienceLevels } from "./lib/types";
 
 const app = new Hono();
@@ -99,7 +99,9 @@ app.post("/api/blog/generate", async (c) => {
   const { keyTerms, audienceLevel, onCacheHit } = parsed.data;
 
   try {
-    console.info(`[API] Starting blog generation for terms: [${keyTerms.join(", ")}] (audience: ${audienceLevel}, cache: ${onCacheHit})`);
+    console.info(
+      `[API] Starting blog generation for terms: [${keyTerms.join(", ")}] (audience: ${audienceLevel}, cache: ${onCacheHit})`,
+    );
     const result = await generateBlogPost({ keyTerms, audienceLevel, onCacheHit });
     console.info(`[API] Blog generation completed for terms: [${keyTerms.join(", ")}]`);
 

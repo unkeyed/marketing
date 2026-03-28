@@ -11,48 +11,49 @@ export async function seoMetaTagsStep({
   term,
   onCacheHit = "stale" as CacheStrategy,
 }: { term: string; onCacheHit?: CacheStrategy }) {
-  return withRetry(async () => {
-    const existing = await db.query.entries.findFirst({
-      where: eq(entries.inputTerm, term),
-      columns: {
-        id: true,
-        inputTerm: true,
-        metaTitle: true,
-        metaDescription: true,
-        metaH1: true,
-      },
-      with: {
-        dynamicSections: true,
-      },
-      orderBy: (entries, { desc }) => [desc(entries.createdAt)],
-    });
+  return withRetry(
+    async () => {
+      const existing = await db.query.entries.findFirst({
+        where: eq(entries.inputTerm, term),
+        columns: {
+          id: true,
+          inputTerm: true,
+          metaTitle: true,
+          metaDescription: true,
+          metaH1: true,
+        },
+        with: {
+          dynamicSections: true,
+        },
+        orderBy: (entries, { desc }) => [desc(entries.createdAt)],
+      });
 
-    if (
-      existing?.metaTitle &&
-      existing?.metaDescription &&
-      existing?.metaH1 &&
-      onCacheHit === "stale"
-    ) {
-      return existing;
-    }
+      if (
+        existing?.metaTitle &&
+        existing?.metaDescription &&
+        existing?.metaH1 &&
+        onCacheHit === "stale"
+      ) {
+        return existing;
+      }
 
-    const relatedKeywords = await db.query.keywords.findMany({
-      where: and(
-        eq(keywords.inputTerm, term),
-        or(eq(keywords.source, "related_searches"), eq(keywords.source, "auto_suggest")),
-      ),
-    });
+      const relatedKeywords = await db.query.keywords.findMany({
+        where: and(
+          eq(keywords.inputTerm, term),
+          or(eq(keywords.source, "related_searches"), eq(keywords.source, "auto_suggest")),
+        ),
+      });
 
-    const topRankingPages = await db.query.firecrawlResponses.findMany({
-      where: eq(firecrawlResponses.inputTerm, term),
-      with: {
-        serperOrganicResult: true,
-      },
-    });
+      const topRankingPages = await db.query.firecrawlResponses.findMany({
+        where: eq(firecrawlResponses.inputTerm, term),
+        with: {
+          serperOrganicResult: true,
+        },
+      });
 
-    const craftedMetaTags = await generateObject({
-      model: openai("gpt-4o-mini"),
-      system: `
+      const craftedMetaTags = await generateObject({
+        model: openai("gpt-4o-mini"),
+        system: `
         You are three specialized experts collaborating on creating meta tags for an API documentation glossary:
 
         TITLE EXPERT (aim for 45-50 chars, strict max 55)
@@ -107,7 +108,7 @@ export async function seoMetaTagsStep({
         4. Technical accuracy is non-negotiable
         5. Consider search intent progression
       `,
-      prompt: `
+        prompt: `
         Term: ${term}
         Content outline:
         ${existing?.dynamicSections.map((section) => `- ${section.heading}`).join("\n")}
@@ -126,23 +127,23 @@ export async function seoMetaTagsStep({
         Create two meta tags and an H1 that form a compelling journey from search result to page content.
         Focus on standing out in search results while maintaining accuracy and user value.
       `,
-      schema: z.object({
-        title: z.string().max(60),
-        description: z.string().max(190),
-        h1: z.string().max(80),
-        reasoning: z.object({
-          titleStrategy: z.string(),
-          descriptionStrategy: z.string(),
-          h1Strategy: z.string(),
-          cohesion: z.string(),
+        schema: z.object({
+          title: z.string().max(60),
+          description: z.string().max(190),
+          h1: z.string().max(80),
+          reasoning: z.object({
+            titleStrategy: z.string(),
+            descriptionStrategy: z.string(),
+            h1Strategy: z.string(),
+            cohesion: z.string(),
+          }),
         }),
-      }),
-      temperature: 0.3,
-    });
+        temperature: 0.3,
+      });
 
-    const validatedMetaTags = await generateObject({
-      model: openai("gpt-4o-mini"),
-      system: `
+      const validatedMetaTags = await generateObject({
+        model: openai("gpt-4o-mini"),
+        system: `
         You are an expert SEO consultant with 10 years of experience optimizing content for search engines.
         Your task is to validate and optimize meta tags to ensure they meet strict character limits while
         maintaining their SEO value and readability.
@@ -165,7 +166,7 @@ export async function seoMetaTagsStep({
         3. Restructure for conciseness
         4. Ensure truncation occurs at natural breaks
       `,
-      prompt: `
+        prompt: `
         Original tags:
         Title: ${craftedMetaTags.object.title}
         Description: ${craftedMetaTags.object.description}
@@ -174,31 +175,33 @@ export async function seoMetaTagsStep({
         Optimize these tags to meet character limits while maintaining SEO value.
         If they already meet the limits, return them unchanged.
       `,
-      schema: z.object({
-        title: z.string().max(60),
-        description: z.string().max(160),
-        h1: z.string().max(80),
-        reasoning: z.object({
-          titleChanges: z.string(),
-          descriptionChanges: z.string(),
-          h1Changes: z.string(),
+        schema: z.object({
+          title: z.string().max(60),
+          description: z.string().max(160),
+          h1: z.string().max(80),
+          reasoning: z.object({
+            titleChanges: z.string(),
+            descriptionChanges: z.string(),
+            h1Changes: z.string(),
+          }),
         }),
-      }),
-      temperature: 0.1,
-    });
+        temperature: 0.1,
+      });
 
-    await db
-      .update(entries)
-      .set({
-        metaTitle: validatedMetaTags.object.title,
-        metaDescription: validatedMetaTags.object.description,
-        metaH1: validatedMetaTags.object.h1,
-      })
-      .where(eq(entries.inputTerm, term));
+      await db
+        .update(entries)
+        .set({
+          metaTitle: validatedMetaTags.object.title,
+          metaDescription: validatedMetaTags.object.description,
+          metaH1: validatedMetaTags.object.h1,
+        })
+        .where(eq(entries.inputTerm, term));
 
-    return db.query.entries.findFirst({
-      where: eq(entries.inputTerm, term),
-      orderBy: (entries, { desc }) => [desc(entries.createdAt)],
-    });
-  }, { maxAttempts: 3, label: "seoMetaTags" });
+      return db.query.entries.findFirst({
+        where: eq(entries.inputTerm, term),
+        orderBy: (entries, { desc }) => [desc(entries.createdAt)],
+      });
+    },
+    { maxAttempts: 3, label: "seoMetaTags" },
+  );
 }

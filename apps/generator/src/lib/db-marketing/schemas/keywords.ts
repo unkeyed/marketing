@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { index, integer, pgTable, serial, timestamp, unique, varchar } from "drizzle-orm/pg-core";
+import { index, pgTable, serial, timestamp, unique, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 import { searchQueries } from "./searchQuery";

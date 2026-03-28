@@ -27,11 +27,17 @@ type TaskInput = {
   seoKeywordsToAllocate: Array<SelectKeywords>;
 };
 
-export async function reviseSEOOutline({ term, outlineToRefine, reviewReport, seoKeywordsToAllocate }: TaskInput) {
-  return withRetry(async () => {
-    console.info(`[task=revise_seo_outline] Starting SEO revision for term: ${term}`);
+export async function reviseSEOOutline({
+  term,
+  outlineToRefine,
+  reviewReport,
+  seoKeywordsToAllocate,
+}: TaskInput) {
+  return withRetry(
+    async () => {
+      console.info(`[task=revise_seo_outline] Starting SEO revision for term: ${term}`);
 
-    const seoRevisionSystem = `
+      const seoRevisionSystem = `
 You are a **Senior SEO Strategist & Technical Content Specialist** with over 10 years of experience in optimizing content for API development and computer science domains.
 
 Task:
@@ -80,24 +86,24 @@ You must return a JSON object with an "outline" array. Each section must have:
 You have the ability to add, modify, or merge sections in the outline as needed to create the most effective and SEO-optimized structure.
 `;
 
-    const ratings =
-      typeof reviewReport.ratings === "string"
-        ? JSON.parse(reviewReport.ratings)
-        : reviewReport.ratings;
-    const recommendations =
-      typeof reviewReport.recommendations === "string"
-        ? JSON.parse(reviewReport.recommendations)
-        : reviewReport.recommendations;
+      const ratings =
+        typeof reviewReport.ratings === "string"
+          ? JSON.parse(reviewReport.ratings)
+          : reviewReport.ratings;
+      const recommendations =
+        typeof reviewReport.recommendations === "string"
+          ? JSON.parse(reviewReport.recommendations)
+          : reviewReport.recommendations;
 
-    const allKeywords = seoKeywordsToAllocate.map((k) => k.keyword);
-    const relatedSearchKeywords = seoKeywordsToAllocate
-      .filter((k) => k.source === "related_searches")
-      .map((k) => k.keyword);
-    const autoSuggestKeywords = seoKeywordsToAllocate
-      .filter((k) => k.source === "auto_suggest")
-      .map((k) => k.keyword);
+      const allKeywords = seoKeywordsToAllocate.map((k) => k.keyword);
+      const relatedSearchKeywords = seoKeywordsToAllocate
+        .filter((k) => k.source === "related_searches")
+        .map((k) => k.keyword);
+      const autoSuggestKeywords = seoKeywordsToAllocate
+        .filter((k) => k.source === "auto_suggest")
+        .map((k) => k.keyword);
 
-    const seoRevisionPrompt = `
+      const seoRevisionPrompt = `
 Review and SEO-optimize the outline for "${term}".
 
 Current outline structure (${outlineToRefine.length} sections):
@@ -139,77 +145,93 @@ Example of INCORRECT (do not do this):
 ]
 `;
 
-    const result = await generateObject({
-      model: openai("gpt-4o-mini"),
-      system: seoRevisionSystem,
-      prompt: seoRevisionPrompt,
-      schema: seoOutlineSchema,
-      experimental_repairText: async (res) => {
-        console.warn("[revise_seo_outline] Schema mismatch, attempting repair");
+      const result = await generateObject({
+        model: openai("gpt-4o-mini"),
+        system: seoRevisionSystem,
+        prompt: seoRevisionPrompt,
+        schema: seoOutlineSchema,
+        experimental_repairText: async (res) => {
+          console.warn("[revise_seo_outline] Schema mismatch, attempting repair");
 
-        try {
-          const trimmedText = res.text.trim();
-          const hasProperEnding = trimmedText.endsWith("}]}") || trimmedText.endsWith("}]\n}");
-
-          if (!hasProperEnding) {
-            throw new Error("Response was truncated. Try reducing sections or using shorter descriptions.");
-          }
-
-          let parsed: any;
           try {
-            parsed = JSON.parse(res.text);
-          } catch (e) {
-            throw new Error("Invalid JSON format.");
+            const trimmedText = res.text.trim();
+            const hasProperEnding = trimmedText.endsWith("}]}") || trimmedText.endsWith("}]\n}");
+
+            if (!hasProperEnding) {
+              throw new Error(
+                "Response was truncated. Try reducing sections or using shorter descriptions.",
+              );
+            }
+
+            let parsed: any;
+            try {
+              parsed = JSON.parse(res.text);
+            } catch (_e) {
+              throw new Error("Invalid JSON format.");
+            }
+
+            if (!parsed.outline) {
+              parsed = { outline: Array.isArray(parsed) ? parsed : [parsed] };
+            }
+
+            if (Array.isArray(parsed.outline)) {
+              parsed.outline = parsed.outline.map((section: any, index: number) => {
+                const fixed: any = { ...section };
+                if (!section.heading) {
+                  fixed.heading = `Section ${index + 1}`;
+                }
+                if (!section.description) {
+                  fixed.description = "Description pending.";
+                }
+                if (!section.order) {
+                  fixed.order = index + 1;
+                }
+                if (!section.citedSources) {
+                  fixed.citedSources = "https://www.w3.org/TR/trace-context/";
+                }
+                if (Array.isArray(section.keywords)) {
+                  fixed.keywords = section.keywords.map((k: any) =>
+                    typeof k === "string" ? { keyword: k } : k,
+                  );
+                } else {
+                  fixed.keywords = [];
+                }
+                if (!Array.isArray(section.contentTypes)) {
+                  fixed.contentTypes = [
+                    { type: "text", description: "Default content", whyToUse: "Default reason" },
+                  ];
+                } else {
+                  fixed.contentTypes = section.contentTypes.map((ct: any) => ({
+                    type: ct.type || "text",
+                    description: ct.description || "Content description",
+                    whyToUse: ct.whyToUse || "Reason for content type",
+                  }));
+                }
+                return fixed;
+              });
+            }
+
+            const finalParseResult = seoOutlineSchema.safeParse(parsed);
+            if (finalParseResult.success) {
+              return JSON.stringify(parsed);
+            }
+            throw new Error("Could not repair the response");
+          } catch (error) {
+            console.error("[revise_seo_outline] Repair failed:", error);
+            throw error;
           }
+        },
+        experimental_telemetry: {
+          functionId: "reviseSEOOutline",
+          recordInputs: true,
+          recordOutputs: true,
+        },
+      });
 
-          if (!parsed.outline) {
-            parsed = { outline: Array.isArray(parsed) ? parsed : [parsed] };
-          }
+      console.info(`[task=revise_seo_outline] Completed SEO revision for term: ${term}`);
 
-          if (Array.isArray(parsed.outline)) {
-            parsed.outline = parsed.outline.map((section: any, index: number) => {
-              const fixed: any = { ...section };
-              if (!section.heading) fixed.heading = `Section ${index + 1}`;
-              if (!section.description) fixed.description = "Description pending.";
-              if (!section.order) fixed.order = index + 1;
-              if (!section.citedSources) fixed.citedSources = "https://www.w3.org/TR/trace-context/";
-              if (Array.isArray(section.keywords)) {
-                fixed.keywords = section.keywords.map((k: any) => typeof k === "string" ? { keyword: k } : k);
-              } else {
-                fixed.keywords = [];
-              }
-              if (!Array.isArray(section.contentTypes)) {
-                fixed.contentTypes = [{ type: "text", description: "Default content", whyToUse: "Default reason" }];
-              } else {
-                fixed.contentTypes = section.contentTypes.map((ct: any) => ({
-                  type: ct.type || "text",
-                  description: ct.description || "Content description",
-                  whyToUse: ct.whyToUse || "Reason for content type",
-                }));
-              }
-              return fixed;
-            });
-          }
-
-          const finalParseResult = seoOutlineSchema.safeParse(parsed);
-          if (finalParseResult.success) {
-            return JSON.stringify(parsed);
-          }
-          throw new Error("Could not repair the response");
-        } catch (error) {
-          console.error("[revise_seo_outline] Repair failed:", error);
-          throw error;
-        }
-      },
-      experimental_telemetry: {
-        functionId: "reviseSEOOutline",
-        recordInputs: true,
-        recordOutputs: true,
-      },
-    });
-
-    console.info(`[task=revise_seo_outline] Completed SEO revision for term: ${term}`);
-
-    return result.object;
-  }, { maxAttempts: 5, label: "reviseSEOOutline" });
+      return result.object;
+    },
+    { maxAttempts: 5, label: "reviseSEOOutline" },
+  );
 }

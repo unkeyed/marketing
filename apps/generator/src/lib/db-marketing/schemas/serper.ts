@@ -1,5 +1,14 @@
 import { relations } from "drizzle-orm";
-import { index, integer, jsonb, pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import {
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 import { firecrawlResponses } from "./firecrawl";
@@ -15,7 +24,10 @@ export const serperSearchResponses = pgTable(
     answerBox: jsonb("answer_box"),
     knowledgeGraph: jsonb("knowledge_graph"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow().$onUpdate(() => new Date()),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
   },
   (table) => ({
     inputTermIdx: index("serper_search_responses_input_term_idx").on(table.inputTerm),
@@ -53,10 +65,15 @@ export const serperOrganicResults = pgTable(
     position: integer("position").notNull(),
     imageUrl: text("image_url"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow().$onUpdate(() => new Date()),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
   },
   (table) => ({
-    searchResponseIdIdx: index("serper_organic_results_search_response_id_idx").on(table.searchResponseId),
+    searchResponseIdIdx: index("serper_organic_results_search_response_id_idx").on(
+      table.searchResponseId,
+    ),
     linkIdx: index("serper_organic_results_link_idx").on(table.link),
   }),
 );
@@ -89,7 +106,10 @@ export const serperSitelinks = pgTable(
     title: text("title").notNull(),
     link: varchar("link", { length: 767 }).notNull(),
     createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow().$onUpdate(() => new Date()),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
   },
   (table) => ({
     organicResultIdIdx: index("serper_sitelinks_organic_result_id_idx").on(table.organicResultId),
@@ -124,10 +144,15 @@ export const serperTopStories = pgTable(
     date: text("date").notNull(),
     imageUrl: text("image_url").notNull(),
     createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow().$onUpdate(() => new Date()),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
   },
   (table) => ({
-    searchResponseIdIdx: index("serper_top_stories_search_response_id_idx").on(table.searchResponseId),
+    searchResponseIdIdx: index("serper_top_stories_search_response_id_idx").on(
+      table.searchResponseId,
+    ),
     linkIdx: index("serper_top_stories_link_idx").on(table.link),
   }),
 );
@@ -156,10 +181,15 @@ export const serperPeopleAlsoAsk = pgTable(
     title: text("title").notNull(),
     link: varchar("link", { length: 767 }).notNull(),
     createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow().$onUpdate(() => new Date()),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
   },
   (table) => ({
-    searchResponseIdIdx: index("serper_people_also_ask_search_response_id_idx").on(table.searchResponseId),
+    searchResponseIdIdx: index("serper_people_also_ask_search_response_id_idx").on(
+      table.searchResponseId,
+    ),
     linkIdx: index("serper_people_also_ask_link_idx").on(table.link),
   }),
 );
@@ -187,10 +217,15 @@ export const serperRelatedSearches = pgTable(
     searchResponseId: integer("search_response_id").notNull(),
     query: varchar("query", { length: 767 }).notNull(),
     createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow().$onUpdate(() => new Date()),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
   },
   (table) => ({
-    searchResponseIdIdx: index("serper_related_searches_search_response_id_idx").on(table.searchResponseId),
+    searchResponseIdIdx: index("serper_related_searches_search_response_id_idx").on(
+      table.searchResponseId,
+    ),
     queryIdx: index("serper_related_searches_query_idx").on(table.query),
   }),
 );

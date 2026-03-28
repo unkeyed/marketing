@@ -2,7 +2,6 @@ import { relations } from "drizzle-orm";
 import {
   boolean,
   index,
-  integer,
   pgTable,
   serial,
   text,
@@ -26,7 +25,10 @@ export const searchQueries = pgTable(
     ambiguityReason: text("ambiguity_reason").notNull().default(""),
     clarifyingContext: text("clarifying_context").notNull().default(""),
     createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow().$onUpdate(() => new Date()),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
   },
   (table) => ({
     inputTermIdx: index("search_queries_input_term_idx").on(table.inputTerm),

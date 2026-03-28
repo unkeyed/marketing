@@ -1,8 +1,8 @@
 import { db } from "@/lib/db-marketing/client";
 import { takeawaysSchema } from "@/lib/db-marketing/schemas/takeaways-schema";
 import { google } from "@/lib/google";
-import { openai } from "@ai-sdk/openai";
 import { withRetry } from "@/lib/utils/retry";
+import { openai } from "@ai-sdk/openai";
 import { type GenerateObjectResult, RetryError, generateObject } from "ai";
 import { eq } from "drizzle-orm";
 import type { z } from "zod";
@@ -16,40 +16,41 @@ export async function contentTakeawaysStep({
   term: string;
   onCacheHit?: CacheStrategy;
 }) {
-  return withRetry(async () => {
-    const existing = await db.query.entries.findFirst({
-      where: eq(entries.inputTerm, term),
-      columns: {
-        id: true,
-        inputTerm: true,
-        takeaways: true,
-      },
-    });
+  return withRetry(
+    async () => {
+      const existing = await db.query.entries.findFirst({
+        where: eq(entries.inputTerm, term),
+        columns: {
+          id: true,
+          inputTerm: true,
+          takeaways: true,
+        },
+      });
 
-    if (existing?.takeaways && onCacheHit === "stale") {
-      return existing;
-    }
+      if (existing?.takeaways && onCacheHit === "stale") {
+        return existing;
+      }
 
-    const scrapedContent = await db.query.exaScrapedResults.findMany({
-      where: eq(exaScrapedResults.inputTerm, term),
-      columns: {
-        text: true,
-        summary: true,
-        url: true,
-        domainCategory: true,
-      },
-    });
+      const scrapedContent = await db.query.exaScrapedResults.findMany({
+        where: eq(exaScrapedResults.inputTerm, term),
+        columns: {
+          text: true,
+          summary: true,
+          url: true,
+          domainCategory: true,
+        },
+      });
 
-    const groupedScrapedContent = scrapedContent.reduce(
-      (acc, content) => {
-        acc[content.domainCategory] = acc[content.domainCategory] || [];
-        acc[content.domainCategory].push(content);
-        return acc;
-      },
-      {} as Record<string, typeof scrapedContent>,
-    );
+      const groupedScrapedContent = scrapedContent.reduce(
+        (acc, content) => {
+          acc[content.domainCategory] = acc[content.domainCategory] || [];
+          acc[content.domainCategory].push(content);
+          return acc;
+        },
+        {} as Record<string, typeof scrapedContent>,
+      );
 
-    const systemPrompt = `
+      const systemPrompt = `
         You are an API documentation expert. Create comprehensive takeaways for API-related terms.
         Focus on practical, accurate, and developer-friendly content.
         Each section should be concise but informative.
@@ -57,7 +58,7 @@ export async function contentTakeawaysStep({
         For usage in APIs, provide a maximum of 3 short, focused sentences highlighting key terms and primary use cases.
       `;
 
-    const userPrompt = `
+      const userPrompt = `
         Term: "${term}"
 
         ## Scraped Content summaries
@@ -110,47 +111,49 @@ export async function contentTakeawaysStep({
         7. Interesting fact (did you know)
       `;
 
-    let takeaways: GenerateObjectResult<z.infer<typeof takeawaysSchema>>;
+      let takeaways: GenerateObjectResult<z.infer<typeof takeawaysSchema>>;
 
-    try {
-      takeaways = await generateObject({
-        model: openai("gpt-4o-mini"),
-        system: systemPrompt,
-        prompt: userPrompt,
-        schema: takeawaysSchema,
-        temperature: 0.2,
-        experimental_telemetry: {
-          functionId: "content_takeaways",
-          isEnabled: true,
-        },
-      });
-    } catch (error) {
-      if (RetryError.isInstance(error)) {
+      try {
         takeaways = await generateObject({
-          model: google("gemini-2.5-pro-exp-03-25"),
+          model: openai("gpt-4o-mini"),
           system: systemPrompt,
           prompt: userPrompt,
           schema: takeawaysSchema,
           temperature: 0.2,
           experimental_telemetry: {
-            functionId: "content_takeaways_gemini",
+            functionId: "content_takeaways",
             isEnabled: true,
           },
         });
-      } else {
-        throw error;
+      } catch (error) {
+        if (RetryError.isInstance(error)) {
+          takeaways = await generateObject({
+            model: google("gemini-2.5-pro-exp-03-25"),
+            system: systemPrompt,
+            prompt: userPrompt,
+            schema: takeawaysSchema,
+            temperature: 0.2,
+            experimental_telemetry: {
+              functionId: "content_takeaways_gemini",
+              isEnabled: true,
+            },
+          });
+        } else {
+          throw error;
+        }
       }
-    }
 
-    await db
-      .update(entries)
-      .set({
-        takeaways: takeaways.object,
-      })
-      .where(eq(entries.inputTerm, term));
+      await db
+        .update(entries)
+        .set({
+          takeaways: takeaways.object,
+        })
+        .where(eq(entries.inputTerm, term));
 
-    return db.query.entries.findFirst({
-      where: eq(entries.inputTerm, term),
-    });
-  }, { maxAttempts: 3, label: "contentTakeaways" });
+      return db.query.entries.findFirst({
+        where: eq(entries.inputTerm, term),
+      });
+    },
+    { maxAttempts: 3, label: "contentTakeaways" },
+  );
 }

@@ -9,7 +9,9 @@ import { google } from "@/lib/google";
 import { generateObject } from "ai";
 import { and, eq } from "drizzle-orm";
 
-export async function evaluateSearchResultsStep({ inputTerm }: Pick<TechnicalResearch, "inputTerm">) {
+export async function evaluateSearchResultsStep({
+  inputTerm,
+}: Pick<TechnicalResearch, "inputTerm">) {
   const existing = await db.query.technicalResearch.findMany({
     where: eq(technicalResearch.inputTerm, inputTerm),
     columns: {
@@ -130,9 +132,7 @@ export async function evaluateSearchResultsStep({ inputTerm }: Pick<TechnicalRes
     },
   });
   if (!updatedEntries.length) {
-    throw new Error(
-      `Technical research evaluation not found in DB for term "${inputTerm}".`,
-    );
+    throw new Error(`Technical research evaluation not found in DB for term "${inputTerm}".`);
   }
   console.info(
     `Evaluated search results for term "${inputTerm}" with stats: ${JSON.stringify(updatedEntries.map((entry) => entry.searchEvaluation?.metadata.stats))}`,

@@ -70,9 +70,7 @@ export async function generateGlossaryEntry({
   // Step 1: Keyword Research
   console.info("Step 1 - Starting keyword research...");
   const keywordResearch = await keywordResearchStep({ term, onCacheHit });
-  console.info(
-    `Keyword research completed with ${keywordResearch.keywords.length} keywords`,
-  );
+  console.info(`Keyword research completed with ${keywordResearch.keywords.length} keywords`);
 
   // Step 1.5: Technical Research
   console.info("Step 1.5 - Starting technical research...");

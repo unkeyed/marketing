@@ -3,8 +3,8 @@ import { openai } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { eq } from "drizzle-orm";
 
-import { entries, insertSearchQuerySchema, searchQueries } from "@/lib/db-marketing/schemas";
 import type { CacheStrategy } from "@/glossary/generate-glossary-entry";
+import { entries, insertSearchQuerySchema, searchQueries } from "@/lib/db-marketing/schemas";
 
 export async function getOrCreateSearchQuery({
   term,

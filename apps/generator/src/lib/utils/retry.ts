@@ -9,7 +9,7 @@ export async function withRetry<T>(
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
       if (attempt < opts.maxAttempts) {
-        const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
+        const delay = Math.min(1000 * 2 ** (attempt - 1), 10000);
         console.warn(
           `[retry] ${opts.label || "task"} attempt ${attempt}/${opts.maxAttempts} failed, retrying in ${delay}ms...`,
         );

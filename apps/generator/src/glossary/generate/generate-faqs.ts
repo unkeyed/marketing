@@ -15,36 +15,37 @@ export async function generateFaqsStep({
   term: string;
   onCacheHit?: CacheStrategy;
 }) {
-  return withRetry(async () => {
-    const existing = await db.query.entries.findFirst({
-      where: eq(entries.inputTerm, term),
-      with: {
-        searchQuery: {
-          with: {
-            searchResponse: {
-              with: {
-                serperPeopleAlsoAsk: true,
+  return withRetry(
+    async () => {
+      const existing = await db.query.entries.findFirst({
+        where: eq(entries.inputTerm, term),
+        with: {
+          searchQuery: {
+            with: {
+              searchResponse: {
+                with: {
+                  serperPeopleAlsoAsk: true,
+                },
               },
             },
           },
         },
-      },
-      orderBy: (entries, { asc }) => [asc(entries.createdAt)],
-    });
+        orderBy: (entries, { asc }) => [asc(entries.createdAt)],
+      });
 
-    if (existing?.faq && existing.faq.length > 0 && onCacheHit === "stale") {
-      return existing;
-    }
+      if (existing?.faq && existing.faq.length > 0 && onCacheHit === "stale") {
+        return existing;
+      }
 
-    if (!existing?.searchQuery?.searchResponse?.serperPeopleAlsoAsk) {
-      throw new Error(`No 'People Also Ask' data found for term: ${term}`);
-    }
+      if (!existing?.searchQuery?.searchResponse?.serperPeopleAlsoAsk) {
+        throw new Error(`No 'People Also Ask' data found for term: ${term}`);
+      }
 
-    const peopleAlsoAsk = existing.searchQuery.searchResponse.serperPeopleAlsoAsk;
+      const peopleAlsoAsk = existing.searchQuery.searchResponse.serperPeopleAlsoAsk;
 
-    const faqs = await generateObject({
-      model: openai("gpt-4o-mini"),
-      system: `You are an API documentation expert. Your task is to provide clear, accurate, and comprehensive answers to frequently asked questions about API-related concepts.
+      const faqs = await generateObject({
+        model: openai("gpt-4o-mini"),
+        system: `You are an API documentation expert. Your task is to provide clear, accurate, and comprehensive answers to frequently asked questions about API-related concepts.
 
       Guidelines for answers:
       1. Be technically accurate and precise
@@ -54,7 +55,7 @@ export async function generateFaqsStep({
       5. Keep answers focused and relevant to API development
       6. Maintain a professional, technical tone
       7. Ensure answers are complete but not overly verbose`,
-      prompt: `
+        prompt: `
         Term: "${term}"
 
         Generate comprehensive answers for these questions from "People Also Ask":
@@ -70,20 +71,22 @@ export async function generateFaqsStep({
 
         Provide clear, accurate answers that improve upon the existing snippets while maintaining technical accuracy.
       `,
-      schema: z.object({ faq: faqSchema }),
-      temperature: 0.2,
-    });
+        schema: z.object({ faq: faqSchema }),
+        temperature: 0.2,
+      });
 
-    await db
-      .update(entries)
-      .set({
-        faq: faqs.object.faq,
-      })
-      .where(eq(entries.inputTerm, term));
+      await db
+        .update(entries)
+        .set({
+          faq: faqs.object.faq,
+        })
+        .where(eq(entries.inputTerm, term));
 
-    return db.query.entries.findFirst({
-      where: eq(entries.inputTerm, term),
-      orderBy: (entries, { asc }) => [asc(entries.createdAt)],
-    });
-  }, { maxAttempts: 3, label: "generateFaqs" });
+      return db.query.entries.findFirst({
+        where: eq(entries.inputTerm, term),
+        orderBy: (entries, { asc }) => [asc(entries.createdAt)],
+      });
+    },
+    { maxAttempts: 3, label: "generateFaqs" },
+  );
 }

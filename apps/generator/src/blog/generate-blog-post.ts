@@ -1,13 +1,13 @@
 import { db } from "@/lib/db-marketing/client";
-import { blogPosts } from "@/lib/db-marketing/schemas/blog-posts";
 import { entries } from "@/lib/db-marketing/schemas";
+import { blogPosts } from "@/lib/db-marketing/schemas/blog-posts";
 import type { AudienceLevel, CacheStrategy } from "@/lib/types";
 import { eq } from "drizzle-orm";
 import { keywordResearchStep } from "../glossary/research/keyword-research";
 import { technicalResearchStep } from "../glossary/research/technical-research";
-import { generateBlogOutlineStep } from "./generate/generate-blog-outline";
-import { draftBlogSectionsStep } from "./generate/draft-blog-sections";
 import { blogSeoMetaTagsStep } from "./generate/blog-seo-meta-tags";
+import { draftBlogSectionsStep } from "./generate/draft-blog-sections";
+import { generateBlogOutlineStep } from "./generate/generate-blog-outline";
 import { commitBlogToBranchStep } from "./publish/create-blog-pr";
 
 /**
@@ -31,7 +31,9 @@ export async function generateBlogPost({
   audienceLevel: AudienceLevel;
   onCacheHit?: CacheStrategy;
 }) {
-  console.info(`-- Starting blog post generation for terms: [${keyTerms.join(", ")}] (audience: ${audienceLevel}) --`);
+  console.info(
+    `-- Starting blog post generation for terms: [${keyTerms.join(", ")}] (audience: ${audienceLevel}) --`,
+  );
 
   // Create blog post record
   const [inserted] = await db

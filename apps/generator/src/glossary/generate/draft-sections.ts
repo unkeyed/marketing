@@ -18,87 +18,90 @@ export async function draftSectionsStep({
   term,
   onCacheHit = "stale" as CacheStrategy,
 }: { term: string; onCacheHit?: CacheStrategy }) {
-  return withRetry(async () => {
-    const existing = await db.query.entries.findFirst({
-      where: eq(entries.inputTerm, term),
-      columns: {
-        id: true,
-        inputTerm: true,
-        dynamicSectionsContent: true,
-      },
-      orderBy: (entries, { desc }) => [desc(entries.createdAt)],
-    });
+  return withRetry(
+    async () => {
+      const existing = await db.query.entries.findFirst({
+        where: eq(entries.inputTerm, term),
+        columns: {
+          id: true,
+          inputTerm: true,
+          dynamicSectionsContent: true,
+        },
+        orderBy: (entries, { desc }) => [desc(entries.createdAt)],
+      });
 
-    if (existing?.dynamicSectionsContent && onCacheHit === "stale") {
-      return existing;
-    }
+      if (existing?.dynamicSectionsContent && onCacheHit === "stale") {
+        return existing;
+      }
 
-    const entry = await db.query.entries.findFirst({
-      where: eq(entries.inputTerm, term),
-      with: {
-        dynamicSections: {
-          with: {
-            contentTypes: true,
-            sectionsToKeywords: {
-              with: {
-                keyword: true,
+      const entry = await db.query.entries.findFirst({
+        where: eq(entries.inputTerm, term),
+        with: {
+          dynamicSections: {
+            with: {
+              contentTypes: true,
+              sectionsToKeywords: {
+                with: {
+                  keyword: true,
+                },
               },
             },
           },
         },
-      },
-      orderBy: (entries, { desc }) => [desc(entries.createdAt)],
-    });
+        orderBy: (entries, { desc }) => [desc(entries.createdAt)],
+      });
 
-    if (!entry) {
-      throw new Error(`Entry not found for term: ${term}`);
-    }
+      if (!entry) {
+        throw new Error(`Entry not found for term: ${term}`);
+      }
 
-    const entryWithMarkdownEnsured = {
-      ...entry,
-      dynamicSections: entry.dynamicSections.slice(0, 6),
-    };
+      const entryWithMarkdownEnsured = {
+        ...entry,
+        dynamicSections: entry.dynamicSections.slice(0, 6),
+      };
 
-    const draftedContent = await draftSections({ term, entry: entryWithMarkdownEnsured });
-    console.info(
-      `[DRAFT_SECTIONS] Step 1/3: Drafted content for term="${entry.inputTerm}" length=${draftedContent.length}`,
-    );
+      const draftedContent = await draftSections({ term, entry: entryWithMarkdownEnsured });
+      console.info(
+        `[DRAFT_SECTIONS] Step 1/3: Drafted content for term="${entry.inputTerm}" length=${draftedContent.length}`,
+      );
 
-    const reviewedContent = await reviewContent({ term, content: draftedContent });
-    console.info(
-      `[DRAFT_SECTIONS] Step 2/3: Reviewed content for term="${entry.inputTerm}" length=${reviewedContent.length}`,
-    );
+      const reviewedContent = await reviewContent({ term, content: draftedContent });
+      console.info(
+        `[DRAFT_SECTIONS] Step 2/3: Reviewed content for term="${entry.inputTerm}" length=${reviewedContent.length}`,
+      );
 
-    const optimizedContent = await seoOptimizeContent({
-      term: entry.inputTerm,
-      content: reviewedContent,
-      keywords: entry.dynamicSections.flatMap((ds) =>
-        ds.sectionsToKeywords.map((stk) => stk.keyword.keyword),
-      ),
-    });
-    console.info(
-      `[DRAFT_SECTIONS] Step 3/3: SEO optimized content for term="${entry.inputTerm}" length=${optimizedContent.length}`,
-    );
+      const optimizedContent = await seoOptimizeContent({
+        term: entry.inputTerm,
+        content: reviewedContent,
+        keywords: entry.dynamicSections.flatMap((ds) =>
+          ds.sectionsToKeywords.map((stk) => stk.keyword.keyword),
+        ),
+      });
+      console.info(
+        `[DRAFT_SECTIONS] Step 3/3: SEO optimized content for term="${entry.inputTerm}" length=${optimizedContent.length}`,
+      );
 
-    const finalContent = optimizedContent.replace(/^#\s+[^\n]+\n/, "");
+      const finalContent = optimizedContent.replace(/^#\s+[^\n]+\n/, "");
 
-    await db
-      .update(entries)
-      .set({
-        dynamicSectionsContent: finalContent,
-      })
-      .where(eq(entries.inputTerm, entry.inputTerm));
+      await db
+        .update(entries)
+        .set({
+          dynamicSectionsContent: finalContent,
+        })
+        .where(eq(entries.inputTerm, entry.inputTerm));
 
-    return await db.query.entries.findFirst({
-      columns: {
-        id: true,
-        inputTerm: true,
-        dynamicSectionsContent: true,
-      },
-      where: eq(entries.id, entry.id),
-      orderBy: (entries, { asc }) => [asc(entries.createdAt)],
-    });
-  }, { maxAttempts: 5, label: "draftSections" });
+      return await db.query.entries.findFirst({
+        columns: {
+          id: true,
+          inputTerm: true,
+          dynamicSectionsContent: true,
+        },
+        where: eq(entries.id, entry.id),
+        orderBy: (entries, { asc }) => [asc(entries.createdAt)],
+      });
+    },
+    { maxAttempts: 5, label: "draftSections" },
+  );
 }
 
 async function draftSections({
