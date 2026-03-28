@@ -295,14 +295,23 @@ export async function generateOutlineStep({
   );
 }
 
-const initialOutlineSchema = z.object({
-  outline: z.array(
-    insertSectionSchema.omit({ entryId: true }).extend({
-      citedSources: z.string().url(),
-      contentTypes: z.array(insertSectionContentTypeSchema.omit({ sectionId: true })),
-    }),
-  ),
-});
+const initialOutlineSchema = z
+  .object({
+    outline: z.array(
+      insertSectionSchema.omit({ entryId: true }).extend({
+        order: z.number().optional(),
+        citedSources: z.string().url(),
+        contentTypes: z.array(insertSectionContentTypeSchema.omit({ sectionId: true })),
+      }),
+    ),
+  })
+  .transform((data) => ({
+    ...data,
+    outline: data.outline.map((section, i) => ({
+      ...section,
+      order: section.order ?? i + 1,
+    })),
+  }));
 
 async function generateInitialOutline({
   term,
