@@ -12,8 +12,8 @@ RUN pnpm install --frozen-lockfile || pnpm install
 COPY . .
 
 ENV NODE_ENV=production
-ENV PORT=3069
+ENV PORT=8080
 
-EXPOSE 3069
+EXPOSE 8080
 
-CMD ["pnpm", "start"]
+ENTRYPOINT ["pnpm", "start"]

@@ -3,10 +3,10 @@
   "version": "2.0.0",
   "private": true,
   "description": "Glossary article generator server",
-  "main": "dist/server.js",
+  "main": "src/server.ts",
   "scripts": {
     "dev": "dotenv -e .env -- tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "echo 'No build step required — tsx runs TypeScript directly'",
     "start": "tsx src/server.ts",
     "db:push": "dotenv -e .env drizzle-kit push",
     "db:studio": "dotenv -e .env drizzle-kit studio --verbose",
