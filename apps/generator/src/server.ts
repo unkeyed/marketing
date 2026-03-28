@@ -123,9 +123,13 @@ app.post("/api/blog/generate", async (c) => {
 
 const port = Number(process.env.PORT) || 3069;
 
-console.info(`Generator server starting on port ${port}`);
-
-serve({
-  fetch: app.fetch,
-  port,
-});
+serve(
+  {
+    fetch: app.fetch,
+    port,
+    hostname: "0.0.0.0",
+  },
+  (info) => {
+    console.info(`Generator server listening on http://0.0.0.0:${info.port}`);
+  },
+);
