@@ -8,7 +8,7 @@ import { eq } from "drizzle-orm";
 import GithubSlugger from "github-slugger";
 import yaml from "js-yaml";
 
-export async function createBlogPrStep({
+export async function commitBlogToBranchStep({
   blogPostId,
   onCacheHit = "stale",
 }: {
@@ -28,8 +28,8 @@ export async function createBlogPrStep({
     }
 
     if (post.githubPrUrl && onCacheHit === "stale") {
-      console.info(`[blog-pr] Cache hit for blog post ${blogPostId}: ${post.githubPrUrl}`);
-      return { blogPost: post };
+      console.info(`[blog-commit] Cache hit for blog post ${blogPostId}: ${post.githubPrUrl}`);
+      return { blogPost: post, branch: post.githubPrUrl };
     }
 
     if (!post.content) {
@@ -39,7 +39,6 @@ export async function createBlogPrStep({
     const slugger = new GithubSlugger();
     const slug = post.slug || slugger.slug(post.keyTerms.join("-"));
 
-    // Update slug if it wasn't set
     if (!post.slug) {
       await db.update(blogPosts).set({ slug }).where(eq(blogPosts.id, blogPostId));
     }
@@ -67,30 +66,24 @@ export async function createBlogPrStep({
     const branchPrefix = `blog/add_${slug}`;
     const filePath = `apps/www/content/blog/${slug}.mdx`;
     const commitMessage = `feat(blog): Add or update ${slug}.mdx`;
-    const prTitle = `Add or update blog post: ${post.title || slug}`;
-    const prBody = `This PR adds or updates the blog post covering: ${post.keyTerms.join(", ")}.`;
     const octokit = new Octokit({ auth: process.env.GITHUB_PERSONAL_ACCESS_TOKEN });
 
-    // Check if file exists in main
+    // Check if file is identical in main
     const mainFileResult = await tryCatch(
       octokit.repos.getContent({ owner, repo, path: filePath, ref: baseBranch }),
     );
-    let fileExistsInMain = false;
-    let fileIsIdenticalInMain = false;
     if (mainFileResult.data && !mainFileResult.error) {
       const mainFile = mainFileResult.data.data;
       if (mainFile && typeof mainFile === "object" && "content" in mainFile) {
-        fileExistsInMain = true;
         const mainFileContent = (mainFile.content as string).replace(/\n/g, "");
-        fileIsIdenticalInMain = mainFileContent === contentBase64;
+        if (mainFileContent === contentBase64) {
+          console.info(`[blog-commit] File identical in main, nothing to do`);
+          return { blogPost: post, branch: baseBranch };
+        }
       }
     }
-    if (fileExistsInMain && fileIsIdenticalInMain) {
-      console.info(`[blog-pr] File identical in main, skipping PR`);
-      return { blogPost: post };
-    }
 
-    // Check for existing branches
+    // Check for existing branch
     const branchListResult = await tryCatch(octokit.repos.listBranches({ owner, repo }));
     const allBranches = branchListResult.data?.data || [];
     const relevantBranches = allBranches
@@ -99,6 +92,7 @@ export async function createBlogPrStep({
 
     if (relevantBranches.length > 0) {
       const branch = relevantBranches[0];
+
       const fileResult = await tryCatch(
         octokit.repos.getContent({ owner, repo, path: filePath, ref: branch }),
       );
@@ -110,8 +104,7 @@ export async function createBlogPrStep({
         }
       }
 
-      // Update file in existing branch
-      await tryCatch(
+      const updateResult = await tryCatch(
         octokit.repos.createOrUpdateFileContents({
           owner,
           repo,
@@ -122,28 +115,16 @@ export async function createBlogPrStep({
           sha: branchFileSha,
         }),
       );
-
-      // Check for existing PR
-      const prsResult = await tryCatch(
-        octokit.rest.pulls.list({ owner, repo, head: `${owner}:${branch}`, base: baseBranch, state: "open" }),
-      );
-      const prs = prsResult.data?.data || [];
-      if (prs.length > 0) {
-        await db.update(blogPosts).set({ githubPrUrl: prs[0].html_url }).where(eq(blogPosts.id, blogPostId));
-        return { blogPost: { ...post, githubPrUrl: prs[0].html_url } };
+      if (!updateResult.data) {
+        throw new Error(`Failed to update file in branch ${branch}`);
       }
 
-      // Create PR on existing branch
-      const prResult = await tryCatch(
-        octokit.pulls.create({ owner, repo, title: prTitle, body: prBody, head: branch, base: baseBranch }),
-      );
-      if (prResult.data) {
-        await db.update(blogPosts).set({ githubPrUrl: prResult.data.data.html_url }).where(eq(blogPosts.id, blogPostId));
-        return { blogPost: { ...post, githubPrUrl: prResult.data.data.html_url } };
-      }
+      await db.update(blogPosts).set({ githubPrUrl: branch }).where(eq(blogPosts.id, blogPostId));
+      console.info(`[blog-commit] Updated file in existing branch: ${branch}`);
+      return { blogPost: { ...post, githubPrUrl: branch }, branch };
     }
 
-    // Create new branch and PR
+    // Create new branch and commit
     const newBranchName = `${branchPrefix}_${Date.now()}`;
     const refResult = await tryCatch(
       octokit.git.getRef({ owner, repo, ref: `heads/${baseBranch}` }),
@@ -152,7 +133,7 @@ export async function createBlogPrStep({
       throw new Error(`Failed to get ref for ${baseBranch}`);
     }
 
-    await tryCatch(
+    const createBranchResult = await tryCatch(
       octokit.git.createRef({
         owner,
         repo,
@@ -160,6 +141,9 @@ export async function createBlogPrStep({
         sha: refResult.data.data.object.sha,
       }),
     );
+    if (!createBranchResult.data) {
+      throw new Error(`Failed to create branch ${newBranchName}`);
+    }
 
     const createFileResult = await tryCatch(
       octokit.repos.createOrUpdateFileContents({
@@ -175,17 +159,8 @@ export async function createBlogPrStep({
       throw new Error(`Failed to create file ${filePath}`);
     }
 
-    const createPrResult = await tryCatch(
-      octokit.pulls.create({ owner, repo, title: prTitle, body: prBody, head: newBranchName, base: baseBranch }),
-    );
-    if (!createPrResult.data) {
-      throw new Error(`Failed to create PR from ${newBranchName}`);
-    }
-
-    const prUrl = createPrResult.data.data.html_url;
-    await db.update(blogPosts).set({ githubPrUrl: prUrl }).where(eq(blogPosts.id, blogPostId));
-    console.info(`[blog-pr] Created PR: ${prUrl}`);
-
-    return { blogPost: { ...post, githubPrUrl: prUrl } };
-  }, { maxAttempts: 3, label: "createBlogPr" });
+    await db.update(blogPosts).set({ githubPrUrl: newBranchName }).where(eq(blogPosts.id, blogPostId));
+    console.info(`[blog-commit] Created branch and committed: ${newBranchName}`);
+    return { blogPost: { ...post, githubPrUrl: newBranchName }, branch: newBranchName };
+  }, { maxAttempts: 3, label: "commitBlogToBranch" });
 }

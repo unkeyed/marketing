@@ -8,7 +8,7 @@ import { technicalResearchStep } from "../glossary/research/technical-research";
 import { generateBlogOutlineStep } from "./generate/generate-blog-outline";
 import { draftBlogSectionsStep } from "./generate/draft-blog-sections";
 import { blogSeoMetaTagsStep } from "./generate/blog-seo-meta-tags";
-import { createBlogPrStep } from "./publish/create-blog-pr";
+import { commitBlogToBranchStep } from "./publish/create-blog-pr";
 
 /**
  * Generates a blog post from a set of key terms.
@@ -93,21 +93,17 @@ export async function generateBlogPost({
   });
   console.info("[blog] SEO meta tags generated");
 
-  // Step 5: Create PR
-  console.info("[blog] Step 5 - Creating PR...");
-  const pr = await createBlogPrStep({
+  // Step 5: Commit to branch
+  console.info("[blog] Step 5 - Committing to branch...");
+  const commit = await commitBlogToBranchStep({
     blogPostId,
     onCacheHit,
   });
-  console.info(`[blog] PR created: ${pr.blogPost.githubPrUrl}`);
-
-  const result = await db.query.blogPosts.findFirst({
-    where: eq(blogPosts.id, blogPostId),
-  });
+  console.info(`[blog] Committed to branch: ${commit.branch}`);
 
   return {
     keyTerms,
     audienceLevel,
-    blogPost: result,
+    branch: commit.branch,
   };
 }

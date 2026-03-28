@@ -6,7 +6,7 @@ import { draftSectionsStep } from "./generate/draft-sections";
 import { generateFaqsStep } from "./generate/generate-faqs";
 import { generateOutlineStep } from "./generate/generate-outline";
 import { seoMetaTagsStep } from "./generate/seo-meta-tags";
-import { createPrStep } from "./publish/create-pr";
+import { commitToBranchStep } from "./publish/create-pr";
 import { keywordResearchStep } from "./research/keyword-research";
 import { technicalResearchStep } from "./research/technical-research";
 
@@ -107,24 +107,19 @@ export async function generateGlossaryEntry({
   await generateFaqsStep({ term, onCacheHit });
   console.info("FAQs generated");
 
-  // Step 7: Create PR
-  console.info("Step 7 - Creating PR...");
-  const pr = await createPrStep({ input: term, onCacheHit });
+  // Step 7: Commit to branch
+  console.info("Step 7 - Committing to branch...");
+  const result = await commitToBranchStep({ input: term, onCacheHit });
 
-  if (!pr.entry?.id) {
-    throw new Error(`PR creation failed for term: ${term}`);
+  if (!result.entry?.id) {
+    throw new Error(`Branch commit failed for term: ${term}`);
   }
-  console.info(`PR created: ${pr.entry?.githubPrUrl}`);
-
-  const generated = await db.query.entries.findFirst({
-    where: eq(entries.id, pr.entry.id),
-    orderBy: (entries, { desc }) => [desc(entries.createdAt)],
-  });
+  console.info(`Committed to branch: ${result.entry.branch}`);
 
   return {
     term,
+    branch: result.entry.branch,
     keywordCount: keywordResearch.keywords.length,
     sectionCount: outline?.dynamicSections?.length,
-    entry: generated,
   };
 }
