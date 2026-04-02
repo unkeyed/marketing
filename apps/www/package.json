@@ -61,7 +61,7 @@
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.0",
-    "zod": "^3.23.5"
+    "zod": "~3.24.2"
   },
   "devDependencies": {
     "@content-collections/core": "^0.7.2",

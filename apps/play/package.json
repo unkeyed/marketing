@@ -39,7 +39,7 @@
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "xterm-for-react": "^1.0.4",
-    "zod": "^3.23.8"
+    "zod": "~3.24.2"
   },
   "devDependencies": {
     "@types/ms": "^0.7.34",
