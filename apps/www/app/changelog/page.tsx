@@ -1,17 +1,92 @@
 import { RainbowDarkButton } from "@/components/button";
 import { CTA } from "@/components/cta";
-
 import { ChangelogGridItem } from "@/components/changelog/changelog-grid-item";
+import { changelogMdxComponents } from "@/components/changelog/changelog-mdx-components";
 import { SideList } from "@/components/changelog/side-list";
 import { ChangelogLight } from "@/components/svg/changelog";
+import { MDX } from "@/components/mdx-content";
 import { allChangelogs } from "content-collections";
 import { formatDate } from "date-fns";
 import { ArrowRight } from "lucide-react";
+import { MDXRemote } from "next-mdx-remote/rsc";
+
+const GITHUB_REPO = "unkeyed/unkey";
+const CHANGELOG_PATH = "docs/product/changelog";
+
+function parseFrontmatter(source: string): {
+  title: string;
+  description?: string;
+  tags: string[];
+} {
+  const match = source.match(/^---\n([\s\S]*?)\n---/);
+  if (!match) return { title: "", tags: ["product"] };
+
+  const fm = match[1];
+
+  const get = (key: string) => {
+    const m = fm.match(new RegExp(`^${key}:\\s*(.+)$`, "m"));
+    return m ? m[1].replace(/^["']|["']$/g, "").trim() : undefined;
+  };
+
+  const tags = ["product"];
+
+  return { title: get("title") ?? "", description: get("description"), tags };
+}
+
+async function fetchProductChangelogs() {
+  try {
+    const headers: HeadersInit = { Accept: "application/vnd.github.v3+json" };
+    if (process.env.GITHUB_TOKEN) {
+      headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+    }
+
+    const res = await fetch(
+      `https://api.github.com/repos/${GITHUB_REPO}/contents/${CHANGELOG_PATH}`,
+      { headers, next: { revalidate: 86400 } },
+    );
+    if (!res.ok) return [];
+
+    const entries = (await res.json()) as Array<{
+      type: string;
+      name: string;
+      download_url: string;
+    }>;
+
+    const mdxFiles = entries.filter(
+      (f) => f.type === "file" && f.name.endsWith(".mdx"),
+    );
+
+    return Promise.all(
+      mdxFiles.map(async (file) => {
+        const raw = await fetch(file.download_url, {
+          next: { revalidate: 86400 },
+        });
+        const source = await raw.text();
+        const date = file.name.slice(0, -4); // YYYY-MM-DD from filename
+        const { title, description, tags } = parseFrontmatter(source);
+        return { slug: date, date, title, description, tags, source };
+      }),
+    );
+  } catch {
+    return [];
+  }
+}
 
 export default async function Changelogs() {
-  const changelogs = allChangelogs.sort((a, b) => {
-    return new Date(b.date).getTime() - new Date(a.date).getTime();
-  });
+  const productEntries = await fetchProductChangelogs();
+
+  const collectionEntries = allChangelogs.map((e) => ({
+    ...e,
+    _kind: "collection" as const,
+  }));
+  const githubEntries = productEntries.map((e) => ({
+    ...e,
+    _kind: "github" as const,
+  }));
+
+  const changelogs = [...collectionEntries, ...githubEntries].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+  );
 
   return (
     <>
@@ -25,12 +100,17 @@ export default async function Changelogs() {
           <div className="flex flex-row text-center">
             <div className="mx-auto flex-flex-col ">
               <a href="https://x.com/unkeydev" target="_blank" rel="noreferrer">
-                <RainbowDarkButton label="Follow us on X" IconRight={ArrowRight} />
+                <RainbowDarkButton
+                  label="Follow us on X"
+                  IconRight={ArrowRight}
+                />
               </a>
-              <h2 className="blog-heading-gradient text-6xl font-medium mt-12">Changelog</h2>
+              <h2 className="blog-heading-gradient text-6xl font-medium mt-12">
+                Changelog
+              </h2>
               <p className="mt-6 font-normal leading-7 text-balance">
-                We are constantly improving our product, fixing bugs and introducing features.{" "}
-                <br className="hidden lg:inline" />
+                We are constantly improving our product, fixing bugs and
+                introducing features. <br className="hidden lg:inline" />
                 Here you can find the latest updates and changes to Unkey.
               </p>
             </div>
@@ -48,8 +128,18 @@ export default async function Changelogs() {
               </div>
             </div>
             <div className="flex flex-col w-full sm:overflow-hidden">
-              {changelogs?.map((changelog) => (
-                <ChangelogGridItem key={changelog.title} changelog={changelog} />
+              {changelogs.map((entry) => (
+                <ChangelogGridItem key={entry.slug} changelog={entry}>
+                  {entry._kind === "collection" ? (
+                    <MDX code={entry.mdx} />
+                  ) : (
+                    <MDXRemote
+                      source={entry.source}
+                      options={{ parseFrontmatter: true }}
+                      components={changelogMdxComponents}
+                    />
+                  )}
+                </ChangelogGridItem>
               ))}
             </div>
           </div>

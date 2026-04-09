@@ -1,17 +1,27 @@
-import { MDX } from "@/components/mdx-content";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import type { Changelog } from "content-collections";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { Frame } from "../../components/frame";
 import { ImageWithBlur } from "../image-with-blur";
 import { XShareButton } from "../x-share-button";
+
+type ChangelogMeta = {
+  slug: string;
+  title: string;
+  description?: string | null;
+  date: string;
+  tags?: string[];
+  image?: string | null;
+};
+
 type Props = {
-  changelog: Changelog;
+  changelog: ChangelogMeta;
+  children: ReactNode;
   className?: string;
 };
 
-export async function ChangelogGridItem({ className, changelog }: Props) {
+export function ChangelogGridItem({ className, changelog, children }: Props) {
   const baseUrl = process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
     : "http://localhost:3000";
@@ -59,7 +69,7 @@ export async function ChangelogGridItem({ className, changelog }: Props) {
           "prose-sm md:prose-md prose-strong:text-white/90 prose-code:text-white/80 prose-code:bg-white/10 prose-code:px-2 prose-code:py-1 prose-code:border-white/20 prose-code:rounded-md prose-pre:p-0 prose-pre:m-0 prose-pre:leading-6",
         )}
       >
-        <MDX code={changelog.mdx} />
+        {children}
         <XShareButton
           className="my-2"
           url={`https://x.com/intent/post?text=${changelog.title}%0a%0a${baseUrl}/changelog#${changelog.slug}`}

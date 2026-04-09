@@ -39,7 +39,8 @@ import { type Framework, type Language, templates } from "./data";
 
 export function TemplatesClient() {
   const form = useForm<TemplatesFormValues>({
-    resolver: zodResolver(schema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(schema) as any,
     defaultValues: getDefaulTemplatesFormValues(),
     reValidateMode: "onChange",
   });

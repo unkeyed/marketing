@@ -12,6 +12,7 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  transpilePackages: ["@mintlify/components"],
   pageExtensions: ["tsx", "mdx", "ts", "js"],
   reactStrictMode: true,
   cacheComponents: true,
