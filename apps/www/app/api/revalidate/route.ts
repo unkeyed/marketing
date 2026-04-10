@@ -1,4 +1,4 @@
-import { revalidatePath } from "next/cache";
+import { updateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  revalidatePath("/changelog");
+  updateTag("changelogs");
 
   return NextResponse.json({ revalidated: true });
 }
