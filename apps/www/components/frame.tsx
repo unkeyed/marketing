@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import type { ReactNode } from "react";
 
 export function Frame({
   as: Component = "div",
@@ -9,7 +10,7 @@ export function Frame({
   as?: any;
   size: "sm" | "md" | "lg";
   className?: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <Component className={cn("relative", className)}>
