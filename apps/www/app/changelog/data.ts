@@ -1,3 +1,4 @@
+import { cacheLife, cacheTag } from "next/cache";
 import { allChangelogs } from "content-collections";
 
 const GITHUB_REPO = "unkeyed/unkey";
@@ -34,7 +35,7 @@ async function fetchProductChangelogs() {
 
     const res = await fetch(
       `https://api.github.com/repos/${GITHUB_REPO}/contents/${CHANGELOG_PATH}`,
-      { headers, next: { revalidate: 86400 } },
+      { headers },
     );
     if (!res.ok) {
       return [];
@@ -51,9 +52,7 @@ async function fetchProductChangelogs() {
     const results = await Promise.all(
       mdxFiles.map(async (file) => {
         try {
-          const raw = await fetch(file.download_url, {
-            next: { revalidate: 86400 },
-          });
+          const raw = await fetch(file.download_url);
           if (!raw.ok) {
             console.error(`Failed to fetch changelog file ${file.name}: ${raw.status}`);
             return null;
@@ -77,6 +76,10 @@ async function fetchProductChangelogs() {
 }
 
 export async function getAllChangelogs() {
+  "use cache";
+  cacheLife("days");
+  cacheTag("changelogs");
+
   const productEntries = await fetchProductChangelogs();
 
   const collectionEntries = allChangelogs.map((e) => ({

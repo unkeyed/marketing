@@ -1,14 +1,20 @@
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   const token = request.headers.get("authorization")?.replace("Bearer ", "");
 
-  if (token !== process.env.REVALIDATION_TOKEN) {
+  if (!process.env.REVALIDATION_TOKEN || token !== process.env.REVALIDATION_TOKEN) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  revalidatePath("/changelog");
-
-  return NextResponse.json({ revalidated: true });
+  try {
+    revalidateTag("changelogs", "days");
+    return NextResponse.json({ revalidated: true });
+  } catch (err) {
+    return NextResponse.json(
+      { error: "Revalidation failed", details: String(err) },
+      { status: 500 },
+    );
+  }
 }
