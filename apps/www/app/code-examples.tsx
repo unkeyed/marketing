@@ -60,159 +60,179 @@ const editorTheme = {
   ],
 } satisfies PrismTheme;
 
-const typescriptCodeBlock = `import { Unkey } from "@unkey/api";
-  const unkey = new Unkey({
-    rootKey: process.env["UNKEY_ROOT_KEY"] ?? "",
-  });
-  const result = await unkey.keys.verifyKey({
-      key: "sk_1234abcdef"
+const tsVerifyKeyBlock = `import { Unkey } from "@unkey/api";
 
+const unkey = new Unkey({
+  rootKey: process.env.UNKEY_ROOT_KEY,
+});
 
-if ( error ) {
-  // handle network error
-}
+const result = await unkey.keys.verifyKey({
+  key: "sk_1234abcdef",
+});
 
-if ( !result.valid ) {
+if (!result.data.valid) {
   // reject unauthorized request
 }
 
 // handle request`;
 
-const nextJsCodeBlock = `import { withUnkey } from '@unkey/nextjs';
-export const POST = withUnkey(async (req) => {
-  // Process the request here
-  // You have access to the typed verification response using \`req.unkey\`
-  console.log(req.unkey);
-  return new Response('Your API key is valid!');
-});`;
+const tsCreateKeyBlock = `import { Unkey } from "@unkey/api";
 
-const nuxtCodeBlock = `export default defineEventHandler(async (event) => {
-  if (!event.context.unkey.valid) {
-    throw createError({ statusCode: 403, message: "Invalid API key" })
-  }
+const unkey = new Unkey({
+  rootKey: process.env.UNKEY_ROOT_KEY,
+});
 
-  // return authorised information
-  return {
-    // ...
-  };
-});`;
+const result = await unkey.keys.createKey({
+  apiId: "api_1234abcd",
+  name: "Production API Key",
+});
 
-const pythonCreateKeyBlock = `from unkey.py import Unkey, models
+// result.data.key - the created API key
+// result.data.keyId - the key's unique identifier`;
 
+const tsRatelimitBlock = `import { Unkey } from "@unkey/api";
 
-with Unkey(
-    root_key="<UNKEY_ROOT_KEY>",
-) as unkey:
+const unkey = new Unkey({
+  rootKey: process.env.UNKEY_ROOT_KEY,
+});
 
-    res = unkey.keys.create_key(api_id="api_1234abcd")
+const result = await unkey.ratelimit.limit({
+  namespace: "my-app",
+  identifier: "user_123",
+  limit: 10,
+  duration: 30000,
+});
 
-    # Handle response
-    print(res)`;
+if (!result.data.success) {
+  return new Response("try again later", { status: 429 });
+}
+
+// handle the request`;
 
 const pythonVerifyKeyBlock = `from unkey.py import Unkey
 
+with Unkey(root_key="<UNKEY_ROOT_KEY>") as unkey:
+    result = unkey.keys.verify_key(key="sk_1234abcdef")
 
-with Unkey(
-    root_key="<UNKEY_ROOT_KEY>",
-) as unkey:
+    if not result.data.valid:
+        # reject unauthorized request
+        pass
 
-    res = unkey.keys.verify_key(key="sk_1234abcdef")
+    # handle request`;
 
-    # Handle response
-    print(res)
-`;
+const pythonCreateKeyBlock = `from unkey.py import Unkey
 
-const honoCodeBlock = `import { Hono } from "hono"
-import { UnkeyContext, unkey } from "@unkey/hono";
+with Unkey(root_key="<UNKEY_ROOT_KEY>") as unkey:
+    result = unkey.keys.create_key(
+        api_id="api_1234abcd",
+        name="Production API Key",
+    )
 
-const app = new Hono<{ Variables: { unkey: UnkeyContext } }>();
-app.use("*", unkey());
+    # result.data.key - the created API key
+    # result.data.key_id - the key's unique identifier`;
 
-app.get("/somewhere", (c) => {
-  // access the unkey response here to get metadata of the key etc
-  const unkey = c.get("unkey")
- return c.text("yo")
-})`;
+const pythonRatelimitBlock = `from unkey.py import Unkey
 
-const tsRatelimitCodeBlock = `import { Ratelimit } from "@unkey/ratelimit"
+with Unkey(root_key="<UNKEY_ROOT_KEY>") as unkey:
+    result = unkey.ratelimit.limit(
+        namespace="my-app",
+        identifier="user_123",
+        limit=10,
+        duration=30000,
+    )
 
-const unkey = new Ratelimit({
-  rootKey: process.env.UNKEY_ROOT_KEY,
-  namespace: "my-app",
-  limit: 10,
-  duration: "30s",
-  async: true
-})
+    if not result.data.success:
+        # rate limit exceeded
+        pass
 
-// elsewhere
-async function handler(request) {
-  const identifier = request.getUserId() // or ip or anything else you want
+    # handle the request`;
 
-  const ratelimit = await unkey.limit(identifier)
-  if (!ratelimit.success){
-    return new Response("try again later", { status: 429 })
-  }
+const goVerifyKeyBlock = `package main
 
-  // handle the request here
+import (
+  "context"
+  "log"
+  "os"
 
-}`;
-
-const goVerifyKeyCodeBlock = `package main
-
-  import(
-	"context"
-	"os"
-	unkey "github.com/unkeyed/sdks/api/go/v2"
-	"github.com/unkeyed/sdks/api/go/v2/models/components"
-	"log"
-  )
-
-  func main() {
-      ctx := context.Background()
-
-      s := unkey.New(
-          unkey.WithSecurity(os.Getenv("UNKEY_ROOT_KEY")),
-      )
-
-      res, err := s.Keys.VerifyKey(ctx, components.V2KeysVerifyKeyRequestBody{
-          Key: "sk_1234abcdef",
-      })
-      if err != nil {
-          log.Fatal(err)
-      }
-      if res.V2KeysVerifyKeyResponseBody != nil {
-          // handle response
-      }
-  }`;
-
-const goCreateKeyCodeBlock = `package main
-
-import(
-	"context"
-	"os"
-	unkey "github.com/unkeyed/sdks/api/go/v2"
-	"github.com/unkeyed/sdks/api/go/v2/models/components"
-	"log"
+  unkey "github.com/unkeyed/sdks/api/go/v2"
+  "github.com/unkeyed/sdks/api/go/v2/models/components"
 )
 
 func main() {
-    ctx := context.Background()
+  ctx := context.Background()
+  s := unkey.New(
+    unkey.WithSecurity(os.Getenv("UNKEY_ROOT_KEY")),
+  )
 
-    s := unkey.New(
-        unkey.WithSecurity(os.Getenv("UNKEY_ROOT_KEY")),
-    )
+  res, err := s.Keys.VerifyKey(ctx, components.V2KeysVerifyKeyRequestBody{
+    Key: "sk_1234abcdef",
+  })
+  if err != nil {
+    log.Fatal(err)
+  }
+  if res.V2KeysVerifyKeyResponseBody != nil {
+    // handle response
+  }
+}`;
 
-    res, err := s.Keys.CreateKey(ctx, components.V2KeysCreateKeyRequestBody{
-        APIID: "api_1234abcd",
-    })
-    if err != nil {
-        log.Fatal(err)
-    }
-    if res.V2KeysCreateKeyResponseBody != nil {
-        // handle response
-    }
-}
-`;
+const goCreateKeyBlock = `package main
+
+import (
+  "context"
+  "log"
+  "os"
+
+  unkey "github.com/unkeyed/sdks/api/go/v2"
+  "github.com/unkeyed/sdks/api/go/v2/models/components"
+)
+
+func main() {
+  ctx := context.Background()
+  s := unkey.New(
+    unkey.WithSecurity(os.Getenv("UNKEY_ROOT_KEY")),
+  )
+
+  res, err := s.Keys.CreateKey(ctx, components.V2KeysCreateKeyRequestBody{
+    APIID: "api_1234abcd",
+  })
+  if err != nil {
+    log.Fatal(err)
+  }
+  if res.V2KeysCreateKeyResponseBody != nil {
+    // handle response
+  }
+}`;
+
+const goRatelimitBlock = `package main
+
+import (
+  "context"
+  "log"
+  "os"
+
+  unkey "github.com/unkeyed/sdks/api/go/v2"
+  "github.com/unkeyed/sdks/api/go/v2/models/components"
+)
+
+func main() {
+  ctx := context.Background()
+  s := unkey.New(
+    unkey.WithSecurity(os.Getenv("UNKEY_ROOT_KEY")),
+  )
+
+  res, err := s.Ratelimit.Limit(ctx, components.V2RatelimitLimitRequestBody{
+    Namespace:  "my-app",
+    Identifier: "user_123",
+    Limit:      10,
+    Duration:   30000,
+  })
+  if err != nil {
+    log.Fatal(err)
+  }
+  if res.V2RatelimitLimitResponseBody != nil {
+    // handle response
+  }
+}`;
 
 const curlVerifyCodeBlock = `curl --request POST \\
   --url https://api.unkey.com/v2/keys.verifyKey \\
@@ -227,35 +247,20 @@ const curlCreateKeyCodeBlock = `curl --request POST \\
   --header 'Authorization: Bearer <UNKEY_ROOT_KEY>' \\
   --header 'Content-Type: application/json' \\
   --data '{
-    "apiId": "api_123",
-    "externalId": "user_1234abcd",
-    "expires": ${Date.now() + 7 * 24 * 60 * 60 * 1000},
-    "ratelimits": [
-        {
-          "name": "requests",
-          "limit": 100,
-          "duration": 60000,
-          "autoApply": true
-        },
-        {
-          "name": "heavy_operations",
-          "limit": 10,
-          "duration": 3600000,
-          "autoApply": false
-        }
-      ]
+    "apiId": "api_1234abcd",
+    "name": "Production API Key"
   }'`;
 
 const curlRatelimitCodeBlock = `curl --request POST \\
   --url https://api.unkey.com/v2/ratelimit.limit \\
-  --header 'Authorization: Bearer <token>' \\
+  --header 'Authorization: Bearer <UNKEY_ROOT_KEY>' \\
   --header 'Content-Type: application/json' \\
   --data '{
-    "duration": 60000,
-    "identifier": "user_abc123",
-    "limit": 100,
-    "namespace": "api.requests"
-}'`;
+    "namespace": "my-app",
+    "identifier": "user_123",
+    "limit": 10,
+    "duration": 30000
+  }'`;
 
 type Framework = {
   name: string;
@@ -267,37 +272,31 @@ type Framework = {
 const languagesList = {
   Typescript: [
     {
-      name: "Typescript",
+      name: "Verify Key",
       Icon: TSIcon,
-      codeBlock: typescriptCodeBlock,
+      codeBlock: tsVerifyKeyBlock,
       editorLanguage: "tsx",
     },
     {
-      name: "Next.js",
+      name: "Create Key",
       Icon: TSIcon,
-      codeBlock: nextJsCodeBlock,
+      codeBlock: tsCreateKeyBlock,
       editorLanguage: "tsx",
     },
     {
-      name: "Nuxt",
-      codeBlock: nuxtCodeBlock,
+      name: "Ratelimit",
       Icon: TSIcon,
-      editorLanguage: "tsx",
-    },
-    {
-      name: "Hono",
-      Icon: TSIcon,
-      codeBlock: honoCodeBlock,
-      editorLanguage: "tsx",
-    },
-    {
-      name: "Ratelimiting",
-      Icon: TSIcon,
-      codeBlock: tsRatelimitCodeBlock,
+      codeBlock: tsRatelimitBlock,
       editorLanguage: "tsx",
     },
   ],
   Python: [
+    {
+      name: "Verify Key",
+      Icon: PythonIcon,
+      codeBlock: pythonVerifyKeyBlock,
+      editorLanguage: "python",
+    },
     {
       name: "Create Key",
       Icon: PythonIcon,
@@ -305,44 +304,50 @@ const languagesList = {
       editorLanguage: "python",
     },
     {
-      name: "Verify Key",
+      name: "Ratelimit",
       Icon: PythonIcon,
-      codeBlock: pythonVerifyKeyBlock,
+      codeBlock: pythonRatelimitBlock,
       editorLanguage: "python",
     },
   ],
   Golang: [
     {
-      name: "Verify key",
+      name: "Verify Key",
       Icon: GoIcon,
-      codeBlock: goVerifyKeyCodeBlock,
+      codeBlock: goVerifyKeyBlock,
       editorLanguage: "go",
     },
     {
-      name: "Create key",
+      name: "Create Key",
       Icon: GoIcon,
-      codeBlock: goCreateKeyCodeBlock,
+      codeBlock: goCreateKeyBlock,
+      editorLanguage: "go",
+    },
+    {
+      name: "Ratelimit",
+      Icon: GoIcon,
+      codeBlock: goRatelimitBlock,
       editorLanguage: "go",
     },
   ],
   Curl: [
     {
-      name: "Verify key",
+      name: "Verify Key",
       Icon: CurlIcon,
       codeBlock: curlVerifyCodeBlock,
-      editorLanguage: "tsx",
+      editorLanguage: "bash",
     },
     {
-      name: "Create key",
+      name: "Create Key",
       Icon: CurlIcon,
       codeBlock: curlCreateKeyCodeBlock,
-      editorLanguage: "tsx",
+      editorLanguage: "bash",
     },
     {
       name: "Ratelimit",
       Icon: CurlIcon,
       codeBlock: curlRatelimitCodeBlock,
-      editorLanguage: "tsx",
+      editorLanguage: "bash",
     },
   ],
 } as const satisfies {
@@ -386,7 +391,7 @@ LanguageTrigger.displayName = TabsPrimitive.Trigger.displayName;
 
 export const CodeExamples: React.FC<Props> = ({ className }) => {
   const [language, setLanguage] = useState<Language>("Typescript");
-  const [framework, setFramework] = useState<FrameworkName>("Typescript");
+  const [framework, setFramework] = useState<FrameworkName>("Verify Key");
   const [languageHover, setLanguageHover] = useState("Typescript");
   function getLanguage({
     language,
