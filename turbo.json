@@ -11,7 +11,7 @@
         "NEXT_PUBLIC_PLAYGROUND_API_ID",
         "PLAYGROUND_API_ID",
         "PLAYGROUND_ROOT_KEY",
-        "GITHUB_ACCESS_TOKEN",
+        "GITHUB_TOKEN",
         "REVALIDATION_TOKEN"
       ]
     },
