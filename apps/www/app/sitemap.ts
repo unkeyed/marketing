@@ -1,5 +1,6 @@
-import { allChangelogs, allGlossaries, allPolicies, allPosts } from "content-collections";
-import type { Changelog, Glossary, Policy, Post } from "content-collections";
+import { getAllChangelogs } from "@/app/changelog/data";
+import { allGlossaries, allPolicies, allPosts } from "content-collections";
+import type { Glossary, Policy, Post } from "content-collections";
 import type { MetadataRoute } from "next";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://www.unkey.com";
@@ -13,7 +14,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${baseUrl}/policies/${policy.slug}`,
   }));
 
-  const changelogs: MetadataRoute.Sitemap = allChangelogs.map((changelog: Changelog) => ({
+  const allChangelogEntries = await getAllChangelogs();
+  const changelogs: MetadataRoute.Sitemap = allChangelogEntries.map((changelog) => ({
     url: `${baseUrl}/changelog#${changelog.slug}`,
     lastModified: changelog.date,
   }));
