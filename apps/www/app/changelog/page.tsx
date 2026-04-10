@@ -1,10 +1,10 @@
 import { RainbowDarkButton } from "@/components/button";
-import { CTA } from "@/components/cta";
 import { ChangelogGridItem } from "@/components/changelog/changelog-grid-item";
 import { changelogMdxComponents } from "@/components/changelog/changelog-mdx-components";
 import { SideList } from "@/components/changelog/side-list";
-import { ChangelogLight } from "@/components/svg/changelog";
+import { CTA } from "@/components/cta";
 import { MDX } from "@/components/mdx-content";
+import { ChangelogLight } from "@/components/svg/changelog";
 import { allChangelogs } from "content-collections";
 import { formatDate } from "date-fns";
 import { ArrowRight } from "lucide-react";
@@ -19,7 +19,9 @@ function parseFrontmatter(source: string): {
   tags: string[];
 } {
   const match = source.match(/^---\n([\s\S]*?)\n---/);
-  if (!match) return { title: "", tags: ["product"] };
+  if (!match) {
+    return { title: "", tags: ["product"] };
+  }
 
   const fm = match[1];
 
@@ -44,7 +46,9 @@ async function fetchProductChangelogs() {
       `https://api.github.com/repos/${GITHUB_REPO}/contents/${CHANGELOG_PATH}`,
       { headers, next: { revalidate: 86400 } },
     );
-    if (!res.ok) return [];
+    if (!res.ok) {
+      return [];
+    }
 
     const entries = (await res.json()) as Array<{
       type: string;
@@ -52,16 +56,14 @@ async function fetchProductChangelogs() {
       download_url: string;
     }>;
 
-    const mdxFiles = entries.filter(
-      (f) => f.type === "file" && f.name.endsWith(".mdx"),
-    );
+    const mdxFiles = entries.filter((f) => f.type === "file" && f.name.endsWith(".mdx"));
 
     return Promise.all(
       mdxFiles.map(async (file) => {
         const raw = await fetch(file.download_url, {
           next: { revalidate: 86400 },
         });
-        const source = await raw.text();
+        const source = (await raw.text()).replace(/^noindex:\s*.+$/m, "");
         const date = file.name.slice(0, -4); // YYYY-MM-DD from filename
         const { title, description, tags } = parseFrontmatter(source);
         return { slug: date, date, title, description, tags, source };
@@ -100,17 +102,12 @@ export default async function Changelogs() {
           <div className="flex flex-row text-center">
             <div className="mx-auto flex-flex-col ">
               <a href="https://x.com/unkeydev" target="_blank" rel="noreferrer">
-                <RainbowDarkButton
-                  label="Follow us on X"
-                  IconRight={ArrowRight}
-                />
+                <RainbowDarkButton label="Follow us on X" IconRight={ArrowRight} />
               </a>
-              <h2 className="blog-heading-gradient text-6xl font-medium mt-12">
-                Changelog
-              </h2>
+              <h2 className="blog-heading-gradient text-6xl font-medium mt-12">Changelog</h2>
               <p className="mt-6 font-normal leading-7 text-balance">
-                We are constantly improving our product, fixing bugs and
-                introducing features. <br className="hidden lg:inline" />
+                We are constantly improving our product, fixing bugs and introducing features.{" "}
+                <br className="hidden lg:inline" />
                 Here you can find the latest updates and changes to Unkey.
               </p>
             </div>

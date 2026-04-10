@@ -3,91 +3,63 @@
 @tailwind utilities;
 
 .bg-yt-button-gradient {
-  background: linear-gradient(
-    243deg,
-    rgba(255, 255, 255, 0.6) 0%,
-    rgba(255, 255, 255, 0) 100%
-  );
+  background: linear-gradient(243deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 100%);
   backdrop-filter: blur(5px);
 }
 
 .section-title-heading-gradient {
-  background: linear-gradient(
-    86deg,
-    #fff 27.24%,
-    rgba(255, 255, 255, 0.4) 66.97%
-  );
+  background: linear-gradient(86deg, #fff 27.24%, rgba(255, 255, 255, 0.4) 66.97%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .usage-bento-bg-gradient {
-  background: linear-gradient(
-    180deg,
-    rgba(17, 17, 17, 0.7) 0%,
-    rgba(0, 0, 0, 0.5) 100%
-  );
+  background: linear-gradient(180deg, rgba(17, 17, 17, 0.7) 0%, rgba(0, 0, 0, 0.5) 100%);
   backdrop-filter: blur(150px);
 }
 
 .stats-border-gradient {
-  background:
-    linear-gradient(#010101, #010101) padding-box,
+  background: linear-gradient(#010101, #010101) padding-box,
     radial-gradient(
-        17.42% 100% at 71.66% 0%,
-        rgba(255, 255, 255, 0.15) 0%,
-        rgba(255, 255, 255, 0.01) 100%
-      )
-      border-box,
+      17.42% 100% at 71.66% 0%,
+      rgba(255, 255, 255, 0.15) 0%,
+      rgba(255, 255, 255, 0.01) 100%
+    )
+    border-box,
     radial-gradient(
-        595.89% 141.42% at 100% 0%,
-        rgba(255, 255, 255, 0.12) 0%,
-        rgba(255, 255, 255, 0.06) 50%,
-        rgba(255, 255, 255, 0) 100%
-      )
-      border-box;
+      595.89% 141.42% at 100% 0%,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.06) 50%,
+      rgba(255, 255, 255, 0) 100%
+    )
+    border-box;
   border-radius: 32px;
   border: 0.75px solid transparent;
 }
 
 .stats-number-gradient {
-  background: linear-gradient(
-    to right,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(255, 255, 255, 0.3) 80%
-  );
+  background: linear-gradient(to right, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.3) 80%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .editor-top-gradient {
-  background:
-    linear-gradient(
+  background: linear-gradient(
       180deg,
       rgba(255, 255, 255, 0.08) 0%,
       rgba(255, 255, 255, 0) 50%,
       rgba(255, 255, 255, 0) 100%
-    ),
-    #000;
+    ), #000;
 }
 
 .analytics-linear-gradient {
-  background: linear-gradient(
-    to bottom,
-    #11111199 0%,
-    #11111199 40%,
-    rgba(0, 0, 0, 50%) 100%
-  );
+  background: linear-gradient(to bottom, #11111199 0%, #11111199 40%, rgba(0, 0, 0, 50%) 100%);
 }
 
 .analytics-background-gradient::before {
-  background: radial-gradient(
-    520% 82.5% at 10.25% 85%,
-    black,
-    rgba(200, 200, 200, 0.08)
-  );
+  background: radial-gradient(520% 82.5% at 10.25% 85%, black, rgba(200, 200, 200, 0.08));
   content: "";
   border-bottom-left-radius: 24px;
   border-bottom-right-radius: 24px;
@@ -99,11 +71,7 @@
 }
 
 .analytics-dashboard-gradient::before {
-  background: radial-gradient(
-    300% 82.5% at 10.25% 100%,
-    black,
-    rgba(200, 200, 200, 0.08)
-  );
+  background: radial-gradient(300% 82.5% at 10.25% 100%, black, rgba(200, 200, 200, 0.08));
   content: "";
   border-bottom-right-radius: 24px;
   border-top-left-radius: 24px;
@@ -134,36 +102,21 @@
 }
 
 .blog-breadcrumb-gradient {
-  background: linear-gradient(
-    100deg,
-    #fff 0%,
-    #fff 54.36%,
-    rgba(255, 255, 255, 0.6) 108.72%
-  );
+  background: linear-gradient(100deg, #fff 0%, #fff 54.36%, rgba(255, 255, 255, 0.6) 108.72%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .blog-heading-gradient {
-  background: linear-gradient(
-    100.35deg,
-    #ffffff 0%,
-    #ffffff 37.45%,
-    rgba(255, 255, 255, 0.6) 74.9%
-  );
+  background: linear-gradient(100.35deg, #ffffff 0%, #ffffff 37.45%, rgba(255, 255, 255, 0.6) 74.9%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .usage-item-gradient {
-  background:
-    linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.08) 0%,
-      rgba(255, 255, 255, 0.01) 100%
-    ),
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.01) 100%),
     #000;
 }
 
@@ -202,9 +155,7 @@ li > p {
 }
 
 .audit-logs-bg-gradient {
-  background:
-    linear-gradient(180deg, rgba(17, 17, 17, 0.9) 0%, rgba(0, 0, 0, 0.5) 100%),
-    #000;
+  background: linear-gradient(180deg, rgba(17, 17, 17, 0.9) 0%, rgba(0, 0, 0, 0.5) 100%), #000;
 }
 
 .audit-logs-fade-gradient {
@@ -213,11 +164,7 @@ li > p {
 
 .audit-logs-fade-gradient::after {
   position: absolute;
-  background: radial-gradient(
-    300% 82.5% at 10.25% 100%,
-    black,
-    rgba(200, 200, 200, 0.08)
-  );
+  background: radial-gradient(300% 82.5% at 10.25% 100%, black, rgba(200, 200, 200, 0.08));
   display: block;
   content: "";
   height: 340px;
@@ -236,11 +183,7 @@ li > p {
 }
 
 .ip-blur-gradient::before {
-  background: radial-gradient(
-    300% 82.5% at 10.25% 100%,
-    black,
-    rgba(200, 200, 200, 0)
-  );
+  background: radial-gradient(300% 82.5% at 10.25% 100%, black, rgba(200, 200, 200, 0));
   content: "";
   border-top-right-radius: 24px;
   border-top-left-radius: 24px;
@@ -261,12 +204,7 @@ li > p {
 }
 
 .ratelimits-editor-bg-gradient-2 {
-  background:
-    linear-gradient(
-      0deg,
-      rgba(255, 255, 255, 0.05) 0%,
-      rgba(255, 255, 255, 0) 95.37%
-    ),
+  background: linear-gradient(0deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 95.37%),
     #000;
 }
 
@@ -276,11 +214,7 @@ li > p {
 
 .ratelimits-fade-gradient::after {
   position: absolute;
-  background: radial-gradient(
-    100% 92.5% at 10.25% 90%,
-    black,
-    rgba(200, 200, 200, 0.02)
-  );
+  background: radial-gradient(100% 92.5% at 10.25% 90%, black, rgba(200, 200, 200, 0.02));
   display: block;
   content: "";
   height: 100%;
@@ -299,9 +233,7 @@ li > p {
 }
 
 .ratelimits-key-icon {
-  fill:
-    linear-gradient(0deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.15) 100%),
-    #3ceeae;
+  fill: linear-gradient(0deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.15) 100%), #3ceeae;
   stroke-width: 0.75px;
   stroke: rgba(255, 255, 255, 0.1);
   filter: drop-shadow(0px 0px 30px #3ceeae);
@@ -327,14 +259,7 @@ li > p {
   width: 200%;
   /* Make the gradient twice as wide to allow for smooth scrolling */
   height: 100%;
-  background: linear-gradient(
-    to right,
-    #02fcf1,
-    #02defc,
-    #7002fc,
-    #0239fc,
-    #02fcf1
-  );
+  background: linear-gradient(to right, #02fcf1, #02defc, #7002fc, #0239fc, #02fcf1);
   /* Extend the gradient for smoothness */
   z-index: -1;
 }
@@ -395,11 +320,7 @@ li > p {
 
 @media only screen and (min-width: 960px) {
   .analytics-background-gradient::before {
-    background: radial-gradient(
-      520% 82.5% at 10.25% 85%,
-      black,
-      rgba(200, 200, 200, 0.08)
-    );
+    background: radial-gradient(520% 82.5% at 10.25% 85%, black, rgba(200, 200, 200, 0.08));
     content: "";
     border-bottom-left-radius: 24px;
     border-bottom-right-radius: 24px;
@@ -418,31 +339,18 @@ li > p {
 }
 
 .code-inline-gradient {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.06) 0%,
-      rgba(255, 255, 255, 0.08) 100%
-    ),
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.08) 100%),
     linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1));
   border: 0.75px solid;
   border-color: rgba(255, 255, 255, 0.08);
 }
 
 .blog-footer-radial-gradient {
-  background: radial-gradient(
-    at top center,
-    rgba(255, 255, 255, 0.04) 0%,
-    rgba(0, 0, 0, 0) 40%
-  );
+  background: radial-gradient(at top center, rgba(255, 255, 255, 0.04) 0%, rgba(0, 0, 0, 0) 40%);
 }
 
 .mobile-blog-footer-radial {
-  background: radial-gradient(
-    at top center,
-    rgba(255, 255, 255, 0.13) 0%,
-    rgba(0, 0, 0, 0) 70%
-  );
+  background: radial-gradient(at top center, rgba(255, 255, 255, 0.13) 0%, rgba(0, 0, 0, 0) 70%);
 }
 
 .changelog-gradient {
@@ -455,11 +363,7 @@ li > p {
   height: 100%;
   width: 100%;
   content: "";
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 1) 20%,
-    rgba(1, 1, 1, 0) 80%
-  );
+  background: linear-gradient(to top, rgba(0, 0, 0, 1) 20%, rgba(1, 1, 1, 0) 80%);
   pointer-events: none;
 }
 
@@ -467,11 +371,7 @@ li > p {
   height: 200px;
   /* Adjust based on your requirements */
   width: 100%;
-  background-image: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.1) 0.75px,
-    transparent 1px
-  );
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 0.75px, transparent 1px);
   background-size: 100% 30px;
   /* This controls the spacing of the lines */
 }

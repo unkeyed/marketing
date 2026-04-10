@@ -114,25 +114,17 @@ const glossary = defineCollection({
     description: z.string(),
     h1: z.string(),
     term: z.string(),
-    categories: z.array(
-      z.enum(categories.map((c) => c.slug) as [string, ...string[]])
-    ),
+    categories: z.array(z.enum(categories.map((c) => c.slug) as [string, ...string[]])),
     takeaways: z.object({
       tldr: z.string(),
-      definitionAndStructure: z.array(
-        z.object({ key: z.string(), value: z.string() })
-      ),
-      historicalContext: z.array(
-        z.object({ key: z.string(), value: z.string() })
-      ),
+      definitionAndStructure: z.array(z.object({ key: z.string(), value: z.string() })),
+      historicalContext: z.array(z.object({ key: z.string(), value: z.string() })),
       usageInAPIs: z.object({
         tags: z.array(z.string()),
         description: z.string(),
       }),
       bestPractices: z.array(z.string()),
-      recommendedReading: z.array(
-        z.object({ title: z.string(), url: z.string() })
-      ),
+      recommendedReading: z.array(z.object({ title: z.string(), url: z.string() })),
       didYouKnow: z.string(),
     }),
     faq: z.array(z.object({ question: z.string(), answer: z.string() })),

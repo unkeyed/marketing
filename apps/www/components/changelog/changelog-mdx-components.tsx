@@ -1,17 +1,9 @@
 import { Frame } from "@/components/frame";
-import { Mermaid } from "@/components/mermaid";
 import { MdxComponents } from "@/components/mdx-components";
-import { Check, Danger, Info, Note, Tip, Warning } from "./callouts";
-import {
-  Accordion,
-  Badge,
-  Card,
-  CodeGroup,
-  Columns,
-  Steps,
-  Tabs,
-} from "./mintlify-wrappers";
+import { Mermaid } from "@/components/mermaid";
 import type { AnchorHTMLAttributes, ReactNode } from "react";
+import { Check, Danger, Info, Note, Tip, Warning } from "./callouts";
+import { Accordion, Badge, Card, CodeGroup, Columns, Steps, Tabs } from "./mintlify-wrappers";
 
 function CardGroup({
   children,
@@ -26,20 +18,12 @@ function CardGroup({
     3: "grid-cols-3",
     4: "grid-cols-4",
   };
-  return (
-    <div className={`grid ${colMap[cols] ?? "grid-cols-2"} gap-4 my-6`}>
-      {children}
-    </div>
-  );
+  return <div className={`grid ${colMap[cols] ?? "grid-cols-2"} gap-4 my-6`}>{children}</div>;
 }
 
 // Rewrite relative links (e.g. /platform/instances/overview) to absolute docs URLs
-function ChangelogAnchor({
-  href,
-  ...props
-}: AnchorHTMLAttributes<HTMLAnchorElement>) {
-  const resolvedHref =
-    href && href.startsWith("/") ? `https://unkey.com/docs${href}` : href;
+function ChangelogAnchor({ href, ...props }: AnchorHTMLAttributes<HTMLAnchorElement>) {
+  const resolvedHref = href?.startsWith("/") ? `https://unkey.com/docs${href}` : href;
   return (
     <a
       {...props}

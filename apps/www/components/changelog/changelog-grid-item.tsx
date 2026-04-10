@@ -51,7 +51,9 @@ export function ChangelogGridItem({ className, changelog, children }: Props) {
             {changelog.title}
           </Link>
         </h3>
-        <p className="my-8 text-lg font-normal">{changelog.description}</p>
+        {changelog.description && (
+          <p className="my-8 text-lg font-normal">{changelog.description}</p>
+        )}
       </div>
       {changelog.image && (
         <Frame className="shadow-sm my-14 2xl:ml-24" size="md">

@@ -26,7 +26,7 @@ export const MdxComponents = {
     ),
   ImageZoom: (props: ImageProps) => <ImageZoom {...props} />,
   img: (props: DetailedHTMLProps<ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>) => (
-    <img src={props.src} alt={props.src} />
+    <img {...props} alt={props.alt ?? props.src} />
   ),
   Callout: Alert,
   th: (props: JSX.IntrinsicAttributes) => (
@@ -39,11 +39,7 @@ export const MdxComponents = {
     <td {...props} className="py-4 text-base font-normal text-left text-white/70" />
   ),
   a: (props: JSX.IntrinsicAttributes) => (
-    <a
-      {...props}
-      aria-label="Link"
-      className="text-left text-white underline hover:text-white/60"
-    />
+    <a {...props} className="text-left text-white underline hover:text-white/60" />
   ),
   blockquote: (props: BlogQuoteProps) => BlogQuote(props),
   BlogQuote: (props: BlogQuoteProps) => BlogQuote(props),
