@@ -58,18 +58,23 @@ async function fetchProductChangelogs() {
 
     const mdxFiles = entries.filter((f) => f.type === "file" && f.name.endsWith(".mdx"));
 
-    return Promise.all(
+    const results = await Promise.all(
       mdxFiles.map(async (file) => {
         const raw = await fetch(file.download_url, {
-          headers,
           next: { revalidate: 86400 },
         });
+        if (!raw.ok) {
+          console.error(`Failed to fetch changelog file ${file.name}: ${raw.status}`);
+          return null;
+        }
         const source = (await raw.text()).replace(/^noindex:\s*.+$/m, "");
         const date = file.name.slice(0, -4); // YYYY-MM-DD from filename
         const { title, description, tags } = parseFrontmatter(source);
         return { slug: date, date, title, description, tags, source };
       }),
     );
+
+    return results.filter((entry) => entry !== null);
   } catch (err) {
     console.error("Failed to fetch product changelogs:", err);
     return [];
