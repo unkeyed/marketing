@@ -61,6 +61,7 @@ async function fetchProductChangelogs() {
     return Promise.all(
       mdxFiles.map(async (file) => {
         const raw = await fetch(file.download_url, {
+          headers,
           next: { revalidate: 86400 },
         });
         const source = (await raw.text()).replace(/^noindex:\s*.+$/m, "");
