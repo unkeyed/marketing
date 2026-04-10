@@ -34,12 +34,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowRight, SearchX, VenetianMask } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { type Resolver, useForm } from "react-hook-form";
 import { type Framework, type Language, templates } from "./data";
 
 export function TemplatesClient() {
   const form = useForm<TemplatesFormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as Resolver<TemplatesFormValues>,
     defaultValues: getDefaulTemplatesFormValues(),
     reValidateMode: "onChange",
   });

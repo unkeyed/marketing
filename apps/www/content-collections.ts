@@ -2,9 +2,7 @@ import { defineCollection, defineConfig } from "@content-collections/core";
 import { compileMDX } from "@content-collections/mdx";
 import { remarkGfm, remarkHeading, remarkStructure } from "fumadocs-core/mdx-plugins";
 import GithubSlugger from "github-slugger";
-import { categoryEnum } from "./app/glossary/data";
-import { faqSchema } from "./lib/schemas/faq-schema";
-import { takeawaysSchema } from "./lib/schemas/takeaways-schema";
+import { categories } from "./app/glossary/data";
 
 const posts = defineCollection({
   name: "posts",
@@ -24,9 +22,9 @@ const posts = defineCollection({
     });
     const slugger = new GithubSlugger();
     const regXHeader = /\n(?<flag>#+)\s+(?<content>.+)/g;
-    const tableOfContents = Array.from(document.content.matchAll(regXHeader)).map(({ groups }) => {
-      const flag = groups?.flag;
-      const content = groups?.content;
+    const tableOfContents = Array.from(document.content.matchAll(regXHeader)).map((match) => {
+      const flag = match.groups?.flag;
+      const content = match.groups?.content;
       return {
         level: flag?.length,
         text: content,
@@ -51,7 +49,7 @@ const changelog = defineCollection({
     title: z.string(),
     description: z.string().optional(),
     date: z.string(),
-    tags: z.array(z.string()),
+    tags: z.array(z.string()).default(["product"]),
     image: z.string().optional(),
   }),
   transform: async (document, context) => {
@@ -116,9 +114,20 @@ const glossary = defineCollection({
     description: z.string(),
     h1: z.string(),
     term: z.string(),
-    categories: z.array(categoryEnum),
-    takeaways: takeawaysSchema,
-    faq: faqSchema,
+    categories: z.array(z.enum(categories.map((c) => c.slug) as [string, ...string[]])),
+    takeaways: z.object({
+      tldr: z.string(),
+      definitionAndStructure: z.array(z.object({ key: z.string(), value: z.string() })),
+      historicalContext: z.array(z.object({ key: z.string(), value: z.string() })),
+      usageInAPIs: z.object({
+        tags: z.array(z.string()),
+        description: z.string(),
+      }),
+      bestPractices: z.array(z.string()),
+      recommendedReading: z.array(z.object({ title: z.string(), url: z.string() })),
+      didYouKnow: z.string(),
+    }),
+    faq: z.array(z.object({ question: z.string(), answer: z.string() })),
     updatedAt: z.string(),
     slug: z.string(),
   }),
@@ -131,9 +140,9 @@ const glossary = defineCollection({
 
     const regXHeader = /(?:^|\n)(?<flag>#+)\s+(?<content>.+)/g;
     const tableOfContents = Array.from(document.content.matchAll(regXHeader))
-      .map(({ groups }) => {
-        const flag = groups?.flag;
-        const content = groups?.content;
+      .map((match) => {
+        const flag = match.groups?.flag;
+        const content = match.groups?.content;
         // Only include headers that are not the main title (h1)
         if (flag && flag.length > 1) {
           return {
@@ -144,7 +153,7 @@ const glossary = defineCollection({
         }
         return null;
       })
-      .filter(Boolean); // Remove null entries
+      .filter((item): item is NonNullable<typeof item> => item !== null);
     return {
       ...document,
       mdx,

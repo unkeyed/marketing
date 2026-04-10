@@ -1,17 +1,17 @@
 import { RainbowDarkButton } from "@/components/button";
-import { CTA } from "@/components/cta";
-
 import { ChangelogGridItem } from "@/components/changelog/changelog-grid-item";
+import { changelogMdxComponents } from "@/components/changelog/changelog-mdx-components";
 import { SideList } from "@/components/changelog/side-list";
+import { CTA } from "@/components/cta";
+import { MDX } from "@/components/mdx-content";
 import { ChangelogLight } from "@/components/svg/changelog";
-import { allChangelogs } from "content-collections";
 import { formatDate } from "date-fns";
 import { ArrowRight } from "lucide-react";
+import { MDXRemote } from "next-mdx-remote/rsc";
+import { getAllChangelogs } from "./data";
 
 export default async function Changelogs() {
-  const changelogs = allChangelogs.sort((a, b) => {
-    return new Date(b.date).getTime() - new Date(a.date).getTime();
-  });
+  const changelogs = await getAllChangelogs();
 
   return (
     <>
@@ -48,8 +48,18 @@ export default async function Changelogs() {
               </div>
             </div>
             <div className="flex flex-col w-full sm:overflow-hidden">
-              {changelogs?.map((changelog) => (
-                <ChangelogGridItem key={changelog.title} changelog={changelog} />
+              {changelogs.map((entry) => (
+                <ChangelogGridItem key={entry.slug} changelog={entry}>
+                  {entry._kind === "collection" ? (
+                    <MDX code={entry.mdx} />
+                  ) : (
+                    <MDXRemote
+                      source={entry.source}
+                      options={{ parseFrontmatter: true }}
+                      components={changelogMdxComponents}
+                    />
+                  )}
+                </ChangelogGridItem>
               ))}
             </div>
           </div>
