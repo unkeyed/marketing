@@ -8,11 +8,44 @@ import { ChangelogLight } from "@/components/svg/changelog";
 import { formatDate } from "date-fns";
 import { ArrowRight } from "lucide-react";
 import { MDXRemote } from "next-mdx-remote/rsc";
+import { Suspense } from "react";
 import { getAllChangelogs } from "./data";
 
-export default async function Changelogs() {
+async function ChangelogFeed() {
   const changelogs = await getAllChangelogs();
 
+  return (
+    <div className="flex flex-row mt-[5.5rem] gap-20 mb-20 w-full mx-auto">
+      <div className="relative hidden w-72 lg:block">
+        <div className="top-20 sticky">
+          <SideList
+            list={changelogs.map((c) => ({
+              href: `/changelog#${c.slug}`,
+              label: formatDate(c.date, "MMMM dd, yyyy"),
+            }))}
+          />
+        </div>
+      </div>
+      <div className="flex flex-col w-full sm:overflow-hidden">
+        {changelogs.map((entry) => (
+          <ChangelogGridItem key={entry.slug} changelog={entry}>
+            {entry._kind === "collection" ? (
+              <MDX code={entry.mdx} />
+            ) : (
+              <MDXRemote
+                source={entry.source}
+                options={{ parseFrontmatter: true }}
+                components={changelogMdxComponents}
+              />
+            )}
+          </ChangelogGridItem>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function Changelogs() {
   return (
     <>
       <div className="container mt-48 text-white/60">
@@ -36,33 +69,9 @@ export default async function Changelogs() {
             </div>
           </div>
 
-          <div className="flex flex-row mt-[5.5rem] gap-20 mb-20 w-full mx-auto">
-            <div className="relative hidden w-72 lg:block">
-              <div className="top-20 sticky">
-                <SideList
-                  list={changelogs.map((c) => ({
-                    href: `/changelog#${c.slug}`,
-                    label: formatDate(c.date, "MMMM dd, yyyy"),
-                  }))}
-                />
-              </div>
-            </div>
-            <div className="flex flex-col w-full sm:overflow-hidden">
-              {changelogs.map((entry) => (
-                <ChangelogGridItem key={entry.slug} changelog={entry}>
-                  {entry._kind === "collection" ? (
-                    <MDX code={entry.mdx} />
-                  ) : (
-                    <MDXRemote
-                      source={entry.source}
-                      options={{ parseFrontmatter: true }}
-                      components={changelogMdxComponents}
-                    />
-                  )}
-                </ChangelogGridItem>
-              ))}
-            </div>
-          </div>
+          <Suspense>
+            <ChangelogFeed />
+          </Suspense>
         </div>
       </div>
       <CTA />
