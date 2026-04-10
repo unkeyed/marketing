@@ -70,7 +70,8 @@ async function fetchProductChangelogs() {
         return { slug: date, date, title, description, tags, source };
       }),
     );
-  } catch {
+  } catch (err) {
+    console.error("Failed to fetch product changelogs:", err);
     return [];
   }
 }
