@@ -1,4 +1,4 @@
-import { updateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    updateTag("changelogs");
+    revalidateTag("changelogs", "days");
     return NextResponse.json({ revalidated: true });
   } catch (err) {
     return NextResponse.json(
