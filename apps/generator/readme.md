@@ -24,7 +24,7 @@ A server-based workflow for automatically generating marketing content, specific
 
 ___
 
-## 1. Running the Generator
+## 1. Running the Generator    
 
 ### API Endpoints
 
