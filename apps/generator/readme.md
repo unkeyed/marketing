@@ -9,7 +9,7 @@ A server-based workflow for automatically generating marketing content, specific
   - [Docker](#docker)
   - [Environment Variables](#environment-variables)
 - [2. Understanding the Workflow](#2-understanding-the-workflow)
-  - [Workflow Visualization](#workflow-visualization)
+  - [Workflow Visualization](#workflow-visualization)     
     - [Quick Overview](#quick-overview)
     - [Detailed Workflow](#detailed-workflow)     
     - [Architecture Layers](#architecture-layers)
