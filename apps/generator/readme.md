@@ -11,7 +11,7 @@ A server-based workflow for automatically generating marketing content, specific
 - [2. Understanding the Workflow](#2-understanding-the-workflow)
   - [Workflow Visualization](#workflow-visualization)
     - [Quick Overview](#quick-overview)
-    - [Detailed Workflow](#detailed-workflow)
+    - [Detailed Workflow](#detailed-workflow)     
     - [Architecture Layers](#architecture-layers)
   - [Workflow Steps](#workflow-steps)
 - [3. Database Schema](#3-database-schema)
