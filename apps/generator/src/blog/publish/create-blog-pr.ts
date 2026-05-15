@@ -18,7 +18,7 @@ export async function commitBlogToBranchStep({
   return withRetry(
     async () => {
       const owner = process.env.NODE_ENV === "production" ? "unkeyed" : "unkeyed";
-      const repo = "marketing";
+      const repo = "marketing-site";
 
       const post = await db.query.blogPosts.findFirst({
         where: eq(blogPosts.id, blogPostId),
@@ -65,7 +65,7 @@ export async function commitBlogToBranchStep({
       const contentBase64 = Buffer.from(mdxContent).toString("base64");
       const baseBranch = "main";
       const branchPrefix = `blog/add_${slug}`;
-      const filePath = `apps/www/content/blog/${slug}.mdx`;
+      const filePath = `src/content/blog/${slug}.mdx`;
       const commitMessage = `feat(blog): Add or update ${slug}.mdx`;
       const octokit = new Octokit({ auth: process.env.GITHUB_PERSONAL_ACCESS_TOKEN });
 

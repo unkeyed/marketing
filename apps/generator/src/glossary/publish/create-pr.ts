@@ -81,7 +81,7 @@ export async function commitToBranchStep({
       const contentBase64 = Buffer.from(mdxContent).toString("base64");
       const baseBranch = "main";
       const branchPrefix = `glossary/add_${slug}`;
-      const filePath = `apps/www/content/glossary/${slug}.mdx`;
+      const filePath = `src/content/glossary/${slug}.mdx`;
       const commitMessage = `feat(glossary): Add or update ${input}.mdx in glossary`;
       const octokit = new Octokit({ auth: process.env.GITHUB_PERSONAL_ACCESS_TOKEN });
 
