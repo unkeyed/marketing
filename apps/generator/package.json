@@ -42,5 +42,10 @@
     "@types/node": "^20.14.9",
     "drizzle-kit": "^0.30.0",
     "typescript": "^5.5.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "zod-to-json-schema": "3.24.5"
+    }
   }
 }
