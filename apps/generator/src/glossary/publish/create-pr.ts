@@ -18,7 +18,7 @@ export async function commitToBranchStep({
   return withRetry(
     async () => {
       const owner = process.env.NODE_ENV === "production" ? "unkeyed" : "unkeyed";
-      const repo = "marketing";
+      const repo = "marketing-site";
       console.info(`[commit][owner:${owner}][repo:${repo}][term:${input}] Start branch commit`);
 
       const existing = await db.query.entries.findFirst({
